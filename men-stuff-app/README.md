@@ -34,3 +34,36 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+cấu trúc thư mục hiện tại
+src/
+├── app/
+│ ├── [locale]/
+│ │ ├── (store)/ # Customer-facing UI
+│ │ │ ├── account/
+│ │ │ ├── cart/
+│ │ │ ├── checkout/
+│ │ │ ├── product/[slug]/
+│ │ │ └── products/
+│ │ ├── admin/ # Admin dashboard
+│ │ │ ├── dashboard/
+│ │ │ └── products/
+│ │ │ ├── [id]/
+│ │ │ └── new/
+│ │ ├── login/
+│ │ └── pages/ # Static pages
+│ │ ├── about/
+│ │ ├── contact/
+│ │ └── policies/delivery/
+│ └── api/admin/products/ # API routes
+│ └── [id]/
+├── components/
+│ ├── admin/ # Admin components
+│ └── LanguageSwitcher.tsx
+├── i18n/ # Translations
+│ ├── vi.json
+│ └── en.json
+└── lib/ # Utilities
+├── auth.ts
+├── i18n.ts
+└── mock-products.ts

@@ -1,0 +1,54 @@
+{
+  "common": {
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "account": "Account",
+    "login": "Login",
+    "logout": "Logout",
+    "search": "Search",
+    "language": "Language"
+  },
+  "home": {
+    "title": "Welcome to our store",
+    "subtitle": "Discover our product collection",
+    "shopNow": "Shop Now"
+  },
+  "products": {
+    "title": "Products",
+    "allProducts": "All Products",
+    "addToCart": "Add to Cart",
+    "price": "Price",
+    "description": "Description"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "products": "Manage Products",
+    "createProduct": "Create New Product",
+    "editProduct": "Edit Product",
+    "deleteProduct": "Delete Product",
+    "productName": "Product Name",
+    "productNameVi": "Product Name (Vietnamese)",
+    "productNameEn": "Product Name (English)",
+    "productSlug": "Slug",
+    "productPrice": "Price",
+    "productDescription": "Description",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "save": "Save",
+    "cancel": "Cancel",
+    "actions": "Actions",
+    "backToProducts": "Back to Products",
+    "viewStore": "View Store",
+    "totalProducts": "Total Products",
+    "totalOrders": "Total Orders",
+    "totalRevenue": "Total Revenue",
+    "pendingOrders": "Pending Orders",
+    "quickActions": "Quick Actions",
+    "noProducts": "No products found",
+    "createdAt": "Created At"
+  }
+}
+
