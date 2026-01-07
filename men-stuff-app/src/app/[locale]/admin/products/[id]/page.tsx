@@ -1,8 +1,8 @@
-import { useTranslations } from '@/lib/i18n';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { getProductById } from '@/lib/mock-products';
-import ProductForm from '@/components/admin/ProductForm';
+import { useTranslations } from "@/lib/i18n";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getProductById } from "@/lib/mock-products";
+import ProductForm from "@/app/[locale]/_components/admin/ProductForm";
 
 /**
  * Edit product page
@@ -13,7 +13,7 @@ export default async function EditProductPage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
-  const t = await useTranslations(locale as 'vi' | 'en');
+  const t = await useTranslations(locale as "vi" | "en");
   const product = getProductById(id);
 
   if (!product) {
@@ -23,12 +23,12 @@ export default async function EditProductPage({
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">{t('admin.editProduct')}</h1>
+        <h1 className="text-3xl font-bold">{t("admin.editProduct")}</h1>
         <Link
           href={`/${locale}/admin/products`}
           className="text-gray-600 hover:text-black"
         >
-          ← {t('admin.backToProducts')}
+          ← {t("admin.backToProducts")}
         </Link>
       </div>
 
@@ -37,19 +37,18 @@ export default async function EditProductPage({
           product={product}
           locale={locale}
           translations={{
-            productName: t('admin.productName'),
-            productNameVi: t('admin.productNameVi'),
-            productNameEn: t('admin.productNameEn'),
-            productPrice: t('admin.productPrice'),
-            productStatus: t('admin.status'),
-            active: t('admin.active'),
-            inactive: t('admin.inactive'),
-            save: t('admin.save'),
-            cancel: t('admin.cancel'),
+            productName: t("admin.productName"),
+            productNameVi: t("admin.productNameVi"),
+            productNameEn: t("admin.productNameEn"),
+            productPrice: t("admin.productPrice"),
+            productStatus: t("admin.status"),
+            active: t("admin.active"),
+            inactive: t("admin.inactive"),
+            save: t("admin.save"),
+            cancel: t("admin.cancel"),
           }}
         />
       </div>
     </div>
   );
 }
-

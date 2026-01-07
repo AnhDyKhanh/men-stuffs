@@ -1,29 +1,20 @@
-import { locales, defaultLocale } from "@/lib/i18n";
-import { notFound } from "next/navigation";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { ConfigProvider } from "antd";
+import viVN from "antd/locale/vi_VN";
+import enUS from "antd/locale/en_US";
 
-/**
- * Locale layout - validates locale and provides locale context
- */
-export default async function LocaleLayout({
+export default function LocaleLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }) {
-  const { locale } = await params;
+  const antdLocale = params.locale === "vi" ? viVN : enUS;
 
-  // Validate locale
-  if (!locales.includes(locale as any)) {
-    notFound();
-  }
-
-  return <>{children}</>;
-}
-
-/**
- * Generate static params for all locales
- */
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
+  return (
+    <AntdRegistry>
+      <ConfigProvider locale={antdLocale}>{children}</ConfigProvider>
+    </AntdRegistry>
+  );
 }
