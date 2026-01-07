@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
 import { cookies } from "next/headers";
 import { getUserRole } from "@/lib/auth";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import LanguageSwitcher from "@/app/[locale]/_components/LanguageSwitcher";
 
 /**
  * Store layout - customer-facing UI
