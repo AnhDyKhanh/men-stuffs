@@ -36,6 +36,8 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 cấu trúc thư mục hiện tại
+
+```bash
 src/
 ├── app/
 │ ├── [locale]/
@@ -67,3 +69,5 @@ src/
 ├── auth.ts
 ├── i18n.ts
 └── mock-products.ts
+
+```
