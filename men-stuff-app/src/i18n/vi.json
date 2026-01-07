@@ -1,0 +1,54 @@
+{
+  "common": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "cart": "Giỏ hàng",
+    "checkout": "Thanh toán",
+    "account": "Tài khoản",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "search": "Tìm kiếm",
+    "language": "Ngôn ngữ"
+  },
+  "home": {
+    "title": "Chào mừng đến với cửa hàng",
+    "subtitle": "Khám phá bộ sưu tập sản phẩm của chúng tôi",
+    "shopNow": "Mua ngay"
+  },
+  "products": {
+    "title": "Sản phẩm",
+    "allProducts": "Tất cả sản phẩm",
+    "addToCart": "Thêm vào giỏ",
+    "price": "Giá",
+    "description": "Mô tả"
+  },
+  "admin": {
+    "dashboard": "Bảng điều khiển",
+    "products": "Quản lý sản phẩm",
+    "createProduct": "Tạo sản phẩm mới",
+    "editProduct": "Chỉnh sửa sản phẩm",
+    "deleteProduct": "Xóa sản phẩm",
+    "productName": "Tên sản phẩm",
+    "productNameVi": "Tên sản phẩm (Tiếng Việt)",
+    "productNameEn": "Tên sản phẩm (Tiếng Anh)",
+    "productSlug": "Đường dẫn",
+    "productPrice": "Giá",
+    "productDescription": "Mô tả",
+    "status": "Trạng thái",
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "actions": "Thao tác",
+    "backToProducts": "Quay lại danh sách",
+    "viewStore": "Xem cửa hàng",
+    "totalProducts": "Tổng sản phẩm",
+    "totalOrders": "Tổng đơn hàng",
+    "totalRevenue": "Tổng doanh thu",
+    "pendingOrders": "Đơn hàng chờ xử lý",
+    "quickActions": "Thao tác nhanh",
+    "noProducts": "Không có sản phẩm nào",
+    "createdAt": "Ngày tạo"
+  }
+}
+
