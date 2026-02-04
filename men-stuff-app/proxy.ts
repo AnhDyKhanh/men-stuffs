@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { locales, defaultLocale, isValidLocale } from "@/lib/i18n";
+
+// Supported locales
+const locales = ["vi", "en"];
+const defaultLocale = "vi";
 
 // Role-based route protection
 const protectedRoutes = {
-  // Admin-only routes (must start with /admin or /dashboard)
-  admin: ["/admin", "/dashboard", "/products-management"],
+  // Admin-only routes (must start with /admin)
+  admin: ["/admin"],
   // User/Admin routes (guest cannot access)
   user: ["/checkout", "/account"],
 };
@@ -40,7 +43,7 @@ function isUserRoute(pathname: string): boolean {
  */
 function getLocaleFromPath(pathname: string): string | null {
   const segments = pathname.split("/").filter(Boolean);
-  if (segments.length > 0 && isValidLocale(segments[0])) {
+  if (segments.length > 0 && locales.includes(segments[0])) {
     return segments[0];
   }
   return null;
@@ -51,7 +54,7 @@ function getLocaleFromPath(pathname: string): string | null {
  */
 function removeLocaleFromPath(pathname: string): string {
   const segments = pathname.split("/").filter(Boolean);
-  if (segments.length > 0 && isValidLocale(segments[0])) {
+  if (segments.length > 0 && locales.includes(segments[0])) {
     return "/" + segments.slice(1).join("/");
   }
   return pathname;
@@ -76,7 +79,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Validate locale
-  if (!isValidLocale(locale)) {
+  if (!locales.includes(locale)) {
     // Invalid locale, redirect to default locale
     const newUrl = new URL(
       `/${defaultLocale}${pathWithoutLocale}`,
@@ -86,12 +89,8 @@ export function middleware(request: NextRequest) {
   }
 
   // Role-based route protection
-  // Check admin routes (must start with /admin, /dashboard, or /products-management)
-  if (
-    pathWithoutLocale.startsWith("/admin") ||
-    pathWithoutLocale.startsWith("/dashboard") ||
-    pathWithoutLocale.startsWith("/products-management")
-  ) {
+  // Check admin routes (must start with /admin)
+  if (pathWithoutLocale.startsWith("/admin")) {
     if (userRole !== "admin") {
       // Redirect to login if not admin
       const loginUrl = new URL(`/${locale}/login`, request.url);
