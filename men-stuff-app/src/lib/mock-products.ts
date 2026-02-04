@@ -16,7 +16,7 @@ export interface Product {
 }
 
 // In-memory product storage
-let mockProducts: Product[] = [
+const mockProducts: Product[] = [
   {
     id: '1',
     name_vi: 'Áo thun nam',

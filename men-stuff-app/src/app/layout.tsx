@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { locales } from "@/lib/i18n";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +17,10 @@ export const metadata: Metadata = {
   title: "Men Stuffs - E-commerce Store",
   description: "Modern e-commerce store for men's products",
 };
+
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
 
 export default function RootLayout({
   children,
