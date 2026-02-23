@@ -1,27 +1,27 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import type { HeroSlide } from "@/app/_constants/placeholderData";
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import type { HeroSlide } from '@/app/_constants/placeholderData'
 
-const AUTOPLAY_INTERVAL_MS = 7000;
+const AUTOPLAY_INTERVAL_MS = 7000
 
 interface HeroSlideshowProps {
-  slides: HeroSlide[];
+  slides: HeroSlide[]
 }
 
 export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(0)
 
   useEffect(() => {
-    if (slides.length <= 1) return;
+    if (slides.length <= 1) return
     const id = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length);
-    }, AUTOPLAY_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [slides.length]);
+      setCurrent((prev) => (prev + 1) % slides.length)
+    }, AUTOPLAY_INTERVAL_MS)
+    return () => clearInterval(id)
+  }, [slides.length])
 
-  if (slides.length === 0) return null;
+  if (slides.length === 0) return null
 
   return (
     <section
@@ -34,7 +34,7 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
             key={slide.id}
             href={slide.href}
             className={`absolute inset-0 block transition-opacity duration-500 ${
-              index === current ? "z-10 opacity-100" : "z-0 opacity-0"
+              index === current ? 'z-10 opacity-100' : 'z-0 opacity-0'
             }`}
             aria-hidden={index !== current}
           >
@@ -74,8 +74,8 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
                 aria-label={`Slide ${index + 1}`}
                 className={`h-2 rounded-full transition-all ${
                   index === current
-                    ? "w-8 bg-white"
-                    : "w-2 bg-white/60 hover:bg-white/80"
+                    ? 'w-8 bg-white'
+                    : 'w-2 bg-white/60 hover:bg-white/80'
                 }`}
                 onClick={() => setCurrent(index)}
               />
@@ -84,5 +84,5 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
         </ul>
       )}
     </section>
-  );
+  )
 }

@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
-import { cookies } from "next/headers";
-import { getUserRole } from "@/lib/auth";
-import LogoutButton from "@/app/[lang]/_components/admin/LogoutButton";
+import Link from 'next/link'
+import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import { cookies } from 'next/headers'
+import { getUserRole } from '@/lib/auth'
+import LogoutButton from '@/app/[lang]/_components/admin/LogoutButton'
 
 /**
  * Admin layout - internal dashboard UI
@@ -13,17 +13,17 @@ export default async function AdminLayout({
   children,
   params,
 }: {
-  children: React.ReactNode;
-  params: Promise<{ lang: string }>;
+  children: React.ReactNode
+  params: Promise<{ lang: string }>
 }) {
-  const { lang } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
-  const cookieStore = await cookies();
-  const userRole = getUserRole(cookieStore);
+  const { lang } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
+  const cookieStore = await cookies()
+  const userRole = getUserRole(cookieStore)
 
   // This should be protected by middleware, but double-check
-  if (userRole !== "admin") {
+  if (userRole !== 'admin') {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
         <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
@@ -37,7 +37,7 @@ export default async function AdminLayout({
           Login as Admin
         </Link>
       </div>
-    );
+    )
   }
 
   return (
@@ -98,5 +98,5 @@ export default async function AdminLayout({
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
-  );
+  )
 }

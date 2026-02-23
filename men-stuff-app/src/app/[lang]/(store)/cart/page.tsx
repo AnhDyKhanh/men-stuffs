@@ -1,23 +1,23 @@
-import { getDictionary, isValidLocale } from "@/lib/i18n";
-import Link from "next/link";
+import { getDictionary, isValidLocale } from '@/lib/i18n'
+import Link from 'next/link'
 
 type PageProps = {
   params: Promise<{
-    lang: string;
-  }>;
-};
+    lang: string
+  }>
+}
 
 /**
  * Shopping cart page
  */
 export default async function CartPage({ params }: PageProps) {
-  const { lang } = await params;
+  const { lang } = await params
 
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
 
   // Mock cart items - replace with real data
-  const cartItems: [] = [];
+  const cartItems: [] = []
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -54,5 +54,5 @@ export default async function CartPage({ params }: PageProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

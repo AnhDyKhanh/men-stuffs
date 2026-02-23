@@ -1,48 +1,52 @@
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import type { Product, ProductStatus } from '@/lib/mock-products';
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import type { Product, ProductStatus } from '@/lib/mock-products'
 
 interface ProductFormProps {
-  product?: Product;
-  lang: string;
+  product?: Product
+  lang: string
   translations: {
-    productName: string;
-    productNameVi: string;
-    productNameEn: string;
-    productPrice: string;
-    productStatus: string;
-    active: string;
-    inactive: string;
-    save: string;
-    cancel: string;
-  };
+    productName: string
+    productNameVi: string
+    productNameEn: string
+    productPrice: string
+    productStatus: string
+    active: string
+    inactive: string
+    save: string
+    cancel: string
+  }
 }
 
 /**
  * Product form component for create/edit
  */
-export default function ProductForm({ product, lang, translations }: ProductFormProps) {
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export default function ProductForm({
+  product,
+  lang,
+  translations,
+}: ProductFormProps) {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name_vi: product?.name_vi || '',
     name_en: product?.name_en || '',
     price: product?.price || 0,
     status: (product?.status || 'active') as ProductStatus,
     thumbnail: product?.thumbnail || '/placeholder-product.jpg',
-  });
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault()
+    setIsSubmitting(true)
 
     try {
       const url = product
         ? `/api/admin/products/${product.id}`
-        : '/api/admin/products';
-      const method = product ? 'PUT' : 'POST';
+        : '/api/admin/products'
+      const method = product ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
         method,
@@ -50,21 +54,21 @@ export default function ProductForm({ product, lang, translations }: ProductForm
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      });
+      })
 
       if (response.ok) {
-        router.refresh();
-        router.push(`/${lang}/products-management`);
+        router.refresh()
+        router.push(`/${lang}/products-management`)
       } else {
-        alert('Failed to save product');
+        alert('Failed to save product')
       }
     } catch (error) {
-      console.error('Failed to save product:', error);
-      alert('Failed to save product');
+      console.error('Failed to save product:', error)
+      alert('Failed to save product')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -75,7 +79,9 @@ export default function ProductForm({ product, lang, translations }: ProductForm
         <input
           type="text"
           value={formData.name_vi}
-          onChange={(e) => setFormData({ ...formData, name_vi: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, name_vi: e.target.value })
+          }
           className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
@@ -88,7 +94,9 @@ export default function ProductForm({ product, lang, translations }: ProductForm
         <input
           type="text"
           value={formData.name_en}
-          onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, name_en: e.target.value })
+          }
           className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
@@ -103,7 +111,9 @@ export default function ProductForm({ product, lang, translations }: ProductForm
           step="1000"
           min="0"
           value={formData.price}
-          onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+          onChange={(e) =>
+            setFormData({ ...formData, price: Number(e.target.value) })
+          }
           className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
@@ -116,7 +126,12 @@ export default function ProductForm({ product, lang, translations }: ProductForm
         </label>
         <select
           value={formData.status}
-          onChange={(e) => setFormData({ ...formData, status: e.target.value as ProductStatus })}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              status: e.target.value as ProductStatus,
+            })
+          }
           className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="active">{translations.active}</option>
@@ -141,6 +156,5 @@ export default function ProductForm({ product, lang, translations }: ProductForm
         </button>
       </div>
     </form>
-  );
+  )
 }
-

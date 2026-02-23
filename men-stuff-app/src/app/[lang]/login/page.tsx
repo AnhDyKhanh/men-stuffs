@@ -1,65 +1,65 @@
-'use client';
+'use client'
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { loginAsAdmin, setUserRole, MOCK_ADMIN } from "@/lib/auth";
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { loginAsAdmin, setUserRole, MOCK_ADMIN } from '@/lib/auth'
 
 /**
  * Login page - mock authentication
  * Supports admin login with credentials
  */
 export interface PageProps {
-  params: Promise<{ lang: string }>;
+  params: Promise<{ lang: string }>
 }
 
 export default function LoginPage({ params }: PageProps) {
-  const router = useRouter();
-  const [locale, setLocale] = useState<string>('vi');
-  
+  const router = useRouter()
+  const [locale, setLocale] = useState<string>('vi')
+
   // Resolve params in useEffect for client component
   useEffect(() => {
-    params.then(({ lang }) => setLocale(lang));
-  }, [params]);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+    params.then(({ lang }) => setLocale(lang))
+  }, [params])
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleAdminLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
 
     if (loginAsAdmin(email, password)) {
       const redirect = new URLSearchParams(window.location.search).get(
-        "redirect"
-      );
-      router.push(redirect || `/${locale}/dashboard`);
-      router.refresh();
+        'redirect',
+      )
+      router.push(redirect || `/${locale}/dashboard`)
+      router.refresh()
     } else {
-      setError("Invalid credentials. Use admin@menstuff.local / admin123");
-      setIsLoading(false);
+      setError('Invalid credentials. Use admin@menstuff.local / admin123')
+      setIsLoading(false)
     }
-  };
+  }
 
-  const handleQuickLogin = (role: "user" | "admin") => {
-    if (role === "admin") {
-      console.log("loginAsAdmin", MOCK_ADMIN.email, MOCK_ADMIN.password);
+  const handleQuickLogin = (role: 'user' | 'admin') => {
+    if (role === 'admin') {
+      console.log('loginAsAdmin', MOCK_ADMIN.email, MOCK_ADMIN.password)
       // Use mock admin credentials
       if (loginAsAdmin(MOCK_ADMIN.email, MOCK_ADMIN.password)) {
-        router.push(`/${locale}/dashboard`);
-        router.refresh();
+        router.push(`/${locale}/dashboard`)
+        router.refresh()
       }
     } else {
-      setUserRole("user");
+      setUserRole('user')
       const redirect = new URLSearchParams(window.location.search).get(
-        "redirect"
-      );
-      router.push(redirect || `/${locale}`);
-      router.refresh();
+        'redirect',
+      )
+      router.push(redirect || `/${locale}`)
+      router.refresh()
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -103,7 +103,7 @@ export default function LoginPage({ params }: PageProps) {
                 disabled={isLoading}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
               >
-                {isLoading ? "Logging in..." : "Login as Admin"}
+                {isLoading ? 'Logging in...' : 'Login as Admin'}
               </button>
             </form>
           </div>
@@ -114,13 +114,13 @@ export default function LoginPage({ params }: PageProps) {
             </p>
             <div className="space-y-2">
               <button
-                onClick={() => handleQuickLogin("admin")}
+                onClick={() => handleQuickLogin('admin')}
                 className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition text-sm"
               >
                 Quick Login as Admin
               </button>
               <button
-                onClick={() => handleQuickLogin("user")}
+                onClick={() => handleQuickLogin('user')}
                 className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition text-sm"
               >
                 Quick Login as User
@@ -139,5 +139,5 @@ export default function LoginPage({ params }: PageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

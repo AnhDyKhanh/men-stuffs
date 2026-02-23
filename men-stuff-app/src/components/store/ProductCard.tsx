@@ -1,39 +1,56 @@
-import Link from "next/link";
-import type { PlaceholderProduct } from "@/app/_constants/placeholderData";
+import Link from 'next/link'
+import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
 
 interface ProductCardProps {
-  product: PlaceholderProduct;
-  buyNowLabel?: string;
+  product: PlaceholderProduct
+  buyNowLabel?: string
 }
 
-const STAR_COUNT = 5;
+const STAR_COUNT = 5
 
-function StarRating({ rating = 0, reviewCount }: { rating?: number; reviewCount?: number }) {
-  if (reviewCount === undefined || reviewCount === 0) return null;
-  const value = Math.min(STAR_COUNT, Math.max(0, rating));
+function StarRating({
+  rating = 0,
+  reviewCount,
+}: {
+  rating?: number
+  reviewCount?: number
+}) {
+  if (reviewCount === undefined || reviewCount === 0) return null
+  const value = Math.min(STAR_COUNT, Math.max(0, rating))
   return (
-    <div className="flex items-center gap-1 mt-1" role="img" aria-label={`${value} out of ${STAR_COUNT} stars`}>
+    <div
+      className="flex items-center gap-1 mt-1"
+      role="img"
+      aria-label={`${value} out of ${STAR_COUNT} stars`}
+    >
       {Array.from({ length: STAR_COUNT }, (_, i) => (
         <span
           key={i}
-          className={`text-amber-500 ${i < value ? "opacity-100" : "opacity-30"}`}
+          className={`text-amber-500 ${i < value ? 'opacity-100' : 'opacity-30'}`}
           aria-hidden
         >
           ★
         </span>
       ))}
       <span className="text-xs text-neutral-500 ml-1" aria-hidden>
-        {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+        {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
       </span>
     </div>
-  );
+  )
 }
 
-export default function ProductCard({ product, buyNowLabel = "Buy now" }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  buyNowLabel = 'Buy now',
+}: ProductCardProps) {
   return (
     <article className="group">
       <div className="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">
-        <Link href={product.href} className="block aspect-square" aria-label={product.name}>
+        <Link
+          href={product.href}
+          className="block aspect-square"
+          aria-label={product.name}
+        >
           <img
             src={product.imageUrl}
             alt=""
@@ -70,5 +87,5 @@ export default function ProductCard({ product, buyNowLabel = "Buy now" }: Produc
         </Link>
       </div>
     </article>
-  );
+  )
 }

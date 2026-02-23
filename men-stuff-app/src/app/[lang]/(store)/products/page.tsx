@@ -1,42 +1,42 @@
-import Link from "next/link";
-import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
+import Link from 'next/link'
+import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
 
 type PageProps = {
-  params: Promise<{ lang: string }>;
-};
+  params: Promise<{ lang: string }>
+}
 
 /**
  * Products listing page  - CRUD interface
  */
 export default async function ProductsPage({ params }: PageProps) {
-  const { lang } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
+  const { lang } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
 
   // Mock products data - replace with real data fetching
   const products = [
     {
       id: 1,
-      name: "Product 1",
-      slug: "product-1",
+      name: 'Product 1',
+      slug: 'product-1',
       price: 99.99,
-      description: "Description 1",
+      description: 'Description 1',
     },
     {
       id: 2,
-      name: "Product 2",
-      slug: "product-2",
+      name: 'Product 2',
+      slug: 'product-2',
       price: 149.99,
-      description: "Description 2",
+      description: 'Description 2',
     },
     {
       id: 3,
-      name: "Product 3",
-      slug: "product-3",
+      name: 'Product 3',
+      slug: 'product-3',
       price: 199.99,
-      description: "Description 3",
+      description: 'Description 3',
     },
-  ];
+  ]
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -69,5 +69,5 @@ export default async function ProductsPage({ params }: PageProps) {
         ))}
       </div>
     </div>
-  );
+  )
 }

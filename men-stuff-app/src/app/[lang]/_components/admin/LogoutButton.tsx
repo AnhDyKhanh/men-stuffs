@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
-import { logout } from '@/lib/auth';
+import { useRouter } from 'next/navigation'
+import { logout } from '@/lib/auth'
 
 /**
  * Logout button component for admin
  */
 export default function LogoutButton({ lang }: { lang: string }) {
-  const router = useRouter();
+  const router = useRouter()
 
   const handleLogout = () => {
-    logout();
-    router.push(`/${lang}/login`);
-    router.refresh();
-  };
+    logout()
+    router.push(`/${lang}/login`)
+    router.refresh()
+  }
 
   return (
     <button
@@ -22,6 +22,5 @@ export default function LogoutButton({ lang }: { lang: string }) {
     >
       Logout
     </button>
-  );
+  )
 }
-

@@ -3,16 +3,16 @@
  * In-memory storage for frontend-only implementation
  */
 
-export type ProductStatus = 'active' | 'inactive';
+export type ProductStatus = 'active' | 'inactive'
 
 export interface Product {
-  id: string;
-  name_vi: string;
-  name_en: string;
-  price: number;
-  thumbnail: string;
-  status: ProductStatus;
-  createdAt: string;
+  id: string
+  name_vi: string
+  name_en: string
+  price: number
+  thumbnail: string
+  status: ProductStatus
+  createdAt: string
 }
 
 // In-memory product storage
@@ -44,66 +44,70 @@ const mockProducts: Product[] = [
     status: 'inactive',
     createdAt: new Date('2024-02-01').toISOString(),
   },
-];
+]
 
 /**
  * Get all products
  */
 export function getAllProducts(): Product[] {
-  return [...mockProducts];
+  return [...mockProducts]
 }
 
 /**
  * Get product by ID
  */
 export function getProductById(id: string): Product | undefined {
-  return mockProducts.find((p) => p.id === id);
+  return mockProducts.find((p) => p.id === id)
 }
 
 /**
  * Create a new product
  */
-export function createProduct(product: Omit<Product, 'id' | 'createdAt'>): Product {
+export function createProduct(
+  product: Omit<Product, 'id' | 'createdAt'>,
+): Product {
   const newProduct: Product = {
     ...product,
     id: Date.now().toString(),
     createdAt: new Date().toISOString(),
-  };
-  mockProducts.push(newProduct);
-  return newProduct;
+  }
+  mockProducts.push(newProduct)
+  return newProduct
 }
 
 /**
  * Update an existing product
  */
-export function updateProduct(id: string, updates: Partial<Omit<Product, 'id' | 'createdAt'>>): Product | null {
-  const index = mockProducts.findIndex((p) => p.id === id);
+export function updateProduct(
+  id: string,
+  updates: Partial<Omit<Product, 'id' | 'createdAt'>>,
+): Product | null {
+  const index = mockProducts.findIndex((p) => p.id === id)
   if (index === -1) {
-    return null;
+    return null
   }
   mockProducts[index] = {
     ...mockProducts[index],
     ...updates,
-  };
-  return mockProducts[index];
+  }
+  return mockProducts[index]
 }
 
 /**
  * Delete a product
  */
 export function deleteProduct(id: string): boolean {
-  const index = mockProducts.findIndex((p) => p.id === id);
+  const index = mockProducts.findIndex((p) => p.id === id)
   if (index === -1) {
-    return false;
+    return false
   }
-  mockProducts.splice(index, 1);
-  return true;
+  mockProducts.splice(index, 1)
+  return true
 }
 
 /**
  * Get product name based on locale
  */
 export function getProductName(product: Product, locale: 'vi' | 'en'): string {
-  return locale === 'vi' ? product.name_vi : product.name_en;
+  return locale === 'vi' ? product.name_vi : product.name_en
 }
-
