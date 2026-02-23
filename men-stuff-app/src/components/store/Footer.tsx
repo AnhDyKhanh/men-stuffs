@@ -1,10 +1,10 @@
-import Link from "next/link";
-import type { FooterColumn } from "@/app/_constants/placeholderData";
+import Link from 'next/link'
+import type { FooterColumn } from '@/app/_constants/placeholderData'
 
 interface FooterProps {
-  columns: FooterColumn[];
-  copyrightText: string;
-  bottomLinks?: { label: string; href: string }[];
+  columns: FooterColumn[]
+  copyrightText: string
+  bottomLinks?: { label: string; href: string }[]
 }
 
 export default function Footer({
@@ -38,7 +38,10 @@ export default function Footer({
         </div>
 
         <div className="mt-12 pt-8 border-t border-neutral-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <nav className="flex flex-wrap items-center justify-center gap-6" aria-label="Footer">
+          <nav
+            className="flex flex-wrap items-center justify-center gap-6"
+            aria-label="Footer"
+          >
             {bottomLinks.map((link) => (
               <Link
                 key={link.href}
@@ -53,5 +56,5 @@ export default function Footer({
         </div>
       </div>
     </footer>
-  );
+  )
 }

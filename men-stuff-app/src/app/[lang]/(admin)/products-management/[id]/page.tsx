@@ -1,27 +1,27 @@
-import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getProductById } from "@/lib/mock-products";
-import ProductForm from "@/app/[lang]/_components/admin/ProductForm";
+import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { getProductById } from '@/lib/mock-products'
+import ProductForm from '@/app/[lang]/_components/admin/ProductForm'
 
 type PageProps = {
   params: Promise<{
-    lang: string;
-    id: string;
-  }>;
-};
+    lang: string
+    id: string
+  }>
+}
 
 /**
  * Edit product page
  */
 export default async function EditProductPage({ params }: PageProps) {
-  const { lang, id } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
-  const product = getProductById(id);
+  const { lang, id } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
+  const product = getProductById(id)
 
   if (!product) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -54,5 +54,5 @@ export default async function EditProductPage({ params }: PageProps) {
         />
       </div>
     </div>
-  );
+  )
 }

@@ -1,18 +1,18 @@
-import Link from "next/link";
-import type { NavLink } from "@/app/_constants/placeholderData";
+import Link from 'next/link'
+import type { NavLink } from '@/app/_constants/placeholderData'
 
 interface HeaderProps {
-  lang: string;
-  logoLabel: string;
-  navLinks: NavLink[];
-  accountHref: string;
-  accountLabel: string;
-  cartHref: string;
-  cartLabel: string;
-  searchLabel: string;
-  languageSwitcher: React.ReactNode;
+  lang: string
+  logoLabel: string
+  navLinks: NavLink[]
+  accountHref: string
+  accountLabel: string
+  cartHref: string
+  cartLabel: string
+  searchLabel: string
+  languageSwitcher: React.ReactNode
   /** When set, shows an Admin link (e.g. for admin users) */
-  adminHref?: string;
+  adminHref?: string
 }
 
 export default function Header({
@@ -39,7 +39,10 @@ export default function Header({
             >
               <MenuIcon />
             </button>
-            <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
+            <nav
+              className="hidden md:flex items-center gap-8"
+              aria-label="Primary"
+            >
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -93,29 +96,49 @@ export default function Header({
         </div>
       </div>
     </header>
-  );
+  )
 }
 
 function MenuIcon() {
   return (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    <svg
+      className="w-6 h-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 6h16M4 12h16M4 18h16"
+      />
     </svg>
-  );
+  )
 }
 
 function SearchIcon() {
   return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <circle cx="11" cy="11" r="8" strokeWidth={2} />
       <path strokeWidth={2} strokeLinecap="round" d="m21 21-4.35-4.35" />
     </svg>
-  );
+  )
 }
 
 function CartIcon() {
   return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -123,5 +146,5 @@ function CartIcon() {
         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
       />
     </svg>
-  );
+  )
 }

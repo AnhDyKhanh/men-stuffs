@@ -6,8 +6,8 @@
  * Example: `ROUTES.STORE.HOME()` => `/${currentLang}`
  */
 
-import { defaultLocale, isValidLocale, type Locale } from "@/lib/i18n";
-import { headers } from "next/headers";
+import { defaultLocale, isValidLocale, type Locale } from '@/lib/i18n'
+import { headers } from 'next/headers'
 
 /**
  * Get current lang from headers (for Server Components)
@@ -15,15 +15,15 @@ import { headers } from "next/headers";
  */
 export async function getCurrentLang(): Promise<Locale> {
   try {
-    const headersList = await headers();
-    const lang = headersList.get("x-locale");
+    const headersList = await headers()
+    const lang = headersList.get('x-locale')
     if (lang && isValidLocale(lang)) {
-      return lang;
+      return lang
     }
   } catch (error) {
     // If headers() fails (e.g., in client component), return default
   }
-  return defaultLocale;
+  return defaultLocale
 }
 
 /**
@@ -33,25 +33,25 @@ export async function getCurrentLang(): Promise<Locale> {
  * Note: This hook must be used in a client component marked with 'use client'
  */
 export function useCurrentLang(): Locale {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     // Server-side: return default, should use getCurrentLang() instead
-    return defaultLocale;
+    return defaultLocale
   }
 
   // Client-side: extract from pathname
-  const pathname = window.location.pathname;
-  const segments = pathname.split("/").filter(Boolean);
+  const pathname = window.location.pathname
+  const segments = pathname.split('/').filter(Boolean)
   if (segments.length > 0 && isValidLocale(segments[0])) {
-    return segments[0] as Locale;
+    return segments[0] as Locale
   }
-  return defaultLocale;
+  return defaultLocale
 }
 
 /**
  * Generate a localized route path
  */
 function localizeRoute(lang: Locale, path: string): string {
-  return `/${lang}${path}`;
+  return `/${lang}${path}`
 }
 
 /**
@@ -64,8 +64,8 @@ export const STORE_ROUTES = {
    * @example await STORE_ROUTES.HOME() => "/vi" (or current lang)
    */
   HOME: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '')
   },
 
   /**
@@ -73,8 +73,8 @@ export const STORE_ROUTES = {
    * @example await STORE_ROUTES.PRODUCTS() => "/vi/products" (or current lang)
    */
   PRODUCTS: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/products");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/products')
   },
 
   /**
@@ -82,8 +82,8 @@ export const STORE_ROUTES = {
    * @example await STORE_ROUTES.PRODUCT("product-slug") => "/vi/product/product-slug"
    */
   PRODUCT: async (slug: string) => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, `/product/${slug}`);
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, `/product/${slug}`)
   },
 
   /**
@@ -91,8 +91,8 @@ export const STORE_ROUTES = {
    * @example await STORE_ROUTES.CART() => "/vi/cart" (or current lang)
    */
   CART: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/cart");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/cart')
   },
 
   /**
@@ -100,8 +100,8 @@ export const STORE_ROUTES = {
    * @example await STORE_ROUTES.CHECKOUT() => "/vi/checkout" (or current lang)
    */
   CHECKOUT: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/checkout");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/checkout')
   },
 
   /**
@@ -109,10 +109,10 @@ export const STORE_ROUTES = {
    * @example await STORE_ROUTES.ACCOUNT() => "/vi/account" (or current lang)
    */
   ACCOUNT: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/account");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/account')
   },
-} as const;
+} as const
 
 /**
  * Admin routes - Admin dashboard pages
@@ -124,8 +124,8 @@ export const ADMIN_ROUTES = {
    * @example await ADMIN_ROUTES.DASHBOARD() => "/vi/dashboard" (or current lang)
    */
   DASHBOARD: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/dashboard");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/dashboard')
   },
 
   /**
@@ -133,8 +133,8 @@ export const ADMIN_ROUTES = {
    * @example await ADMIN_ROUTES.PRODUCTS() => "/vi/products-management" (or current lang)
    */
   PRODUCTS: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/products-management");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/products-management')
   },
 
   /**
@@ -142,8 +142,8 @@ export const ADMIN_ROUTES = {
    * @example await ADMIN_ROUTES.PRODUCT_NEW() => "/vi/products-management/new" (or current lang)
    */
   PRODUCT_NEW: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/products-management/new");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/products-management/new')
   },
 
   /**
@@ -151,10 +151,10 @@ export const ADMIN_ROUTES = {
    * @example await ADMIN_ROUTES.PRODUCT_EDIT("123") => "/vi/products-management/123" (or current lang)
    */
   PRODUCT_EDIT: async (id: string) => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, `/products-management/${id}`);
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, `/products-management/${id}`)
   },
-} as const;
+} as const
 
 /**
  * Auth routes
@@ -166,8 +166,8 @@ export const AUTH_ROUTES = {
    * @example await AUTH_ROUTES.LOGIN() => "/vi/login" (or current lang)
    */
   LOGIN: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/login");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/login')
   },
 
   /**
@@ -175,12 +175,10 @@ export const AUTH_ROUTES = {
    * @example await AUTH_ROUTES.LOGIN_WITH_REDIRECT("/vi/products") => "/vi/login?redirect=/vi/products"
    */
   LOGIN_WITH_REDIRECT: async (redirectPath: string) => {
-    const lang = await getCurrentLang();
-    return `${localizeRoute(lang, "/login")}?redirect=${encodeURIComponent(
-      redirectPath
-    )}`;
+    const lang = await getCurrentLang()
+    return `${localizeRoute(lang, '/login')}?redirect=${encodeURIComponent(redirectPath)}`
   },
-} as const;
+} as const
 
 /**
  * Static pages routes
@@ -192,8 +190,8 @@ export const PAGES_ROUTES = {
    * @example await PAGES_ROUTES.ABOUT() => "/vi/pages/about" (or current lang)
    */
   ABOUT: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/pages/about");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/pages/about')
   },
 
   /**
@@ -201,8 +199,8 @@ export const PAGES_ROUTES = {
    * @example await PAGES_ROUTES.CONTACT() => "/vi/pages/contact" (or current lang)
    */
   CONTACT: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/pages/contact");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/pages/contact')
   },
 
   /**
@@ -210,10 +208,10 @@ export const PAGES_ROUTES = {
    * @example await PAGES_ROUTES.DELIVERY_POLICY() => "/vi/pages/policies/delivery" (or current lang)
    */
   DELIVERY_POLICY: async () => {
-    const lang = await getCurrentLang();
-    return localizeRoute(lang, "/pages/policies/delivery");
+    const lang = await getCurrentLang()
+    return localizeRoute(lang, '/pages/policies/delivery')
   },
-} as const;
+} as const
 
 /**
  * All routes grouped by category
@@ -224,7 +222,7 @@ export const ROUTES = {
   ADMIN: ADMIN_ROUTES,
   AUTH: AUTH_ROUTES,
   PAGES: PAGES_ROUTES,
-} as const;
+} as const
 
 /**
  * Route path templates (without locale)
@@ -232,25 +230,25 @@ export const ROUTES = {
  */
 export const ROUTE_PATHS = {
   STORE: {
-    HOME: "",
-    PRODUCTS: "/products",
-    PRODUCT: "/product/:slug",
-    CART: "/cart",
-    CHECKOUT: "/checkout",
-    ACCOUNT: "/account",
+    HOME: '',
+    PRODUCTS: '/products',
+    PRODUCT: '/product/:slug',
+    CART: '/cart',
+    CHECKOUT: '/checkout',
+    ACCOUNT: '/account',
   },
   ADMIN: {
-    DASHBOARD: "/dashboard",
-    PRODUCTS: "/products-management",
-    PRODUCT_NEW: "/products-management/new",
-    PRODUCT_EDIT: "/products-management/:id",
+    DASHBOARD: '/dashboard',
+    PRODUCTS: '/products-management',
+    PRODUCT_NEW: '/products-management/new',
+    PRODUCT_EDIT: '/products-management/:id',
   },
   AUTH: {
-    LOGIN: "/login",
+    LOGIN: '/login',
   },
   PAGES: {
-    ABOUT: "/pages/about",
-    CONTACT: "/pages/contact",
-    DELIVERY_POLICY: "/pages/policies/delivery",
+    ABOUT: '/pages/about',
+    CONTACT: '/pages/contact',
+    DELIVERY_POLICY: '/pages/policies/delivery',
   },
-} as const;
+} as const

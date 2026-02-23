@@ -1,31 +1,31 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { locales } from "@/lib/i18n";
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
+import { locales } from '@/lib/i18n'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
 
 export const metadata: Metadata = {
-  title: "Men Stuffs - E-commerce Store",
+  title: 'Men Stuffs - E-commerce Store',
   description: "Modern e-commerce store for men's products",
-};
+}
 
 export function generateStaticParams() {
-  return locales.map((lang) => ({ lang }));
+  return locales.map((lang) => ({ lang }))
 }
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html>
@@ -35,5 +35,5 @@ export default function RootLayout({
         {children}
       </body>
     </html>
-  );
+  )
 }

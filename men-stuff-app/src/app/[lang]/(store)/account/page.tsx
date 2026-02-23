@@ -1,18 +1,18 @@
-import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
+import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
 
 type PageProps = {
   params: Promise<{
-    lang: string;
-  }>;
-};
+    lang: string
+  }>
+}
 
 /**
  * User account page - requires user authentication
  */
 export default async function AccountPage({ params }: PageProps) {
-  const { lang } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
+  const { lang } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -70,5 +70,5 @@ export default async function AccountPage({ params }: PageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

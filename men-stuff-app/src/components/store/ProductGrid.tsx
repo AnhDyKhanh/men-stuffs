@@ -1,18 +1,18 @@
-import type { PlaceholderProduct } from "@/app/_constants/placeholderData";
-import ProductCard from "./ProductCard";
+import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import ProductCard from './ProductCard'
 
 interface ProductGridProps {
-  products: PlaceholderProduct[];
-  buyNowLabel?: string;
+  products: PlaceholderProduct[]
+  buyNowLabel?: string
   /** Number of columns on large screens (default 4) */
-  columns?: 2 | 3 | 4;
+  columns?: 2 | 3 | 4
 }
 
 const COLUMN_CLASSES = {
-  2: "grid-cols-1 sm:grid-cols-2",
-  3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-  4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
-} as const;
+  2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+} as const
 
 export default function ProductGrid({
   products,
@@ -24,7 +24,7 @@ export default function ProductGrid({
       <p className="text-center text-neutral-500 py-12">
         No products to display.
       </p>
-    );
+    )
   }
 
   return (
@@ -39,5 +39,5 @@ export default function ProductGrid({
         </li>
       ))}
     </ul>
-  );
+  )
 }

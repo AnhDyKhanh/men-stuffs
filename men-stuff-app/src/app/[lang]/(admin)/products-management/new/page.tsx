@@ -1,6 +1,6 @@
-import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
-import Link from "next/link";
-import ProductForm from "@/app/[lang]/_components/admin/ProductForm";
+import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import Link from 'next/link'
+import ProductForm from '@/app/[lang]/_components/admin/ProductForm'
 
 /**
  * Create new product page
@@ -8,11 +8,11 @@ import ProductForm from "@/app/[lang]/_components/admin/ProductForm";
 export default async function NewProductPage({
   params,
 }: {
-  params: Promise<{ lang: string }>;
+  params: Promise<{ lang: string }>
 }) {
-  const { lang } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
+  const { lang } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
 
   return (
     <div>
@@ -43,5 +43,5 @@ export default async function NewProductPage({
         />
       </div>
     </div>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import { getDictionary, isValidLocale } from "@/lib/i18n";
-import { getAllProducts } from "@/lib/mock-products";
-import Link from "next/link";
+import { getDictionary, isValidLocale } from '@/lib/i18n'
+import { getAllProducts } from '@/lib/mock-products'
+import Link from 'next/link'
 
 /**
  * Admin dashboard page
@@ -9,28 +9,28 @@ import Link from "next/link";
 
 type PageProps = {
   params: Promise<{
-    lang: string;
-  }>;
-};
+    lang: string
+  }>
+}
 
 const CURRENCY_OPTIONS = {
-  vi: { locale: "vi-VN" as const, currency: "VND" },
-  en: { locale: "en-US" as const, currency: "VND" },
-} as const;
+  vi: { locale: 'vi-VN' as const, currency: 'VND' },
+  en: { locale: 'en-US' as const, currency: 'VND' },
+} as const
 
-function formatRevenue(value: number, locale: "vi" | "en") {
-  const { locale: l, currency } = CURRENCY_OPTIONS[locale];
+function formatRevenue(value: number, locale: 'vi' | 'en') {
+  const { locale: l, currency } = CURRENCY_OPTIONS[locale]
   return new Intl.NumberFormat(l, {
-    style: "currency",
+    style: 'currency',
     currency,
     maximumFractionDigits: 0,
-  }).format(value);
+  }).format(value)
 }
 
 interface StatCardProps {
-  title: string;
-  value: string | number;
-  subtitle?: string;
+  title: string
+  value: string | number
+  subtitle?: string
 }
 
 function StatCard({ title, value, subtitle }: StatCardProps) {
@@ -38,23 +38,21 @@ function StatCard({ title, value, subtitle }: StatCardProps) {
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
       <h3 className="text-gray-600 mb-2 text-sm font-medium">{title}</h3>
       <p className="text-3xl font-bold text-gray-900">{value}</p>
-      {subtitle && (
-        <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
-      )}
+      {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
     </div>
-  );
+  )
 }
 
 export default async function AdminDashboardPage({ params }: PageProps) {
-  const { lang } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
+  const { lang } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
 
-  const products = getAllProducts();
-  const activeProducts = products.filter((p) => p.status === "active").length;
+  const products = getAllProducts()
+  const activeProducts = products.filter((p) => p.status === 'active').length
   const inactiveProducts = products.filter(
-    (p) => p.status === "inactive"
-  ).length;
+    (p) => p.status === 'inactive',
+  ).length
 
   const stats = {
     totalProducts: products.length,
@@ -63,7 +61,7 @@ export default async function AdminDashboardPage({ params }: PageProps) {
     totalOrders: 150,
     totalRevenue: 12500000,
     pendingOrders: 5,
-  };
+  }
 
   return (
     <div>
@@ -71,16 +69,16 @@ export default async function AdminDashboardPage({ params }: PageProps) {
         {dict.admin.dashboard}
       </h1>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" aria-label="Statistics">
+      <section
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+        aria-label="Statistics"
+      >
         <StatCard
           title={dict.admin.totalProducts}
           value={stats.totalProducts}
           subtitle={`${stats.activeProducts} ${dict.admin.active}, ${stats.inactiveProducts} ${dict.admin.inactive}`}
         />
-        <StatCard
-          title={dict.admin.totalOrders}
-          value={stats.totalOrders}
-        />
+        <StatCard title={dict.admin.totalOrders} value={stats.totalOrders} />
         <StatCard
           title={dict.admin.totalRevenue}
           value={formatRevenue(stats.totalRevenue, locale)}
@@ -111,5 +109,5 @@ export default async function AdminDashboardPage({ params }: PageProps) {
         </div>
       </section>
     </div>
-  );
+  )
 }

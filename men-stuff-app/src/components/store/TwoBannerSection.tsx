@@ -1,8 +1,8 @@
-import Link from "next/link";
-import type { BannerItem } from "@/app/_constants/placeholderData";
+import Link from 'next/link'
+import type { BannerItem } from '@/app/_constants/placeholderData'
 
 interface TwoBannerSectionProps {
-  items: [BannerItem, BannerItem];
+  items: [BannerItem, BannerItem]
 }
 
 export default function TwoBannerSection({ items }: TwoBannerSectionProps) {
@@ -32,5 +32,5 @@ export default function TwoBannerSection({ items }: TwoBannerSectionProps) {
         </Link>
       ))}
     </section>
-  );
+  )
 }

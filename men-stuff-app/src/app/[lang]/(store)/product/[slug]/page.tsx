@@ -1,30 +1,30 @@
-import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
-import { notFound } from "next/navigation";
+import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import { notFound } from 'next/navigation'
 
 type PageProps = {
-  params: Promise<{ lang: string; slug: string }>;
-};
+  params: Promise<{ lang: string; slug: string }>
+}
 
 /**
  * Product detail page
  */
 export default async function ProductDetailPage({ params }: PageProps) {
-  const { lang, slug } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
+  const { lang, slug } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
 
   // Mock product data - replace with real data fetching
   const product = {
     id: 1,
-    name: "Product 1",
+    name: 'Product 1',
     slug: slug,
     price: 99.99,
     description:
-      "This is a detailed product description. It includes all the features and benefits of the product.",
-  };
+      'This is a detailed product description. It includes all the features and benefits of the product.',
+  }
 
   if (!product) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -47,5 +47,5 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

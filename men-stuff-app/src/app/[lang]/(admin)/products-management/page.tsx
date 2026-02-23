@@ -1,20 +1,20 @@
-import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
-import Link from "next/link";
-import { getAllProducts, getProductName } from "@/lib/mock-products";
-import DeleteProductButton from "@/app/[lang]/_components/admin/DeleteProductButton";
+import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import Link from 'next/link'
+import { getAllProducts, getProductName } from '@/lib/mock-products'
+import DeleteProductButton from '@/app/[lang]/_components/admin/DeleteProductButton'
 
 interface PageProps {
-  params: Promise<{ lang: string }>;
+  params: Promise<{ lang: string }>
 }
 
 /**
  * Admin products list page - CRUD interface
  */
 export default async function AdminProductsPage({ params }: PageProps) {
-  const { lang } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
-  const products = getAllProducts();
+  const { lang } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
+  const products = getAllProducts()
 
   return (
     <div>
@@ -64,28 +64,29 @@ export default async function AdminProductsPage({ params }: PageProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {new Intl.NumberFormat(
-                      locale === "vi" ? "vi-VN" : "en-US",
+                      locale === 'vi' ? 'vi-VN' : 'en-US',
                       {
-                        style: "currency",
-                        currency: "VND",
-                      }
+                        style: 'currency',
+                        currency: 'VND',
+                      },
                     ).format(product.price)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${product.status === "active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                        }`}
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        product.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
                     >
-                      {product.status === "active"
+                      {product.status === 'active'
                         ? dict.admin.active
                         : dict.admin.inactive}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(product.createdAt).toLocaleDateString(
-                      locale === "vi" ? "vi-VN" : "en-US"
+                      locale === 'vi' ? 'vi-VN' : 'en-US',
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -119,5 +120,5 @@ export default async function AdminProductsPage({ params }: PageProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

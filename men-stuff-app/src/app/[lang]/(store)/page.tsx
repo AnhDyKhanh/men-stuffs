@@ -1,30 +1,30 @@
-import { getDictionary, isValidLocale } from "@/lib/i18n";
+import { getDictionary, isValidLocale } from '@/lib/i18n'
 import {
   getPlaceholderProducts,
   getHeroSlides,
   getTwoBannerRows,
-} from "@/app/_constants/placeholderData";
-import HeroSlideshow from "@/components/store/HeroSlideshow";
-import ProductGrid from "@/components/store/ProductGrid";
-import TwoBannerSection from "@/components/store/TwoBannerSection";
+} from '@/app/_constants/placeholderData'
+import HeroSlideshow from '@/components/store/HeroSlideshow'
+import ProductGrid from '@/components/store/ProductGrid'
+import TwoBannerSection from '@/components/store/TwoBannerSection'
 
 type PageProps = {
-  params: Promise<{ lang: string }>;
-};
+  params: Promise<{ lang: string }>
+}
 
 /**
  * Home page - storefront inspired by reference layout
  * Sections: hero slideshow, featured products, two-banner blocks
  */
 export default async function HomePage({ params }: PageProps) {
-  const { lang } = await params;
-  const locale = isValidLocale(lang) ? lang : "vi";
-  const dict = await getDictionary(locale);
+  const { lang } = await params
+  const locale = isValidLocale(lang) ? lang : 'vi'
+  const dict = await getDictionary(locale)
 
-  const basePath = `/${locale}`;
-  const heroSlides = getHeroSlides(basePath);
-  const products = getPlaceholderProducts(locale, basePath);
-  const bannerRows = getTwoBannerRows(basePath);
+  const basePath = `/${locale}`
+  const heroSlides = getHeroSlides(basePath)
+  const products = getPlaceholderProducts(locale, basePath)
+  const bannerRows = getTwoBannerRows(basePath)
 
   return (
     <>
@@ -50,5 +50,5 @@ export default async function HomePage({ params }: PageProps) {
         <TwoBannerSection key={index} items={row} />
       ))}
     </>
-  );
+  )
 }
