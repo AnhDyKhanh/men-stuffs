@@ -63,6 +63,7 @@ export async function PUT(
  * Delete product
  */
 export async function DELETE(
+  request: Request,
   { params }: GetProductByIdParams,
 ) {
   const { id } = await params
