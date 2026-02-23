@@ -43,7 +43,7 @@ export default async function StoreLayout({
     <div className="min-h-screen flex flex-col">
       <AnnouncementBar
         storeLink={`${basePath}/pages/contact`}
-        storeLabel={dict.common.storeSystem ?? 'Store system'}
+        storeLabel="Store system"
       />
       <Header
         lang={locale}

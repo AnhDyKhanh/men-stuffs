@@ -21,7 +21,7 @@ export default function ProductGrid({
 }: ProductGridProps) {
   if (products.length === 0) {
     return (
-      <p className="text-center text-neutral-500 py-12">
+      <p className="text-center">
         No products to display.
       </p>
     )

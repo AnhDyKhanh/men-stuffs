@@ -1,23 +1,54 @@
-import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import { getDictionary, isValidLocale } from '@/lib/i18n'
 import Link from 'next/link'
-import { getAllProducts, getProductName } from '@/lib/mock-products'
+import { getProductName } from '@/lib/mock-products'
+import { Product, ProductStatus } from '@/app/_types/product'
 import DeleteProductButton from '@/app/[lang]/_components/admin/DeleteProductButton'
+import { API_ROUTES } from '@/app/_constants/apiRouter'
+import { getBaseUrl } from '@/lib/utils'
+
+/** Normalize API/Supabase product to Product shape (camelCase + required fields) */
+function normalizeProduct(p: Record<string, unknown>): Product {
+  return {
+    id: String(p.id ?? ''),
+    category_id: String(p.category_id ?? ''),
+    name_vi: String(p.name_vi ?? ''),
+    name_en: String(p.name_en ?? ''),
+    price: Number(p.price ?? 0),
+    thumbnail: String(p.thumbnail ?? ''),
+    status: p.status as ProductStatus,
+    createdAt: String(p.createdAt ?? p.created_at ?? ''),
+  }
+}
 
 interface PageProps {
   params: Promise<{ lang: string }>
 }
 
 /**
- * Admin products list page - CRUD interface
+ * Admin products list page - CRUD interface (data from GET /api/admin/products)
  */
 export default async function AdminProductsPage({ params }: PageProps) {
   const { lang } = await params
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
-  const products = getAllProducts()
+
+  const res = await fetch(`${getBaseUrl()}${API_ROUTES.PRODUCTS.GET_ALL}`, {
+    cache: 'no-store',
+  })
+  console.log(res)
+  const raw = await res.json()
+  const products = Array.isArray(raw)
+    ? raw.map(normalizeProduct)
+    : []
+  const error = !Array.isArray(raw) && raw?.error ? String(raw.error) : null
 
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-50 p-4 text-red-700 border border-red-200">
+          {error}
+        </div>
+      )}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">{dict.admin.products}</h1>
         <Link
@@ -73,11 +104,10 @@ export default async function AdminProductsPage({ params }: PageProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        product.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${product.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                        }`}
                     >
                       {product.status === 'active'
                         ? dict.admin.active

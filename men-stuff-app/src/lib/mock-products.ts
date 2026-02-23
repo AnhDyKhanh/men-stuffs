@@ -3,17 +3,7 @@
  * In-memory storage for frontend-only implementation
  */
 
-export type ProductStatus = 'active' | 'inactive'
-
-export interface Product {
-  id: string
-  name_vi: string
-  name_en: string
-  price: number
-  thumbnail: string
-  status: ProductStatus
-  createdAt: string
-}
+import { Product } from "@/app/_types/product"
 
 // In-memory product storage
 const mockProducts: Product[] = [

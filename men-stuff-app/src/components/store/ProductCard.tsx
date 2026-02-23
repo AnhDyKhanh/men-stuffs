@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import Image from 'next/image'
 
 interface ProductCardProps {
   product: PlaceholderProduct
@@ -15,7 +16,7 @@ function StarRating({
   rating?: number
   reviewCount?: number
 }) {
-  if (reviewCount === undefined || reviewCount === 0) return null
+  // if (reviewCount === undefined || reviewCount === 0) return null
   const value = Math.min(STAR_COUNT, Math.max(0, rating))
   return (
     <div
@@ -51,7 +52,7 @@ export default function ProductCard({
           className="block aspect-square"
           aria-label={product.name}
         >
-          <img
+          <Image
             src={product.imageUrl}
             alt=""
             width={400}
@@ -71,17 +72,17 @@ export default function ProductCard({
       <div className="mt-3">
         <Link
           href={product.href}
-          className="font-medium text-neutral-900 hover:text-neutral-600 line-clamp-2"
+          className="font-medium text-neutral-200 hover:text-neutral-600 line-clamp-2"
         >
           {product.name}
         </Link>
-        <p className="mt-1 text-lg font-semibold text-neutral-900">
+        <p className="mt-1 text-lg font-semibold text-neutral-200">
           {product.priceFormatted}
         </p>
         <StarRating rating={product.rating} reviewCount={product.reviewCount} />
         <Link
           href={product.href}
-          className="mt-3 inline-block w-full rounded-lg border border-neutral-900 py-2.5 text-center text-sm font-medium text-neutral-900 transition hover:bg-neutral-900 hover:text-white"
+          className="mt-3 inline-block w-full rounded-lg border border-neutral-900 py-2.5 text-center text-sm font-medium text-neutral-200 transition hover:bg-neutral-900 hover:text-white"
         >
           {buyNowLabel}
         </Link>

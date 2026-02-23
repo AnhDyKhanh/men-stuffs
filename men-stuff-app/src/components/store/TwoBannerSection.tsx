@@ -1,25 +1,27 @@
 import Link from 'next/link'
 import type { BannerItem } from '@/app/_constants/placeholderData'
+import Image from 'next/image'
 
 interface TwoBannerSectionProps {
-  items: [BannerItem, BannerItem]
+  items: BannerItem[] | [BannerItem, BannerItem]
 }
 
 export default function TwoBannerSection({ items }: TwoBannerSectionProps) {
+  const pair = Array.isArray(items) ? items.slice(0, 2) : []
   return (
     <section
       className="grid grid-cols-1 md:grid-cols-2 gap-0"
       aria-label="Promotional banners"
     >
-      {items.map((item) => (
+      {pair.map((item) => (
         <Link
           key={item.id}
           href={item.href}
           className="group relative block aspect-square min-h-[280px] overflow-hidden bg-neutral-300 md:aspect-square"
         >
-          <img
+          <Image
             src={item.imageUrl}
-            alt=""
+            alt={item.title}
             className="h-full w-full object-cover transition group-hover:scale-105"
             width={800}
             height={800}
