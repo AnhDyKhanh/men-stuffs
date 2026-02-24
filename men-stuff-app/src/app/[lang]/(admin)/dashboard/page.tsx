@@ -1,11 +1,6 @@
 import { getDictionary, isValidLocale } from '@/lib/i18n'
-import { getAllProducts } from '@/lib/mock-products'
+import { getAllProductsMutation } from '@/app/_hooks/getAllProductsMutation'
 import Link from 'next/link'
-
-/**
- * Admin dashboard page
- * Clean Tailwind UI, no external UI library
- */
 
 type PageProps = {
   params: Promise<{
@@ -48,17 +43,17 @@ export default async function AdminDashboardPage({ params }: PageProps) {
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
 
-  const products = getAllProducts()
-  const activeProducts = products.filter((p) => p.status === 'active').length
-  const inactiveProducts = products.filter(
-    (p) => p.status === 'inactive',
-  ).length
+  //cái này chỉ trả thuần data, ko có destructuring được 
+  const { data: products, error, message, status } = await getAllProductsMutation()
+  // const activeProducts = products.filter((p) => p.status === 'active').length
+  // const inactiveProducts = products.filter(
+  //   (p) => p.status === 'inactive',
+  // ).length
 
   const stats = {
-    totalProducts: products.length,
-    activeProducts,
-    inactiveProducts,
-    totalOrders: 150,
+    totalProducts: products?.length || 0,
+    // activeProducts, //check sau    // inactiveProducts,
+    totalOrders: 150, //check sau  
     totalRevenue: 12500000,
     pendingOrders: 5,
   }
@@ -76,7 +71,8 @@ export default async function AdminDashboardPage({ params }: PageProps) {
         <StatCard
           title={dict.admin.totalProducts}
           value={stats.totalProducts}
-          subtitle={`${stats.activeProducts} ${dict.admin.active}, ${stats.inactiveProducts} ${dict.admin.inactive}`}
+        //check sau
+        // subtitle={`${stats.activeProducts} ${dict.admin.active}, ${stats.inactiveProducts} ${dict.admin.inactive}`}
         />
         <StatCard title={dict.admin.totalOrders} value={stats.totalOrders} />
         <StatCard

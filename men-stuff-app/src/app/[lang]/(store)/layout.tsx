@@ -66,8 +66,8 @@ export default async function StoreLayout({
         columns={footerColumns}
         copyrightText={COPYRIGHT_TEXT}
         bottomLinks={[
-          { label: 'About us', href: `${basePath}/pages/about` },
-          { label: 'Contact', href: `${basePath}/pages/contact` },
+          { key: 'footer-bottom-about-us', label: 'About us', href: `${basePath}/pages/about` },
+          { key: 'footer-bottom-contact', label: 'Contact', href: `${basePath}/pages/contact` },
         ]}
       />
     </div>

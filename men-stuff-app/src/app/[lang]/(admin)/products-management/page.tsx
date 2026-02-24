@@ -1,54 +1,21 @@
+import DeleteProductButton from '@/app/[lang]/_components/admin/DeleteProductButton'
+import { getAllProductsMutation } from '@/app/_hooks/getAllProductsMutation'
+import { Product } from '@/app/_types/product'
 import { getDictionary, isValidLocale } from '@/lib/i18n'
 import Link from 'next/link'
-import { getProductName } from '@/lib/mock-products'
-import { Product, ProductStatus } from '@/app/_types/product'
-import DeleteProductButton from '@/app/[lang]/_components/admin/DeleteProductButton'
-import { API_ROUTES } from '@/app/_constants/apiRouter'
-import { getBaseUrl } from '@/lib/utils'
-
-/** Normalize API/Supabase product to Product shape (camelCase + required fields) */
-function normalizeProduct(p: Record<string, unknown>): Product {
-  return {
-    id: String(p.id ?? ''),
-    category_id: String(p.category_id ?? ''),
-    name_vi: String(p.name_vi ?? ''),
-    name_en: String(p.name_en ?? ''),
-    price: Number(p.price ?? 0),
-    thumbnail: String(p.thumbnail ?? ''),
-    status: p.status as ProductStatus,
-    createdAt: String(p.createdAt ?? p.created_at ?? ''),
-  }
-}
 
 interface PageProps {
   params: Promise<{ lang: string }>
 }
 
-/**
- * Admin products list page - CRUD interface (data from GET /api/admin/products)
- */
 export default async function AdminProductsPage({ params }: PageProps) {
   const { lang } = await params
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
-
-  const res = await fetch(`${getBaseUrl()}${API_ROUTES.PRODUCTS.GET_ALL}`, {
-    cache: 'no-store',
-  })
-  console.log(res)
-  const raw = await res.json()
-  const products = Array.isArray(raw)
-    ? raw.map(normalizeProduct)
-    : []
-  const error = !Array.isArray(raw) && raw?.error ? String(raw.error) : null
+  const { data: products, error, message, status } = await getAllProductsMutation()
 
   return (
     <div>
-      {error && (
-        <div className="mb-4 rounded-lg bg-red-50 p-4 text-red-700 border border-red-200">
-          {error}
-        </div>
-      )}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">{dict.admin.products}</h1>
         <Link
@@ -60,7 +27,8 @@ export default async function AdminProductsPage({ params }: PageProps) {
       </div>
 
       {/* Products Table */}
-      {products.length > 0 ? (
+      {/* {products?.length > 0 ? ( */}
+      {true ? (
         <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -83,11 +51,11 @@ export default async function AdminProductsPage({ params }: PageProps) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
+              {products.map((product: Product) => (
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {getProductName(product, locale)}
+                      {product.name}
                     </div>
                     <div className="text-xs text-gray-500">
                       ID: {product.id}
@@ -115,7 +83,7 @@ export default async function AdminProductsPage({ params }: PageProps) {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(product.createdAt).toLocaleDateString(
+                    {new Date(product.created_at).toLocaleDateString(
                       locale === 'vi' ? 'vi-VN' : 'en-US',
                     )}
                   </td>

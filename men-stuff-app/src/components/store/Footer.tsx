@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import type { FooterColumn } from '@/app/_constants/placeholderData'
+import type { FooterColumn, FooterLink } from '@/app/_constants/placeholderData'
 
 interface FooterProps {
   columns: FooterColumn[]
   copyrightText: string
-  bottomLinks?: { label: string; href: string }[]
+  bottomLinks?: FooterLink[]
 }
 
 export default function Footer({
@@ -23,7 +23,7 @@ export default function Footer({
               </h3>
               <ul className="space-y-3">
                 {col.links.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.key}>
                     <Link
                       href={link.href}
                       className="text-sm hover:text-white transition"
@@ -44,7 +44,7 @@ export default function Footer({
           >
             {bottomLinks.map((link) => (
               <Link
-                key={link.href}
+                key={link.key}
                 href={link.href}
                 className="text-sm uppercase tracking-wide hover:text-white transition"
               >

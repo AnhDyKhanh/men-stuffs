@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import type { Product, ProductStatus } from '@/lib/mock-products'
+import { Product, ProductStatus } from '@/app/_types/product'
 
 interface ProductFormProps {
   product?: Product
