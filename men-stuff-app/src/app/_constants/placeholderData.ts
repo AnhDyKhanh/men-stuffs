@@ -31,13 +31,20 @@ export interface BannerItem {
 }
 
 export interface NavLink {
+  key: string
+  label: string
+  href: string
+}
+
+export interface FooterLink {
+  key: string
   label: string
   href: string
 }
 
 export interface FooterColumn {
   title: string
-  links: { label: string; href: string }[]
+  links: FooterLink[]
 }
 
 const CURRENCY = 'VND'
@@ -223,31 +230,31 @@ export function getFooterColumns(basePath: string): FooterColumn[] {
     {
       title: 'Connect with us',
       links: [
-        { label: 'Facebook', href: '#' },
-        { label: 'Instagram', href: '#' },
+        { key: 'footer-connect-facebook', label: 'Facebook', href: '#' },
+        { key: 'footer-connect-instagram', label: 'Instagram', href: '#' },
       ],
     },
     {
       title: 'Customer care',
       links: [
-        { label: 'Payment', href: `${basePath}/pages/policies/delivery` },
-        { label: 'Delivery', href: `${basePath}/pages/policies/delivery` },
-        { label: 'Return policy', href: `${basePath}/pages/policies/delivery` },
-        { label: 'Contact', href: `${basePath}/pages/contact` },
+        { key: 'footer-care-payment', label: 'Payment', href: `${basePath}/pages/policies/delivery` },
+        { key: 'footer-care-delivery', label: 'Delivery', href: `${basePath}/pages/policies/delivery` },
+        { key: 'footer-care-return', label: 'Return policy', href: `${basePath}/pages/policies/delivery` },
+        { key: 'footer-care-contact', label: 'Contact', href: `${basePath}/pages/contact` },
       ],
     },
     {
       title: 'About us',
       links: [
-        { label: 'Our story', href: `${basePath}/pages/about` },
-        { label: 'Store locations', href: `${basePath}/pages/contact` },
+        { key: 'footer-about-story', label: 'Our story', href: `${basePath}/pages/about` },
+        { key: 'footer-about-stores', label: 'Store locations', href: `${basePath}/pages/contact` },
       ],
     },
     {
       title: 'For customers',
       links: [
-        { label: 'Blog', href: '#' },
-        { label: 'Size guide', href: '#' },
+        { key: 'footer-customers-blog', label: 'Blog', href: '#' },
+        { key: 'footer-customers-size-guide', label: 'Size guide', href: '#' },
       ],
     },
   ]
@@ -255,9 +262,9 @@ export function getFooterColumns(basePath: string): FooterColumn[] {
 
 export function getMainNavLinks(basePath: string): NavLink[] {
   return [
-    { label: 'Shop all', href: `${basePath}/products` },
-    { label: 'New in', href: `${basePath}/products` },
-    { label: 'Feedback', href: `${basePath}/pages/contact` },
-    { label: 'Collections', href: `${basePath}/products` },
+    { key: 'nav-shop-all', label: 'Shop all', href: `${basePath}/products` },
+    { key: 'nav-new-in', label: 'New in', href: `${basePath}/products` },
+    { key: 'nav-feedback', label: 'Feedback', href: `${basePath}/pages/contact` },
+    { key: 'nav-collections', label: 'Collections', href: `${basePath}/products` },
   ]
 }

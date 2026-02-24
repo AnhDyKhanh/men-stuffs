@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createProduct } from '@/lib/mock-products'
 import { getAllProducts } from './services/getAllProducts'
+import { createProduct } from './services/createProducts'
 
 /**
  * GET /api/admin/products
@@ -18,29 +18,10 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name_vi, name_en, price, status, thumbnail } = body
+    const product = await createProduct(body)
 
-    if (!name_vi || !name_en || price === undefined) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 },
-      )
-    }
-
-    const product = createProduct({
-      name_vi,
-      name_en,
-      price: Number(price),
-      status: status || 'active',
-      thumbnail: thumbnail || '',
-    })
-
-    return NextResponse.json(product, { status: 201 })
+    return NextResponse.json(product)
   } catch (error) {
-    console.error('Failed to create product', error)
-    return NextResponse.json(
-      { error: 'Failed to create product' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
   }
 }

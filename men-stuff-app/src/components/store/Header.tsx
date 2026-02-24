@@ -45,7 +45,7 @@ export default function Header({
             >
               {navLinks.map((link) => (
                 <Link
-                  key={link.href + link.label}
+                  key={link.key}
                   href={link.href}
                   className="text-sm font-medium text-neutral-700 hover:text-neutral-900 uppercase tracking-wide"
                 >
