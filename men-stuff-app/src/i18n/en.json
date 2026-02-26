@@ -10,6 +10,12 @@
     "search": "Search",
     "language": "Language"
   },
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "invalidCredentials": "Invalid email or password.",
+    "continueAsGuest": "Continue as Guest"
+  },
   "home": {
     "title": "Welcome to our store",
     "subtitle": "Discover our product collection",
@@ -48,6 +54,16 @@
     "pendingOrders": "Pending Orders",
     "quickActions": "Quick Actions",
     "noProducts": "No products found",
-    "createdAt": "Created At"
+    "createdAt": "Created At",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "rowsPerPage": "Rows per page",
+    "categories": "Manage Categories",
+    "createCategory": "Create Category",
+    "categoryName": "Category Name",
+    "noCategories": "No categories yet",
+    "editCategory": "Edit",
+    "backToCategories": "Back to categories"
   }
 }

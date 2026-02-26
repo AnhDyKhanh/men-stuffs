@@ -1,6 +1,6 @@
-import ProductsTable from '@/app/[lang]/(admin)/dashboard/_components/ProductsTable'
-import { getAllProductsMutation } from '@/app/_hooks/getAllProductsMutation'
-import type { Product } from '@/app/_types/product'
+import CategoriesTable from '@/app/[lang]/(admin)/dashboard/_components/CategoriesTable'
+import { getAllCategoryMutation } from '@/app/_hooks/getAllCategoryMutation'
+import type { Category } from '@/app/_types/category'
 import { getDictionary, isValidLocale } from '@/lib/i18n'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,21 +10,21 @@ interface PageProps {
   params: Promise<{ lang: string }>
 }
 
-export default async function AdminProductsPage({ params }: PageProps) {
+export default async function AdminCategoriesPage({ params }: PageProps) {
   const { lang } = await params
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
-  const res = await getAllProductsMutation()
-  const products = (Array.isArray(res) ? res : res?.data ?? []) as Product[]
+  const res = await getAllCategoryMutation()
+  const categories = (Array.isArray(res) ? res : res?.data ?? (res?.error ? [] : [])) as Category[]
   const error = !Array.isArray(res) && res?.error ? String(res.error) : null
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl text-black font-bold tracking-tight">{dict.admin.products}</h1>
+        <h1 className="text-3xl font-bold text-black tracking-tight">{dict.admin.categories}</h1>
         <Button asChild>
-          <Link href={`/${locale}/products-management/new`}>
-            {dict.admin.createProduct}
+          <Link href={`/${locale}/categories-management/new`}>
+            {dict.admin.createCategory}
           </Link>
         </Button>
       </div>
@@ -37,27 +37,23 @@ export default async function AdminProductsPage({ params }: PageProps) {
         </Card>
       )}
 
-      <ProductsTable
+      <CategoriesTable
         variant="white"
-        products={products}
+        categories={categories}
         locale={locale}
         dict={{
-          productName: dict.admin.productName,
-          productPrice: dict.admin.productPrice,
-          status: dict.admin.status,
-          createdAt: dict.admin.createdAt,
+          categoryName: dict.admin.categoryName,
+          slug: dict.admin.productSlug,
           actions: dict.admin.actions,
-          active: dict.admin.active,
-          inactive: dict.admin.inactive,
-          editProduct: dict.admin.editProduct,
-          noProducts: dict.admin.noProducts,
-          createProduct: dict.admin.createProduct,
+          noCategories: dict.admin.noCategories,
+          createCategory: dict.admin.createCategory,
           prev: dict.admin.prev,
           next: dict.admin.next,
           pageOf: dict.admin.pageOf,
           rowsPerPage: dict.admin.rowsPerPage,
+          editCategory: dict.admin.editCategory,
         }}
-        createProductHref={`/${locale}/products-management/new`}
+        createCategoryHref={`/${locale}/categories-management/new`}
       />
     </div>
   )
