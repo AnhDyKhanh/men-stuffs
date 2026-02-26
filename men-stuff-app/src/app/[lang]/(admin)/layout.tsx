@@ -65,6 +65,12 @@ export default async function AdminLayout({
           >
             {dict.admin.products}
           </Link>
+          <Link
+            href={`/${locale}/categories-management`}
+            className="block px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition"
+          >
+            {dict.admin.categories}
+          </Link>
           <div className="pt-4 border-t">
             <LogoutButton lang={locale} />
           </div>

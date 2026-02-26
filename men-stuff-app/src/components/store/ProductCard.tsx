@@ -58,6 +58,7 @@ export default function ProductCard({
             width={400}
             height={400}
             className="h-full w-full object-cover transition group-hover:scale-105"
+            unoptimized
           />
         </Link>
         {product.label && (

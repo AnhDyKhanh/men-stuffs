@@ -25,6 +25,7 @@ export default function TwoBannerSection({ items }: TwoBannerSectionProps) {
             className="h-full w-full object-cover transition group-hover:scale-105"
             width={800}
             height={800}
+            unoptimized
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-hover:bg-black/30">
             <h3 className="px-4 text-center text-xl font-semibold uppercase tracking-wider text-white drop-shadow-md md:text-2xl">

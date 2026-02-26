@@ -6,4 +6,7 @@ export const API_ROUTES = {
     PUT: '/api/admin/products/:id',
     DELETE: '/api/admin/products/:id',
   },
+  CATEGORIES: {
+    GET_ALL: '/api/admin/category',
+  },
 }

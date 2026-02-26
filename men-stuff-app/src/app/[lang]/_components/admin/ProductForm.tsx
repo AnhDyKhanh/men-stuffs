@@ -20,6 +20,20 @@ interface ProductFormProps {
   }
 }
 
+
+// export type Product = {
+//   id: string
+//   category_id: string
+//   name: string
+//   slug: string
+//   description: string
+//   price: number
+//   discount_price: number
+//   material: string
+//   is_active: string
+//   status: ProductStatus
+//   created_at: string
+// }
 /**
  * Product form component for create/edit
  */
@@ -31,11 +45,11 @@ export default function ProductForm({
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
-    name_vi: product?.name_vi || '',
-    name_en: product?.name_en || '',
+    name_vi: product?.name || '',
+    name_en: product?.name || '',
     price: product?.price || 0,
     status: (product?.status || 'active') as ProductStatus,
-    thumbnail: product?.thumbnail || '/placeholder-product.jpg',
+    thumbnail: '/placeholder-product.jpg',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -44,7 +44,7 @@ export default async function AdminDashboardPage({ params }: PageProps) {
   const dict = await getDictionary(locale)
 
   //cái này chỉ trả thuần data, ko có destructuring được 
-  const { data: products, error, message, status } = await getAllProductsMutation()
+  const { data: products } = await getAllProductsMutation()
   // const activeProducts = products.filter((p) => p.status === 'active').length
   // const inactiveProducts = products.filter(
   //   (p) => p.status === 'inactive',

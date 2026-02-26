@@ -10,6 +10,12 @@
     "search": "Tìm kiếm",
     "language": "Ngôn ngữ"
   },
+  "login": {
+    "email": "Email",
+    "password": "Mật khẩu",
+    "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+    "continueAsGuest": "Tiếp tục với tư cách khách"
+  },
   "home": {
     "title": "Chào mừng đến với cửa hàng",
     "subtitle": "Khám phá bộ sưu tập sản phẩm của chúng tôi",
@@ -48,6 +54,16 @@
     "pendingOrders": "Đơn hàng chờ xử lý",
     "quickActions": "Thao tác nhanh",
     "noProducts": "Không có sản phẩm nào",
-    "createdAt": "Ngày tạo"
+    "createdAt": "Ngày tạo",
+    "prev": "Trước",
+    "next": "Sau",
+    "pageOf": "Trang {page} / {total}",
+    "rowsPerPage": "Số dòng mỗi trang",
+    "categories": "Quản lý danh mục",
+    "createCategory": "Tạo danh mục mới",
+    "categoryName": "Tên danh mục",
+    "noCategories": "Chưa có danh mục nào",
+    "editCategory": "Chỉnh sửa",
+    "backToCategories": "Quay lại danh mục"
   }
 }

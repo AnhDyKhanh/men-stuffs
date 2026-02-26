@@ -5,7 +5,7 @@ import { locales, defaultLocale, isValidLocale } from '@/lib/i18n'
 // Role-based route protection
 const protectedRoutes = {
   // Admin-only routes (must start with /admin or /dashboard)
-  admin: ['/admin', '/dashboard', '/products-management'],
+  admin: ['/admin', '/dashboard', '/products-management', '/categories-management'],
   // User/Admin routes (guest cannot access)
   user: ['/checkout', '/account'],
 }
@@ -87,7 +87,8 @@ export function middleware(request: NextRequest) {
   if (
     pathWithoutLocale.startsWith('/admin') ||
     pathWithoutLocale.startsWith('/dashboard') ||
-    pathWithoutLocale.startsWith('/products-management')
+    pathWithoutLocale.startsWith('/products-management') ||
+    pathWithoutLocale.startsWith('/categories-management')
   ) {
     if (userRole !== 'admin') {
       // Redirect to login if not admin

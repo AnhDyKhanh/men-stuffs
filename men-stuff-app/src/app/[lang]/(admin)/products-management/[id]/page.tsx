@@ -1,8 +1,7 @@
-import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import ProductForm from '@/app/[lang]/_components/admin/ProductForm'
+import { getDictionary, isValidLocale } from '@/lib/i18n'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getProductById } from '@/lib/mock-products'
-import ProductForm from '@/app/[lang]/_components/admin/ProductForm'
 
 type PageProps = {
   params: Promise<{
@@ -18,7 +17,8 @@ export default async function EditProductPage({ params }: PageProps) {
   const { lang, id } = await params
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
-  const product = getProductById(id)
+  const product = null
+  // const product = getProductById(id)
 
   if (!product) {
     notFound()
