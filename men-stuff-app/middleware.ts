@@ -1,38 +1,24 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { locales, defaultLocale, isValidLocale } from '@/lib/i18n'
+import { defaultLocale, isValidLocale } from '@/lib/i18n'
+import { isStaffByAccountId } from '@/lib/auth-server'
 
-// Role-based route protection
-const protectedRoutes = {
-  // Admin-only routes (must start with /admin or /dashboard)
-  admin: ['/admin', '/dashboard', '/products-management', '/categories-management'],
-  // User/Admin routes (guest cannot access)
-  user: ['/checkout', '/account'],
-}
+const COOKIE_ACCOUNT_ID = 'account_id'
 
-/**
- * Get user role from cookie
- */
+const protectedUserRoutes = ['/checkout', '/account']
+
 function getUserRole(request: NextRequest): 'guest' | 'user' | 'admin' {
   const role = request.cookies.get('role')?.value
-  if (role === 'user' || role === 'admin') {
-    return role
-  }
+  if (role === 'user' || role === 'admin') return role
   return 'guest'
 }
 
-/**
- * Check if path requires admin role
- */
-function isAdminRoute(pathname: string): boolean {
-  return protectedRoutes.admin.some((route) => pathname.includes(route))
+function getAccountId(request: NextRequest): string | undefined {
+  return request.cookies.get(COOKIE_ACCOUNT_ID)?.value
 }
 
-/**
- * Check if path requires user role (user or admin)
- */
 function isUserRoute(pathname: string): boolean {
-  return protectedRoutes.user.some((route) => pathname.includes(route))
+  return protectedUserRoutes.some((route) => pathname.includes(route))
 }
 
 /**
@@ -57,9 +43,8 @@ function removeLocaleFromPath(pathname: string): string {
   return pathname
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const userRole = getUserRole(request)
   const pathWithoutLocale = removeLocaleFromPath(pathname)
   const locale = getLocaleFromPath(pathname)
 
@@ -68,30 +53,29 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url))
   }
 
-  // Check if locale is missing - redirect to default locale
+  // If path doesn't start with a locale, redirect
   if (!locale) {
-    // If path doesn't start with a locale, prepend default locale
     const newUrl = new URL(`/${defaultLocale}${pathname}`, request.url)
     return NextResponse.redirect(newUrl)
   }
 
-  // Validate locale
   if (!isValidLocale(locale)) {
-    // Invalid locale, redirect to default locale
     const newUrl = new URL(`/${defaultLocale}${pathWithoutLocale}`, request.url)
     return NextResponse.redirect(newUrl)
   }
 
-  // Role-based route protection
-  // Check admin routes (must start with /admin, /dashboard, or /products-management)
+  const userRole = getUserRole(request)
+
+  // Admin routes: phải có account_id trong cookie VÀ bảng staff có bản ghi với account_id đó
   if (
     pathWithoutLocale.startsWith('/admin') ||
     pathWithoutLocale.startsWith('/dashboard') ||
     pathWithoutLocale.startsWith('/products-management') ||
     pathWithoutLocale.startsWith('/categories-management')
   ) {
-    if (userRole !== 'admin') {
-      // Redirect to login if not admin
+    const accountId = getAccountId(request)
+    const isStaff = accountId ? await isStaffByAccountId(accountId) : false
+    if (!isStaff) {
       const loginUrl = new URL(`/${locale}/login`, request.url)
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)
@@ -101,7 +85,6 @@ export function middleware(request: NextRequest) {
   // Check user routes (checkout, account)
   if (isUserRoute(pathWithoutLocale)) {
     if (userRole === 'guest') {
-      // Redirect to login if guest
       const loginUrl = new URL(`/${locale}/login`, request.url)
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)

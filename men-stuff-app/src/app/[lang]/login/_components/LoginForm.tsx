@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Link from 'next/link'
-import { loginAsAdmin } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -36,17 +35,37 @@ export function LoginForm({ dict, locale }: LoginFormProps) {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setIsLoading(true)
 
-    if (loginAsAdmin(email, password)) {
-      const redirect = new URLSearchParams(window.location.search).get('redirect')
-      router.push(redirect || `/${locale}/dashboard`)
-      router.refresh()
-    } else {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json().catch(() => ({}))
+
+      if (res.ok) {
+        const role = data.role as 'admin' | 'user' | undefined
+        const redirectParam = new URLSearchParams(window.location.search).get('redirect')
+
+        if (role === 'admin') {
+          router.push(redirectParam || `/${locale}/dashboard`)
+        } else {
+          // User (không phải staff): chỉ xem store, không vào admin
+          const isAdminPath = redirectParam && /^\/(vi|en)\/(admin|dashboard|products-management|categories-management)/.test(redirectParam)
+          router.push(!isAdminPath && redirectParam ? redirectParam : `/${locale}`)
+        }
+        router.refresh()
+      } else {
+        setError(data.error || dict.login.invalidCredentials)
+      }
+    } catch {
       setError(dict.login.invalidCredentials)
+    } finally {
       setIsLoading(false)
     }
   }

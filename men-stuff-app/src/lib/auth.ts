@@ -1,76 +1,56 @@
 /**
- * Simple cookie-based authentication utilities
- * Mock implementation for role-based access control
+ * Auth utilities: cookie-based role and account_id.
+ * Admin = có bản ghi trong bảng staff (kiểm tra ở middleware + API login).
  */
 
 export type UserRole = 'guest' | 'user' | 'admin'
 
 /**
- * Mock admin credentials
+ * Get user role from cookies (set by API login after verifying staff).
  */
-export const MOCK_ADMIN = {
-  email: 'admin@menstuff.local',
-  password: 'admin123',
-  role: 'admin' as const,
-}
-
-/**
- * Get user role from cookies
- */
-export function getUserRole(cookies: any): UserRole {
+export function getUserRole(cookies: { get: (name: string) => { value?: string } | undefined }): UserRole {
   const role = cookies.get('role')?.value
-  if (role === 'user' || role === 'admin') {
-    return role
-  }
+  if (role === 'user' || role === 'admin') return role
   return 'guest'
 }
 
 /**
- * Set user role in cookies (for mock auth)
- * Client-side only
+ * Get account_id from cookie (set by API login). Server/middleware use.
  */
-export function setUserRole(role: UserRole) {
-  if (typeof document !== 'undefined') {
-    document.cookie = `role=${role}; path=/; max-age=86400` // 24 hours
-  }
+export function getAccountIdFromCookie(cookies: { get: (name: string) => { value?: string } | undefined }): string | undefined {
+  return cookies.get('account_id')?.value
 }
 
 /**
- * Check if user has required role
+ * Set user role in cookies (client-side, e.g. after guest→user).
+ * Admin role is set only by API login after staff check.
  */
+export function setUserRole(role: UserRole) {
+  if (typeof document !== 'undefined') {
+    document.cookie = `role=${role}; path=/; max-age=86400`
+  }
+}
+
 export function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
   if (requiredRole === 'guest') return true
-  if (requiredRole === 'user')
-    return userRole === 'user' || userRole === 'admin'
+  if (requiredRole === 'user') return userRole === 'user' || userRole === 'admin'
   if (requiredRole === 'admin') return userRole === 'admin'
   return false
 }
 
 /**
- * Check if current user is admin (server-side)
+ * Check if current user is admin (server-side, from cookie only).
+ * Middleware uses staff table check for admin routes.
  */
-export function isAdmin(cookies: any): boolean {
+export function isAdmin(cookies: { get: (name: string) => { value?: string } | undefined }): boolean {
   return getUserRole(cookies) === 'admin'
 }
 
 /**
- * Login as admin (client-side)
- * Validates credentials and sets admin cookie
+ * Logout: gọi API để xóa cookie httpOnly (account_id, role).
  */
-export function loginAsAdmin(email: string, password: string): boolean {
-  if (email === MOCK_ADMIN.email && password === MOCK_ADMIN.password) {
-    setUserRole('admin')
-    return true
-  }
-  return false
-}
-
-/**
- * Logout (client-side)
- * Removes role cookie
- */
-export function logout() {
-  if (typeof document !== 'undefined') {
-    document.cookie = 'role=; path=/; max-age=0'
-  }
+export async function logout() {
+  if (typeof document === 'undefined') return
+  await fetch('/api/auth/logout', { method: 'POST' })
+  document.cookie = 'role=; path=/; max-age=0'
 }
