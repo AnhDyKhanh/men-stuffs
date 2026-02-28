@@ -1,6 +1,6 @@
 import { getDictionary, isValidLocale } from '@/lib/i18n'
 import { getAllProductsMutation } from '@/app/_hooks/getAllProductsMutation'
-import Link from 'next/link'
+import DashboardQuickActions from './_components/DashboardQuickActions'
 
 type PageProps = {
   params: Promise<{
@@ -43,17 +43,11 @@ export default async function AdminDashboardPage({ params }: PageProps) {
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
 
-  //cái này chỉ trả thuần data, ko có destructuring được 
   const { data: products } = await getAllProductsMutation()
-  // const activeProducts = products.filter((p) => p.status === 'active').length
-  // const inactiveProducts = products.filter(
-  //   (p) => p.status === 'inactive',
-  // ).length
 
   const stats = {
     totalProducts: products?.length || 0,
-    // activeProducts, //check sau    // inactiveProducts,
-    totalOrders: 150, //check sau  
+    totalOrders: 150,
     totalRevenue: 12500000,
     pendingOrders: 5,
   }
@@ -71,8 +65,6 @@ export default async function AdminDashboardPage({ params }: PageProps) {
         <StatCard
           title={dict.admin.totalProducts}
           value={stats.totalProducts}
-        //check sau
-        // subtitle={`${stats.activeProducts} ${dict.admin.active}, ${stats.inactiveProducts} ${dict.admin.inactive}`}
         />
         <StatCard title={dict.admin.totalOrders} value={stats.totalOrders} />
         <StatCard
@@ -85,25 +77,12 @@ export default async function AdminDashboardPage({ params }: PageProps) {
         />
       </section>
 
-      <section className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          {dict.admin.quickActions}
-        </h2>
-        <div className="flex flex-wrap gap-4">
-          <Link
-            href={`/${locale}/products-management/new`}
-            className="inline-flex items-center justify-center bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-          >
-            {dict.admin.createProduct}
-          </Link>
-          <Link
-            href={`/${locale}/products-management`}
-            className="inline-flex items-center justify-center bg-gray-200 text-gray-900 px-6 py-2.5 rounded-lg hover:bg-gray-300 transition-colors font-medium text-sm"
-          >
-            {dict.admin.products}
-          </Link>
-        </div>
-      </section>
+      <DashboardQuickActions
+        locale={locale}
+        createProductLabel={dict.admin.createProduct}
+        productsLabel={dict.admin.products}
+        quickActionsLabel={dict.admin.quickActions}
+      />
     </div>
   )
 }

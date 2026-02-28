@@ -1,17 +1,25 @@
-export type ProductStatus = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
-}
+import type { Category } from './category'
+
+/**
+ * Product entity (table: product)
+ * Many-to-one with category.
+ */
+export type ProductStatus = 'active' | 'inactive'
 
 export type Product = {
   id: string
-  category_id: string
-  name: string
-  slug: string
-  description: string
-  price: number
-  discount_price: number
-  material: string
-  is_active: ProductStatus
-  created_at: string
+  category_id: string | null
+  name: string | null
+  slug: string | null
+  description: string | null
+  price: number | null
+  discount_price: number | null
+  material: string | null
+  is_active: ProductStatus | null
+  created_at: Date | null
+  updated_at: Date | null
+}
+
+export type ProductWithCategory = Product & {
+  category?: Category | null
 }

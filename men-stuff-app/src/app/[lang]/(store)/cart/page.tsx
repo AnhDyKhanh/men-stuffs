@@ -1,5 +1,6 @@
 import { getDictionary, isValidLocale } from '@/lib/i18n'
 import Link from 'next/link'
+import CartPageClient from './_components/CartPageClient'
 
 type PageProps = {
   params: Promise<{
@@ -7,8 +8,18 @@ type PageProps = {
   }>
 }
 
+interface CartItem {
+  id: number
+  name: string
+  price: number
+  quantity: number
+  image: string
+  size: string
+  color: string
+}
+
 /**
- * Shopping cart page
+ * Shopping cart page - Server Component
  */
 export default async function CartPage({ params }: PageProps) {
   const { lang } = await params
@@ -16,8 +27,38 @@ export default async function CartPage({ params }: PageProps) {
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
 
-  // Mock cart items - replace with real data
-  const cartItems: [] = []
+  // Mock cart items
+  const mockCartItems: CartItem[] = [
+    {
+      id: 1,
+      name: 'Premium Cotton Shirt',
+      price: 499000,
+      quantity: 1,
+      image: '',
+      size: 'M',
+      color: 'Black'
+    },
+    {
+      id: 2,
+      name: 'Classic Denim Jeans',
+      price: 799000,
+      quantity: 2,
+      image: '',
+      size: 'L',
+      color: 'Navy'
+    },
+    {
+      id: 3,
+      name: 'Casual T-Shirt',
+      price: 299000,
+      quantity: 1,
+      image: '',
+      size: 'S',
+      color: 'White'
+    }
+  ]
+
+  const cartItems: CartItem[] = mockCartItems // Change to [] to show empty state
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -34,24 +75,11 @@ export default async function CartPage({ params }: PageProps) {
           </Link>
         </div>
       ) : (
-        <div>
-          {/* Cart items list */}
-          <div className="mb-8">{/* Render cart items here */}</div>
-
-          {/* Cart summary */}
-          <div className="border-t pt-4">
-            <div className="flex justify-between mb-4">
-              <span className="text-xl font-semibold">Total:</span>
-              <span className="text-xl font-bold">$0.00</span>
-            </div>
-            <Link
-              href={`/${locale}/checkout`}
-              className="block w-full bg-black text-white text-center py-3 rounded-lg hover:bg-gray-800"
-            >
-              {dict.common.checkout}
-            </Link>
-          </div>
-        </div>
+        <CartPageClient
+          cartItems={cartItems}
+          locale={locale}
+          dict={dict}
+        />
       )}
     </div>
   )
