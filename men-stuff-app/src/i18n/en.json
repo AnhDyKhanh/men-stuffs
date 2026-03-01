@@ -19,7 +19,10 @@
   "home": {
     "title": "Welcome to our store",
     "subtitle": "Discover our product collection",
-    "shopNow": "Shop Now"
+    "shopNow": "Shop Now",
+    "newProducts": "New Arrivals",
+    "featuredCategories": "Featured Categories",
+    "viewAll": "View all"
   },
   "products": {
     "title": "Products",

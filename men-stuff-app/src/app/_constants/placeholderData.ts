@@ -144,6 +144,42 @@ export function getPlaceholderProducts(
   }))
 }
 
+/** New arrivals (products with label "new" or first N products). */
+export function getNewProducts(
+  locale: string,
+  basePath: string,
+  limit = 8,
+): PlaceholderProduct[] {
+  const all = getPlaceholderProducts(locale, basePath)
+  const withNew = all.filter((p) => p.label === 'new')
+  return (withNew.length >= limit ? withNew : all).slice(0, limit)
+}
+
+export interface FeaturedCategory {
+  id: string
+  title: string
+  imageUrl: string
+  href: string
+}
+
+const FEATURED_CATEGORIES_META: { id: string; titleVi: string; titleEn: string; imageUrl: string }[] = [
+  { id: 'rings', titleVi: 'Nhẫn', titleEn: 'Rings', imageUrl: 'https://placehold.co/600x400/1a1a2e/eee?text=Rings' },
+  { id: 'bracelets', titleVi: 'Vòng tay', titleEn: 'Bracelets', imageUrl: 'https://placehold.co/600x400/16213e/eee?text=Bracelets' },
+  { id: 'pendants', titleVi: 'Mặt dây', titleEn: 'Pendants', imageUrl: 'https://placehold.co/600x400/0f3460/eee?text=Pendants' },
+  { id: 'accessories', titleVi: 'Phụ kiện', titleEn: 'Accessories', imageUrl: 'https://placehold.co/600x400/533483/eee?text=Accessories' },
+]
+
+/** Featured categories for home page. */
+export function getFeaturedCategories(basePath: string, locale?: string): FeaturedCategory[] {
+  const isVi = locale !== 'en'
+  return FEATURED_CATEGORIES_META.map((c) => ({
+    id: c.id,
+    title: isVi ? c.titleVi : c.titleEn,
+    imageUrl: c.imageUrl,
+    href: `${basePath}/products`,
+  }))
+}
+
 export function getHeroSlides(basePath: string): HeroSlide[] {
   return [
     {
