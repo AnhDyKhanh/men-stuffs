@@ -1,27 +1,17 @@
+import { getProductById } from '@/app/_hooks/getProductById';
 import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
+import Image from 'next/image';
 import { notFound } from 'next/navigation'
 
 type PageProps = {
-  params: Promise<{ lang: string; slug: string }>
+  params: Promise<{ lang: string; id: string }>
 }
 
-/**
- * Product detail page
- */
 export default async function ProductDetailPage({ params }: PageProps) {
-  const { lang, slug } = await params
+  const { lang, id } = await params
   const locale = isValidLocale(lang) ? lang : 'vi'
   const dict = await getDictionary(locale)
-
-  // Mock product data - replace with real data fetching
-  const product = {
-    id: 1,
-    name: 'Product 1',
-    slug: slug,
-    price: 99.99,
-    description:
-      'This is a detailed product description. It includes all the features and benefits of the product.',
-  }
+  const product = await getProductById(id)
 
   if (!product) {
     notFound()
@@ -31,11 +21,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Image */}
-        <div className="bg-gray-200 h-96 rounded-lg"></div>
+        <div className="bg-gray-200 h-96 rounded-lg">
+          <Image src={product.thumbnail} alt={product.name} width={300} height={300} className='w-full h-full object-cover' />
+        </div>
 
         {/* Product Info */}
         <div>
-          <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
+          <h1 className="text-4xl font-bold mb-4 text-amber-100">{product.name}</h1>
           <p className="text-3xl font-bold mb-6">${product.price}</p>
           <p className="text-gray-600 mb-8">{product.description}</p>
 
