@@ -19,7 +19,10 @@
   "home": {
     "title": "Chào mừng đến với cửa hàng",
     "subtitle": "Khám phá bộ sưu tập sản phẩm của chúng tôi",
-    "shopNow": "Mua ngay"
+    "shopNow": "Mua ngay",
+    "newProducts": "Sản phẩm mới",
+    "featuredCategories": "Danh mục nổi bật",
+    "viewAll": "Xem tất cả"
   },
   "products": {
     "title": "Sản phẩm",
