@@ -163,10 +163,10 @@ export interface FeaturedCategory {
 }
 
 const FEATURED_CATEGORIES_META: { id: string; titleVi: string; titleEn: string; imageUrl: string }[] = [
-  { id: 'rings', titleVi: 'Nhẫn', titleEn: 'Rings', imageUrl: 'https://placehold.co/600x400/1a1a2e/eee?text=Rings' },
-  { id: 'bracelets', titleVi: 'Vòng tay', titleEn: 'Bracelets', imageUrl: 'https://placehold.co/600x400/16213e/eee?text=Bracelets' },
-  { id: 'pendants', titleVi: 'Mặt dây', titleEn: 'Pendants', imageUrl: 'https://placehold.co/600x400/0f3460/eee?text=Pendants' },
-  { id: 'accessories', titleVi: 'Phụ kiện', titleEn: 'Accessories', imageUrl: 'https://placehold.co/600x400/533483/eee?text=Accessories' },
+  { id: 'rings', titleVi: 'Nhẫn', titleEn: 'Rings', imageUrl: '/categories/rings.png' },
+  { id: 'bracelets', titleVi: 'Vòng tay', titleEn: 'Bracelets', imageUrl: '/categories/bracelets.png' },
+  { id: 'pendants', titleVi: 'Mặt dây', titleEn: 'Pendants', imageUrl: '/categories/pendants.png' },
+  { id: 'accessories', titleVi: 'Phụ kiện', titleEn: 'Accessories', imageUrl: '/categories/accessories.png' },
 ]
 
 /** Featured categories for home page. */
