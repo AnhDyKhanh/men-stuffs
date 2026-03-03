@@ -206,33 +206,48 @@ export function getHeroSlides(basePath: string): HeroSlide[] {
   ]
 }
 
-export function getTwoBannerRows(basePath: string): BannerItem[][] {
+/**
+ * Category/product banner grid on home page.
+ *
+ * If latestProduct is provided, \"New In\" banner will use:
+ * - latestProduct.title as title (fallback \"New In\")
+ * - latestProduct.href as link to product detail
+ * - latestProduct.imageUrl if available, otherwise static image
+ */
+export function getTwoBannerRows(
+  basePath: string,
+  latestProduct?: { title?: string | null; href?: string; imageUrl?: string | null },
+): BannerItem[][] {
+  const newInTitle = latestProduct?.title || 'New In'
+  const newInHref = latestProduct?.href || `${basePath}/products`
+  const newInImage = latestProduct?.imageUrl || '/banners/new-in.jpg'
+
   return [
     [
       {
         id: '1',
         title: 'Silver Ring For Men',
-        imageUrl: 'https://placehold.co/800x800/333/fff?text=Ring',
+        imageUrl: '/banners/rings.jpg',
         href: `${basePath}/products`,
       },
       {
         id: '2',
         title: 'Angelic Collection',
-        imageUrl: 'https://placehold.co/800x800/444/fff?text=Collection',
+        imageUrl: '/banners/collection.jpg',
         href: `${basePath}/products`,
       },
     ],
     [
       {
         id: '3',
-        title: 'New In',
-        imageUrl: 'https://placehold.co/800x800/333/fff?text=New',
-        href: `${basePath}/products`,
+        title: newInTitle,
+        imageUrl: newInImage,
+        href: newInHref,
       },
       {
         id: '4',
         title: 'Silver Pendant',
-        imageUrl: 'https://placehold.co/800x800/444/fff?text=Pendant',
+        imageUrl: '/banners/new-in.jpg',
         href: `${basePath}/products`,
       },
     ],
@@ -240,13 +255,13 @@ export function getTwoBannerRows(basePath: string): BannerItem[][] {
       {
         id: '5',
         title: 'Silver Bracelet',
-        imageUrl: 'https://placehold.co/800x800/333/fff?text=Bracelet',
+        imageUrl: '/banners/bracelet.jpg',
         href: `${basePath}/products`,
       },
       {
         id: '6',
         title: 'Silver Earrings',
-        imageUrl: 'https://placehold.co/800x800/444/fff?text=Earrings',
+        imageUrl: '/banners/earring.jpg',
         href: `${basePath}/products`,
       },
     ],

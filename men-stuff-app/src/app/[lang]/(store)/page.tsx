@@ -6,6 +6,8 @@ import {
   getFeaturedCategories,
   getTwoBannerRows,
 } from '@/app/_constants/placeholderData'
+import { getAllProductsMutation } from '@/app/_hooks/getAllProductsMutation'
+import type { Product } from '@/app/_models/product'
 import HeroSlideshow from '@/components/store/HeroSlideshow'
 import ProductGrid from '@/components/store/ProductGrid'
 import TwoBannerSection from '@/components/store/TwoBannerSection'
@@ -28,7 +30,31 @@ export default async function HomePage({ params }: PageProps) {
   const heroSlides = getHeroSlides(basePath)
   const newProducts = getNewProducts(locale, basePath)
   const featuredCategories = getFeaturedCategories(basePath, locale)
-  const bannerRows = getTwoBannerRows(basePath)
+
+  // Try to get latest product from API (Supabase).
+  // Fallback to static \"New In\" banner when API is not ready or returns empty.
+  let latestProductForBanner: { title?: string | null; href?: string; imageUrl?: string | null } | undefined
+  try {
+    const res = await getAllProductsMutation()
+    const products = (Array.isArray(res) ? res : res?.data ?? []) as Product[]
+    if (products.length > 0) {
+      const sorted = [...products].sort((a, b) => {
+        const aTime = a.created_at ? new Date(a.created_at).getTime() : 0
+        const bTime = b.created_at ? new Date(b.created_at).getTime() : 0
+        return bTime - aTime
+      })
+      const latest = sorted[0]
+      latestProductForBanner = {
+        title: latest.name,
+        href: latest.slug ? `${basePath}/product/${latest.slug}` : `${basePath}/products`,
+        imageUrl: latest.origin_image,
+      }
+    }
+  } catch {
+    // Ignore errors – keep using fallback banner
+  }
+
+  const bannerRows = getTwoBannerRows(basePath, latestProductForBanner)
 
   return (
     <>
