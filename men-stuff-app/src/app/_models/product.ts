@@ -18,6 +18,7 @@ export type Product = {
   is_active: ProductStatus | null
   created_at: Date | null
   updated_at: Date | null
+  origin_image: string | null
 }
 
 export type ProductWithCategory = Product & {
