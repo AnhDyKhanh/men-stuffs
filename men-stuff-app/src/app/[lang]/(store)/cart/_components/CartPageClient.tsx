@@ -71,7 +71,7 @@ export default function CartPageClient({
       <div className="lg:col-span-2">
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {/* Header */}
-          <div className="bg-gray-100 p-4 grid grid-cols-12 gap-4 text-sm font-semibold border-b">
+          <div className="bg-gray-100 p-4 grid grid-cols-12 gap-4 text-sm font-semibold border-b text-black">
             <div className="col-span-5">Product</div>
             <div className="col-span-2 text-center">Price</div>
             <div className="col-span-2 text-center">Qty</div>
@@ -96,7 +96,7 @@ export default function CartPageClient({
         <div className="mt-6">
           <Link
             href={`/${locale}/products`}
-            className="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded transition"
+            className="inline-block bg-gray-200 hover:bg-gray-300 text-black px-6 py-2 rounded transition font-medium"
           >
             ← Continue Shopping
           </Link>
@@ -138,7 +138,7 @@ export default function CartPageClient({
 // Cart Item Row Component
 function CartItemRow({ item, onUpdateQuantity, onRemove }: any) {
   return (
-    <div className="p-4 grid grid-cols-12 gap-4 items-center hover:bg-gray-50 transition">
+    <div className="p-4 grid grid-cols-12 gap-4 items-center hover:bg-gray-50 transition text-black">
       {/* Product Image & Info */}
       <div className="col-span-5 flex gap-3">
         <div className="w-16 h-16 relative flex-shrink-0 bg-gray-200 rounded overflow-hidden">
@@ -150,19 +150,19 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: any) {
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm truncate">{item.name}</h3>
-          <p className="text-xs text-gray-600 mt-1">
-            Color: <span className="text-gray-800">{item.color}</span>
+          <h3 className="font-semibold text-sm truncate text-black">{item.name}</h3>
+          <p className="text-xs text-black mt-1">
+            Color: <span className="text-black font-medium">{item.color}</span>
           </p>
-          <p className="text-xs text-gray-600">
-            Size: <span className="text-gray-800">{item.size}</span>
+          <p className="text-xs text-black">
+            Size: <span className="text-black font-medium">{item.size}</span>
           </p>
         </div>
       </div>
 
       {/* Price */}
       <div className="col-span-2 text-center">
-        <p className="text-sm font-medium">
+        <p className="text-sm font-medium text-black">
           {item.price.toLocaleString('en-US')} đ
         </p>
       </div>
@@ -171,7 +171,7 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: any) {
       <div className="col-span-2 flex items-center justify-center gap-2">
         <button
           onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-          className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded flex items-center justify-center text-sm"
+          className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded flex items-center justify-center text-sm text-black font-bold"
         >
           −
         </button>
@@ -180,11 +180,11 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: any) {
           min="1"
           value={item.quantity}
           onChange={e => onUpdateQuantity(item.id, parseInt(e.target.value) || 1)}
-          className="w-10 text-center border border-gray-300 rounded text-sm py-1"
+          className="w-10 text-center border border-gray-300 rounded text-sm py-1 text-black bg-white"
         />
         <button
           onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-          className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded flex items-center justify-center text-sm"
+          className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded flex items-center justify-center text-sm text-black font-bold"
         >
           +
         </button>
@@ -192,7 +192,7 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: any) {
 
       {/* Total */}
       <div className="col-span-2 text-right">
-        <p className="font-semibold">
+        <p className="font-semibold text-black">
           {(item.price * item.quantity).toLocaleString('en-US')} đ
         </p>
       </div>
@@ -226,66 +226,66 @@ function CartSummaryBox({
   locale
 }: any) {
   return (
-    <div className="bg-white rounded-lg shadow p-6 sticky top-20">
-      <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+    <div className="bg-white rounded-lg shadow p-6 sticky top-20 text-black">
+      <h2 className="text-xl font-bold mb-6 text-black">Order Summary</h2>
 
       {/* Discount Code Input */}
       <div className="mb-6">
-        <label className="text-sm text-gray-700 block mb-2">Discount Code</label>
+        <label className="text-sm text-black block mb-2 font-medium">Discount Code</label>
         <div className="flex gap-2">
           <input
             type="text"
             value={discountCode}
             onChange={e => onDiscountCodeChange(e.target.value)}
             placeholder="Enter code"
-            className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
           />
           <button
             onClick={onApplyDiscount}
-            className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded text-sm transition"
+            className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded text-sm transition font-medium"
           >
             Apply
           </button>
         </div>
         {discountPercent > 0 && (
-          <p className="text-green-600 text-xs mt-2">✓ Valid code ({discountPercent}% off)</p>
+          <p className="text-green-600 text-xs mt-2 font-medium">✓ Valid code ({discountPercent}% off)</p>
         )}
       </div>
 
       {/* Price Breakdown */}
-      <div className="space-y-3 mb-6 pb-6 border-b">
+      <div className="space-y-3 mb-6 pb-6 border-b border-gray-300">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Subtotal:</span>
-          <span className="font-medium">{subtotal.toLocaleString('en-US')} đ</span>
+          <span className="text-black font-medium">Subtotal:</span>
+          <span className="font-medium text-black">{subtotal.toLocaleString('en-US')} đ</span>
         </div>
 
         {discount > 0 && (
-          <div className="flex justify-between text-sm text-green-600">
+          <div className="flex justify-between text-sm text-green-600 font-medium">
             <span>Discount ({discountPercent}%):</span>
             <span>-{discount.toLocaleString('en-US')} đ</span>
           </div>
         )}
 
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Shipping:</span>
-          <span className="font-medium">
+          <span className="text-black font-medium">Shipping:</span>
+          <span className="font-medium text-black">
             {shipping === 0 ? 'Free' : shipping.toLocaleString('en-US') + ' đ'}
           </span>
         </div>
 
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Tax (8%):</span>
-          <span className="font-medium">{tax.toLocaleString('en-US')} đ</span>
+          <span className="text-black font-medium">Tax (8%):</span>
+          <span className="font-medium text-black">{tax.toLocaleString('en-US')} đ</span>
         </div>
       </div>
 
       {/* Total */}
       <div className="mb-6">
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold">Total:</span>
-          <span className="text-2xl font-bold">{total.toLocaleString('en-US')} đ</span>
+          <span className="text-lg font-bold text-black">Total:</span>
+          <span className="text-2xl font-bold text-black">{total.toLocaleString('en-US')} đ</span>
         </div>
-        <p className="text-xs text-gray-500 mt-2">Free shipping for orders over 1,000,000 đ</p>
+        <p className="text-xs text-black mt-2 font-medium">Free shipping for orders over 1,000,000 đ</p>
       </div>
 
       {/* Checkout Button */}
@@ -298,7 +298,7 @@ function CartSummaryBox({
 
       <Link
         href={`/${locale}/products`}
-        className="block w-full bg-gray-200 text-gray-800 text-center font-bold py-3 rounded hover:bg-gray-300 transition"
+        className="block w-full bg-gray-200 text-black text-center font-bold py-3 rounded hover:bg-gray-300 transition"
       >
         Continue Shopping
       </Link>
@@ -310,34 +310,34 @@ function CartSummaryBox({
 function InvoiceBox({ items, subtotal, discount, shipping, tax, total, onBack }: any) {
   const currentDate = new Date()
   const estimatedDelivery = new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000)
-  const orderId = crypto.randomUUID().substring(0, 7).toUpperCase()
+  const orderId = Math.random().toString(36).substring(7).toUpperCase()
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 sticky top-20">
-      <h2 className="text-xl font-bold mb-4">Invoice</h2>
+    <div className="bg-white rounded-lg shadow p-6 sticky top-20 text-black">
+      <h2 className="text-xl font-bold mb-4 text-black">Invoice</h2>
 
       {/* Order Info */}
-      <div className="bg-gray-100 rounded p-4 mb-4 text-sm space-y-2">
+      <div className="bg-gray-100 rounded p-4 mb-4 text-sm space-y-2 text-black">
         <div className="flex justify-between">
-          <span className="text-gray-600">Order ID:</span>
-          <span className="font-mono font-bold">#{orderId}</span>
+          <span className="text-black font-medium">Order ID:</span>
+          <span className="font-mono font-bold text-black">#{orderId}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Date:</span>
-          <span>{currentDate.toLocaleDateString('en-US')}</span>
+          <span className="text-black font-medium">Date:</span>
+          <span className="text-black">{currentDate.toLocaleDateString('en-US')}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Est. Delivery:</span>
-          <span>{estimatedDelivery.toLocaleDateString('en-US')}</span>
+          <span className="text-black font-medium">Est. Delivery:</span>
+          <span className="text-black">{estimatedDelivery.toLocaleDateString('en-US')}</span>
         </div>
       </div>
 
       {/* Items */}
-      <div className="mb-4 pb-4 border-b">
-        <h3 className="font-semibold mb-3 text-sm">Items:</h3>
+      <div className="mb-4 pb-4 border-b border-gray-300 text-black">
+        <h3 className="font-semibold mb-3 text-sm text-black">Items:</h3>
         <div className="space-y-2 text-xs">
           {items.map((item: CartItem) => (
-            <div key={item.id} className="flex justify-between text-gray-600">
+            <div key={item.id} className="flex justify-between text-black">
               <span>{item.name} x{item.quantity}</span>
               <span>{(item.price * item.quantity).toLocaleString('en-US')} đ</span>
             </div>
@@ -346,18 +346,18 @@ function InvoiceBox({ items, subtotal, discount, shipping, tax, total, onBack }:
       </div>
 
       {/* Summary */}
-      <div className="space-y-2 mb-4 text-sm">
+      <div className="space-y-2 mb-4 text-sm text-black">
         <div className="flex justify-between">
-          <span className="text-gray-600">Subtotal:</span>
-          <span>{subtotal.toLocaleString('en-US')} đ</span>
+          <span className="text-black font-medium">Subtotal:</span>
+          <span className="text-black">{subtotal.toLocaleString('en-US')} đ</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Shipping:</span>
-          <span>{shipping === 0 ? 'Free' : shipping.toLocaleString('en-US') + ' đ'}</span>
+          <span className="text-black font-medium">Shipping:</span>
+          <span className="text-black">{shipping === 0 ? 'Free' : shipping.toLocaleString('en-US') + ' đ'}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Tax:</span>
-          <span>{tax.toLocaleString('en-US')} đ</span>
+          <span className="text-black font-medium">Tax:</span>
+          <span className="text-black">{tax.toLocaleString('en-US')} đ</span>
         </div>
       </div>
 
@@ -372,12 +372,12 @@ function InvoiceBox({ items, subtotal, discount, shipping, tax, total, onBack }:
       {/* Shipping & Payment Info */}
       <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3 text-xs">
         <p className="text-blue-800 font-semibold mb-1">📍 Shipping Address:</p>
-        <p className="text-gray-700">To be updated during checkout</p>
+        <p className="text-black">To be updated during checkout</p>
       </div>
 
       <div className="bg-green-50 border border-green-200 rounded p-3 mb-4 text-xs">
         <p className="text-green-800 font-semibold mb-1">💳 Payment Method:</p>
-        <p className="text-gray-700">To be selected during checkout</p>
+        <p className="text-black">To be selected during checkout</p>
       </div>
 
       {/* Buttons */}
@@ -390,7 +390,7 @@ function InvoiceBox({ items, subtotal, discount, shipping, tax, total, onBack }:
         </button>
         <button
           onClick={onBack}
-          className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 rounded text-sm transition font-semibold"
+          className="w-full bg-gray-300 hover:bg-gray-400 text-black py-2 rounded text-sm transition font-semibold"
         >
           ← Back to Cart
         </button>

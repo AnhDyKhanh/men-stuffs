@@ -32,7 +32,7 @@ export default async function CartPage({ params }: PageProps) {
     {
       id: 1,
       name: 'Premium Cotton Shirt',
-      price: 499000,
+      price: 50,
       quantity: 1,
       image: '',
       size: 'M',
