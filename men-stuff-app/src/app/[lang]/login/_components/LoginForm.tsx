@@ -14,21 +14,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import type { labels } from '@/lib/labels'
 
 type LoginFormProps = {
-  dict: {
-    common: { login: string }
-    login: {
-      email: string
-      password: string
-      invalidCredentials: string
-      continueAsGuest: string
-    }
-  }
-  locale: string
+  dict: typeof labels
+  basePath: string
 }
 
-export function LoginForm({ dict, locale }: LoginFormProps) {
+export function LoginForm({ dict, basePath }: LoginFormProps) {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -53,11 +46,10 @@ export function LoginForm({ dict, locale }: LoginFormProps) {
         const redirectParam = new URLSearchParams(window.location.search).get('redirect')
 
         if (role === 'admin') {
-          router.push(redirectParam || `/${locale}/dashboard`)
+          router.push(redirectParam || `${basePath}/dashboard`)
         } else {
-          // User (không phải staff): chỉ xem store, không vào admin
-          const isAdminPath = redirectParam && /^\/(vi|en)\/(admin|dashboard|products-management|categories-management)/.test(redirectParam)
-          router.push(!isAdminPath && redirectParam ? redirectParam : `/${locale}`)
+          const isAdminPath = redirectParam && /\/vi\/(admin|dashboard|products-management|categories-management)/.test(redirectParam)
+          router.push(!isAdminPath && redirectParam ? redirectParam : basePath)
         }
         router.refresh()
       } else {
@@ -125,7 +117,7 @@ export function LoginForm({ dict, locale }: LoginFormProps) {
             </Button>
             <div className="flex items-center justify-center w-full">
               <Link
-                href={`/${locale}`}
+                href={basePath}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
               >
                 {dict.login.continueAsGuest}

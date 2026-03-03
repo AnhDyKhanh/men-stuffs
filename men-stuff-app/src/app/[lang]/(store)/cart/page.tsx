@@ -1,11 +1,9 @@
-import { getDictionary, isValidLocale } from '@/lib/i18n'
+import { labels, BASE_PATH } from '@/lib/labels'
 import Link from 'next/link'
 import CartPageClient from './_components/CartPageClient'
 
 type PageProps = {
-  params: Promise<{
-    lang: string
-  }>
+  params: Promise<{ lang: string }>
 }
 
 interface CartItem {
@@ -18,16 +16,9 @@ interface CartItem {
   color: string
 }
 
-/**
- * Shopping cart page - Server Component
- */
 export default async function CartPage({ params }: PageProps) {
-  const { lang } = await params
+  await params
 
-  const locale = isValidLocale(lang) ? lang : 'vi'
-  const dict = await getDictionary(locale)
-
-  // Mock cart items
   const mockCartItems: CartItem[] = [
     {
       id: 1,
@@ -58,28 +49,24 @@ export default async function CartPage({ params }: PageProps) {
     }
   ]
 
-  const cartItems: CartItem[] = mockCartItems // Change to [] to show empty state
+  const cartItems: CartItem[] = mockCartItems
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">{dict.common.cart}</h1>
+      <h1 className="text-4xl font-bold mb-8">{labels.common.cart}</h1>
 
       {cartItems.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">Your cart is empty</p>
+          <p className="text-gray-600 mb-4">Giỏ hàng trống</p>
           <Link
-            href={`/${locale}/products`}
+            href={`${BASE_PATH}/products`}
             className="inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
           >
-            Continue Shopping
+            Tiếp tục mua sắm
           </Link>
         </div>
       ) : (
-        <CartPageClient
-          cartItems={cartItems}
-          locale={locale}
-          dict={dict}
-        />
+        <CartPageClient cartItems={cartItems} basePath={BASE_PATH} />
       )}
     </div>
   )

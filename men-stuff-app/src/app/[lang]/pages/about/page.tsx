@@ -1,28 +1,19 @@
-import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
-
 type PageProps = {
   params: Promise<{ lang: string }>
 }
 
-/**
- * About page
- */
 export default async function AboutPage({ params }: PageProps) {
-  const { lang } = await params
-  const locale = isValidLocale(lang) ? lang : 'vi'
-  const dict = await getDictionary(locale)
+  await params
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">About Us</h1>
+      <h1 className="text-4xl font-bold mb-8">Về chúng tôi</h1>
       <div className="max-w-3xl">
         <p className="text-lg text-gray-600 mb-4">
-          Welcome to Men Stuffs, your premier destination for quality men's
-          products.
+          Chào mừng bạn đến với Men Stuffs, điểm đến uy tín cho các sản phẩm thời trang nam.
         </p>
         <p className="text-lg text-gray-600">
-          We are committed to providing the best shopping experience with a wide
-          selection of products and excellent customer service.
+          Chúng tôi cam kết mang đến trải nghiệm mua sắm tốt nhất với đa dạng sản phẩm và dịch vụ khách hàng tận tâm.
         </p>
       </div>
     </div>

@@ -6,9 +6,18 @@ import { createProduct } from './services/createProducts'
  * GET /api/admin/products
  * Get all products
  */
-export async function GET() {
-  const products = await getAllProducts()
-  return NextResponse.json(products)
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  const options = {
+    page: parseInt(searchParams.get('page') || '0'),
+    size: parseInt(searchParams.get('size') || '10'),
+    orderBy: searchParams.get('orderBy') || 'created_at',
+    ascending: searchParams.get('ascending') === 'true'
+  };
+
+  const result = await getAllProducts(options);
+  return Response.json(result);
 }
 
 /**
