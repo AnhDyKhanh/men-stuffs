@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -30,25 +30,21 @@ export async function POST(request: Request) {
     if (accountError || !account) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
-    // So sánh mật khẩu (production nên dùng hash, ví dụ bcrypt)
     if (account.password !== password) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
     const isStaff = await isStaffByAccountId(account.id)
     const role = isStaff ? 'admin' : 'user'
 
-    const response = NextResponse.json(
-      { success: true, role },
-      { status: 200 }
-    )
+    const response = NextResponse.json({ success: true, role }, { status: 200 })
     response.cookies.set(COOKIE_ACCOUNT_ID, account.id, {
       httpOnly: true,
       path: '/',
@@ -66,7 +62,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

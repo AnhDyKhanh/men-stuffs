@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getDictionary, isValidLocale, type Locale } from '@/lib/i18n'
 import { cookies } from 'next/headers'
+import { getDictionary, isValidLocale } from '@/lib/i18n'
 import { getUserRole } from '@/lib/auth'
 import LogoutButton from '@/app/[lang]/_components/admin/LogoutButton'
 

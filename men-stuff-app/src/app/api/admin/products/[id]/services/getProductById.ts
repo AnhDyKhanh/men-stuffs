@@ -1,6 +1,5 @@
 import { getSupabase } from '@/lib/supabase';
 
-//ở đây khai báo param cho serivce này
 type GetProductByIdParams = {
   id: string
 }
@@ -10,6 +9,7 @@ export async function getProductById(params: GetProductByIdParams) {
     const { id } = params
     const supabase = getSupabase()
 
+    //làm sao để định nghĩa type cho data?
     const { data } = await supabase
       .from('product')
       .select('*')
@@ -18,16 +18,14 @@ export async function getProductById(params: GetProductByIdParams) {
 
     if (!data) return undefined
 
-    // Lấy ảnh primary từ product_image (product_id trùng, is_primary = true)
-    const { data: primaryImage } = await supabase
-      .from('product_image')
-      .select('image_url')
-      .eq('product_id', id)
-      .eq('is_primary', true)
-      .maybeSingle()
+    // // Lấy ảnh primary từ product_image (product_id trùng, is_primary = true)
+    // const { data: primaryImage } = await supabase
+    //   .from('product_image')
+    //   .select('image_url')
+    //   .eq('product_id', id)
+    //   .eq('is_primary', true)
+    //   .maybeSingle()
 
-    const thumbnail =
-      primaryImage?.image_url ?? ''
 
     const product = {
       id: data.id,
@@ -35,7 +33,7 @@ export async function getProductById(params: GetProductByIdParams) {
       slug: data.slug ?? '',
       description: data.description ?? '',
       price: Number(data.price),
-      thumbnail,
+      thumbnail: data.origin_image ?? '',
       status: data.status ?? 'active',
       createdAt:
         data.created_at ?? data.createdAt ?? new Date().toISOString(),

@@ -1,5 +1,5 @@
-import { getDictionary, isValidLocale } from '@/lib/i18n'
 import { cookies } from 'next/headers'
+import { getDictionary, isValidLocale } from '@/lib/i18n'
 import { getUserRole } from '@/lib/auth'
 import LanguageSwitcher from '@/app/[lang]/_components/LanguageSwitcher'
 import {

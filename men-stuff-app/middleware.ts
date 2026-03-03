@@ -4,7 +4,6 @@ import { defaultLocale, isValidLocale } from '@/lib/i18n'
 import { isStaffByAccountId } from '@/lib/auth-server'
 
 const COOKIE_ACCOUNT_ID = 'account_id'
-
 const protectedUserRoutes = ['/checkout', '/account']
 
 function getUserRole(request: NextRequest): 'guest' | 'user' | 'admin' {
@@ -21,9 +20,6 @@ function isUserRoute(pathname: string): boolean {
   return protectedUserRoutes.some((route) => pathname.includes(route))
 }
 
-/**
- * Extract locale from pathname
- */
 function getLocaleFromPath(pathname: string): string | null {
   const segments = pathname.split('/').filter(Boolean)
   if (segments.length > 0 && isValidLocale(segments[0])) {
@@ -32,9 +28,6 @@ function getLocaleFromPath(pathname: string): string | null {
   return null
 }
 
-/**
- * Remove locale from pathname
- */
 function removeLocaleFromPath(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean)
   if (segments.length > 0 && isValidLocale(segments[0])) {
@@ -43,17 +36,26 @@ function removeLocaleFromPath(pathname: string): string {
   return pathname
 }
 
+const adminRoutePrefixes = [
+  '/admin',
+  '/dashboard',
+  '/products-management',
+  '/categories-management',
+]
+
+function isAdminRoute(pathWithoutLocale: string): boolean {
+  return adminRoutePrefixes.some((prefix) => pathWithoutLocale.startsWith(prefix))
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const pathWithoutLocale = removeLocaleFromPath(pathname)
   const locale = getLocaleFromPath(pathname)
 
-  // Handle root path - redirect to default locale
   if (pathname === '/') {
     return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url))
   }
 
-  // If path doesn't start with a locale, redirect
   if (!locale) {
     const newUrl = new URL(`/${defaultLocale}${pathname}`, request.url)
     return NextResponse.redirect(newUrl)
@@ -66,13 +68,7 @@ export async function middleware(request: NextRequest) {
 
   const userRole = getUserRole(request)
 
-  // Admin routes: phải có account_id trong cookie VÀ bảng staff có bản ghi với account_id đó
-  if (
-    pathWithoutLocale.startsWith('/admin') ||
-    pathWithoutLocale.startsWith('/dashboard') ||
-    pathWithoutLocale.startsWith('/products-management') ||
-    pathWithoutLocale.startsWith('/categories-management')
-  ) {
+  if (isAdminRoute(pathWithoutLocale)) {
     const accountId = getAccountId(request)
     const isStaff = accountId ? await isStaffByAccountId(accountId) : false
     if (!isStaff) {
@@ -82,7 +78,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Check user routes (checkout, account)
   if (isUserRoute(pathWithoutLocale)) {
     if (userRole === 'guest') {
       const loginUrl = new URL(`/${locale}/login`, request.url)
@@ -91,24 +86,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Add locale to request headers for use in components
   const response = NextResponse.next()
   response.headers.set('x-locale', locale)
   response.headers.set('x-user-role', userRole)
-
   return response
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (public folder)
-     */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
