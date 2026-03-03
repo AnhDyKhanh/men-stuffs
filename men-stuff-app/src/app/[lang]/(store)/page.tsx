@@ -6,6 +6,9 @@ import {
   getFeaturedCategories,
   getTwoBannerRows,
 } from '@/app/_constants/placeholderData'
+import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import { getAllProductsMutation } from '@/app/_hooks/getAllProductsMutation'
+import type { Product } from '@/app/_models/product'
 import HeroSlideshow from '@/components/store/HeroSlideshow'
 import ProductGrid from '@/components/store/ProductGrid'
 import TwoBannerSection from '@/components/store/TwoBannerSection'
@@ -26,9 +29,69 @@ export default async function HomePage({ params }: PageProps) {
 
   const basePath = `/${locale}`
   const heroSlides = getHeroSlides(basePath)
-  const newProducts = getNewProducts(locale, basePath)
   const featuredCategories = getFeaturedCategories(basePath, locale)
-  const bannerRows = getTwoBannerRows(basePath)
+
+  // Try to get latest products from API (Supabase) for:
+  // - \"Sản phẩm mới\" section
+  // - \"New In\" banner (latest product)
+  // Fallback to static mock data when API is not ready or returns empty.
+  let newProducts: PlaceholderProduct[] = []
+  let latestProductForBanner: { title?: string | null; href?: string; imageUrl?: string | null } | undefined
+  try {
+    const res = await getAllProductsMutation()
+    const products = (Array.isArray(res) ? res : res?.data ?? []) as Product[]
+    if (products.length > 0) {
+      const sorted = [...products].sort((a, b) => {
+        const aTime = a.created_at ? new Date(a.created_at).getTime() : 0
+        const bTime = b.created_at ? new Date(b.created_at).getTime() : 0
+        return bTime - aTime
+      })
+      const latest = sorted[0]
+      const latestAny = latest as unknown as { origin_image?: string | null }
+
+      // Latest product for \"New In\" banner
+      latestProductForBanner = {
+        title: latest.name,
+        href: latest.slug ? `${basePath}/product/${latest.slug}` : `${basePath}/products`,
+        imageUrl: latestAny.origin_image ?? '/banners/new-in.jpg',
+      }
+
+      // Top N newest products for \"Sản phẩm mới\" section
+      const topNew = sorted.slice(0, 8)
+      newProducts = topNew.map((p) => {
+        const pAny = p as unknown as { origin_image?: string | null }
+        const price = p.price ?? 0
+        const priceFormatted = new Intl.NumberFormat(
+          locale === 'vi' ? 'vi-VN' : 'en-US',
+          {
+            style: 'currency',
+            currency: 'VND',
+            maximumFractionDigits: 0,
+          },
+        ).format(price)
+
+        return {
+          id: p.id,
+          name: p.name ?? 'Unnamed product',
+          price,
+          priceFormatted,
+          imageUrl: pAny.origin_image ?? '/banners/new-in.jpg',
+          href: `${basePath}/product/${p.slug ?? p.id}`,
+          rating: 0,
+          reviewCount: 0,
+        }
+      })
+    }
+  } catch {
+    // Ignore errors – keep using fallback banner + mock products
+  }
+
+  // Fallback: still use mock data when API has no products or fails
+  if (newProducts.length === 0) {
+    newProducts = getNewProducts(locale, basePath)
+  }
+
+  const bannerRows = getTwoBannerRows(basePath, latestProductForBanner)
 
   return (
     <>
