@@ -10,7 +10,8 @@ interface HeaderProps {
   cartHref: string
   cartLabel: string
   searchLabel: string
-  languageSwitcher: React.ReactNode
+  /** Optional: đổi ngôn ngữ (đã bỏ i18n, có thể bỏ qua) */
+  languageSwitcher?: React.ReactNode
   /** When set, shows an Admin link (e.g. for admin users) */
   adminHref?: string
 }
@@ -63,7 +64,7 @@ export default function Header({
           </Link>
 
           <div className="flex items-center gap-4 md:gap-6">
-            {languageSwitcher}
+            {languageSwitcher ?? null}
             {adminHref && (
               <Link
                 href={adminHref}

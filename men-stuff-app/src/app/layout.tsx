@@ -1,14 +1,9 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { locales } from '@/lib/i18n'
 
 export const metadata: Metadata = {
-  title: 'Men Stuffs - E-commerce Store',
-  description: "Modern e-commerce store for men's products",
-}
-
-export function generateStaticParams() {
-  return locales.map((lang) => ({ lang }))
+  title: 'Men Stuffs - Cửa hàng thời trang nam',
+  description: 'Cửa hàng thời trang nam',
 }
 
 export default function RootLayout({
@@ -17,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="vi" className="dark" suppressHydrationWarning>
       <body className="antialiased">
         {children}
       </body>

@@ -16,14 +16,12 @@ interface CartItem {
 
 interface CartPageClientProps {
   cartItems: CartItem[]
-  locale: string
-  dict: any
+  basePath: string
 }
 
 export default function CartPageClient({
   cartItems: initialItems,
-  locale,
-  dict
+  basePath,
 }: CartPageClientProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>(initialItems)
   const [discountCode, setDiscountCode] = useState('')
@@ -95,10 +93,10 @@ export default function CartPageClient({
         {/* Continue Shopping Button */}
         <div className="mt-6">
           <Link
-            href={`/${locale}/products`}
-            className="inline-block bg-gray-200 hover:bg-gray-300 text-black px-6 py-2 rounded transition font-medium"
+            href={`${basePath}/products`}
+            className="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded transition"
           >
-            ← Continue Shopping
+            ← Tiếp tục mua sắm
           </Link>
         </div>
       </div>
@@ -117,7 +115,7 @@ export default function CartPageClient({
             onDiscountCodeChange={setDiscountCode}
             onApplyDiscount={applyDiscount}
             onCheckout={() => setShowInvoice(true)}
-            locale={locale}
+            basePath={basePath}
           />
         ) : (
           <InvoiceBox
@@ -223,7 +221,7 @@ function CartSummaryBox({
   onDiscountCodeChange,
   onApplyDiscount,
   onCheckout,
-  locale
+  basePath,
 }: any) {
   return (
     <div className="bg-white rounded-lg shadow p-6 sticky top-20 text-black">
@@ -297,10 +295,10 @@ function CartSummaryBox({
       </button>
 
       <Link
-        href={`/${locale}/products`}
-        className="block w-full bg-gray-200 text-black text-center font-bold py-3 rounded hover:bg-gray-300 transition"
+        href={`${basePath}/products`}
+        className="block w-full bg-gray-200 text-gray-800 text-center font-bold py-3 rounded hover:bg-gray-300 transition"
       >
-        Continue Shopping
+        Tiếp tục mua sắm
       </Link>
     </div>
   )

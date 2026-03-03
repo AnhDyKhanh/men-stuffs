@@ -1,7 +1,7 @@
-import { locales } from '@/lib/i18n'
+import { defaultLocale } from '@/lib/i18n'
 
 export function generateStaticParams() {
-  return locales.map((lang) => ({ lang }))
+  return [{ lang: defaultLocale }]
 }
 
 export default async function LocaleLayout({

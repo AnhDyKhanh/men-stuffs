@@ -20,7 +20,7 @@ export default function LogoutButton({ lang }: { lang: string }) {
       onClick={handleLogout}
       className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 hover:text-red-700 transition"
     >
-      Logout
+      Đăng xuất
     </button>
   )
 }

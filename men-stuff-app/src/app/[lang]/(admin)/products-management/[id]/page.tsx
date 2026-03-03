@@ -1,24 +1,16 @@
 import ProductForm from '@/app/[lang]/_components/admin/ProductForm'
-import { getDictionary, isValidLocale } from '@/lib/i18n'
+import { labels, BASE_PATH } from '@/lib/labels'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 type PageProps = {
-  params: Promise<{
-    lang: string
-    id: string
-  }>
+  params: Promise<{ lang: string; id: string }>
 }
 
-/**
- * Edit product page
- */
 export default async function EditProductPage({ params }: PageProps) {
-  const { lang, id } = await params
-  const locale = isValidLocale(lang) ? lang : 'vi'
-  const dict = await getDictionary(locale)
+  const { id } = await params
+  const dict = labels.admin
   const product = null
-  // const product = getProductById(id)
 
   if (!product) {
     notFound()
@@ -27,29 +19,29 @@ export default async function EditProductPage({ params }: PageProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">{dict.admin.editProduct}</h1>
+        <h1 className="text-3xl font-bold">{dict.editProduct}</h1>
         <Link
-          href={`/${locale}/products-management`}
+          href={`${BASE_PATH}/products-management`}
           className="text-gray-600 hover:text-black"
         >
-          ← {dict.admin.backToProducts}
+          ← {dict.backToProducts}
         </Link>
       </div>
 
       <div className="bg-white border rounded-lg p-8 max-w-2xl shadow-sm">
         <ProductForm
           product={product}
-          lang={locale}
+          lang="vi"
           translations={{
-            productName: dict.admin.productName,
-            productNameVi: dict.admin.productNameVi,
-            productNameEn: dict.admin.productNameEn,
-            productPrice: dict.admin.productPrice,
-            productStatus: dict.admin.status,
-            active: dict.admin.active,
-            inactive: dict.admin.inactive,
-            save: dict.admin.save,
-            cancel: dict.admin.cancel,
+            productName: dict.productName,
+            productNameVi: dict.productNameVi,
+            productNameEn: dict.productNameEn,
+            productPrice: dict.productPrice,
+            productStatus: dict.status,
+            active: dict.active,
+            inactive: dict.inactive,
+            save: dict.save,
+            cancel: dict.cancel,
           }}
         />
       </div>

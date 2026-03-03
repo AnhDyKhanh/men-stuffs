@@ -1,5 +1,7 @@
-import { getDictionary, isValidLocale } from '@/lib/i18n'
-import ProductGrid from '../cart/_components/ProductGrid'
+import Link from 'next/link'
+import { labels, BASE_PATH } from '@/lib/labels'
+import ProductGrid from '@/components/store/ProductGrid'
+import { PlaceholderProduct } from '@/app/_constants/placeholderData'
 
 type PageProps = {
   params: Promise<{
@@ -21,108 +23,100 @@ interface Product {
 }
 
 export default async function ProductsPage({ params }: PageProps) {
-  const { lang } = await params
+  await params
 
-  const locale = isValidLocale(lang) ? lang : 'vi'
-  const dict = await getDictionary(locale)
-
+  // export interface PlaceholderProduct {
+  //   id: string
+  //   name: string
+  //   price: number
+  //   priceFormatted: string
+  //   imageUrl: string
+  //   href: string
+  //   rating?: number
+  //   reviewCount?: number
+  //   label?: 'new' | 'sale'
+  // }
   // Mock products data
-  const mockProducts: Product[] = [
+  const mockProducts: PlaceholderProduct[] = [
     {
-      id: 1,
+      id: '1',
       name: 'Premium Cotton Shirt',
       price: 499000,
-      image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
-      category: 'Shirts',
+      imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
       rating: 5,
-      reviews: 128,
-      description: 'High-quality cotton shirt perfect for everyday wear',
-      colors: ['Black', 'White', 'Blue'],
-      sizes: ['S', 'M', 'L', 'XL']
+      reviewCount: 128,
+      priceFormatted: '499000',
+      href: '/products/1',
     },
     {
-      id: 2,
+      id: '2',
       name: 'Classic Denim Jeans',
       price: 799000,
-      image: 'https://images.unsplash.com/photo-1542272604-787c62d465d1?w=400&h=400&fit=crop',
-      category: 'Jeans',
+      imageUrl: 'https://images.unsplash.com/photo-1542272604-787c62d465d1?w=400&h=400&fit=crop',
       rating: 4.5,
-      reviews: 95,
-      description: 'Comfortable and stylish denim jeans',
-      colors: ['Navy', 'Black', 'Light Blue'],
-      sizes: ['28', '30', '32', '34', '36']
+      reviewCount: 95,
+      priceFormatted: '799000',
+      href: '/products/2',
     },
     {
-      id: 3,
+      id: '3',
       name: 'Casual T-Shirt',
       price: 299000,
-      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop',
-      category: 'T-Shirts',
+      imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop',
       rating: 4.8,
-      reviews: 156,
-      description: 'Lightweight and breathable t-shirt',
-      colors: ['White', 'Black', 'Gray'],
-      sizes: ['S', 'M', 'L', 'XL', 'XXL']
+      reviewCount: 156,
+      priceFormatted: '299000',
+      href: '/products/3',
     },
     {
-      id: 4,
+      id: '4',
       name: 'Formal Blazer',
       price: 1299000,
-      image: 'https://images.unsplash.com/photo-1591047990975-d7f4dad7bc7a?w=400&h=400&fit=crop',
-      category: 'Blazers',
+      imageUrl: 'https://images.unsplash.com/photo-1591047990975-d7f4dad7bc7a?w=400&h=400&fit=crop',
       rating: 4.9,
-      reviews: 67,
-      description: 'Professional blazer for formal occasions',
-      colors: ['Black', 'Navy', 'Gray'],
-      sizes: ['S', 'M', 'L', 'XL']
+      reviewCount: 67,
+      priceFormatted: '1299000',
+      href: '/products/4',
     },
     {
-      id: 5,
+      id: '5',
       name: 'Polo Shirt',
       price: 399000,
-      image: 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60908?w=400&h=400&fit=crop',
-      category: 'Shirts',
+      imageUrl: 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60908?w=400&h=400&fit=crop',
       rating: 4.7,
-      reviews: 89,
-      description: 'Classic polo shirt with collar',
-      colors: ['Red', 'Blue', 'Green', 'White'],
-      sizes: ['S', 'M', 'L', 'XL']
+      reviewCount: 89,
+      priceFormatted: '399000',
+      href: '/products/5',
     },
     {
-      id: 6,
+      id: '6',
       name: 'Cargo Shorts',
       price: 449000,
-      image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop',
-      category: 'Shorts',
+      imageUrl: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop',
       rating: 4.6,
-      reviews: 73,
-      description: 'Practical cargo shorts with multiple pockets',
-      colors: ['Khaki', 'Black', 'Olive'],
-      sizes: ['S', 'M', 'L', 'XL']
+      reviewCount: 73,
+      priceFormatted: '449000',
+      href: '/products/6',
     },
     {
-      id: 7,
+      id: '7',
       name: 'Hoodie',
       price: 699000,
-      image: 'https://images.unsplash.com/photo-1556821552-5f394c7fbb12?w=400&h=400&fit=crop',
-      category: 'Hoodies',
+      imageUrl: 'https://images.unsplash.com/photo-1556821552-5f394c7fbb12?w=400&h=400&fit=crop',
       rating: 4.8,
-      reviews: 142,
-      description: 'Cozy hoodie perfect for cold weather',
-      colors: ['Black', 'Gray', 'Navy', 'White'],
-      sizes: ['S', 'M', 'L', 'XL', 'XXL']
+      reviewCount: 142,
+      priceFormatted: '699000',
+      href: '/products/7',
     },
     {
-      id: 8,
+      id: '8',
       name: 'Leather Jacket',
       price: 1599000,
-      image: 'https://images.unsplash.com/photo-1557804506-669714153f27?w=400&h=400&fit=crop',
-      category: 'Jackets',
+      imageUrl: 'https://images.unsplash.com/photo-1557804506-669714153f27?w=400&h=400&fit=crop',
       rating: 5,
-      reviews: 54,
-      description: 'Premium leather jacket for style and protection',
-      colors: ['Black', 'Brown'],
-      sizes: ['S', 'M', 'L', 'XL']
+      reviewCount: 54,
+      priceFormatted: '1599000',
+      href: '/products/8',
     }
   ]
 
@@ -131,13 +125,10 @@ export default async function ProductsPage({ params }: PageProps) {
       {/* Header */}
       <div className="mb-12">
         <h1 className="text-4xl font-bold text-black mb-4">
-          {locale === 'vi' ? 'Sản Phẩm' : 'Products'}
+          {'Sản Phẩm'}
         </h1>
         <p className="text-gray-600 text-lg">
-          {locale === 'vi'
-            ? 'Khám phá bộ sưu tập quần áo nam phong cách của chúng tôi'
-            : 'Discover our stylish collection of men\'s clothing'
-          }
+          {'Khám phá bộ sưu tập quần áo nam phong cách của chúng tôi'}
         </p>
       </div>
 
@@ -161,7 +152,7 @@ export default async function ProductsPage({ params }: PageProps) {
       </div>
 
       {/* Products Grid */}
-      <ProductGrid products={mockProducts} locale={locale} />
+      <ProductGrid products={mockProducts} />
     </div>
   )
 }
