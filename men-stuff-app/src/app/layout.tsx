@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ReactQueryProvider } from '@/components/providers/ReactQueryProvider'
 
 export const metadata: Metadata = {
   title: 'Men Stuffs - Cửa hàng thời trang nam',
@@ -17,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="vi" className="dark" suppressHydrationWarning>
       <body className="antialiased">
-        {children}
+        <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
     </html>
   )
