@@ -11,7 +11,7 @@ export type CartItem = {
   product_id: string | null
   quantity: number | null
   price_at_time: number | null
-  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type CartItemStatus = 'active' | 'inactive' | string
