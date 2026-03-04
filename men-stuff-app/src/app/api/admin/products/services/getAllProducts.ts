@@ -8,40 +8,41 @@ export async function getAllProducts(
 ): Promise<Data<Product[]>> {
 
   const {
-    page = 0,
+    page = 1, // Mặc định nên là 1
     size = 10,
     orderBy = 'created_at',
     ascending = false
   } = options;
 
-  const currentPage = Math.max(1, page); // Đảm bảo không bị số âm
-  const from = (currentPage - 1) * size;
-  const to = from + size - 1;
+  // Fix logic tính toán range chuẩn xác
+  const safePage = Math.max(1, Number(page));
+  const safeSize = Math.max(1, Number(size));
+  const from = (safePage - 1) * safeSize;
+  const to = from + safeSize - 1;
 
   try {
-    const { data, error, count } = await getSupabase()
+    const supabase = getSupabase();
+
+    const { data, error, count } = await supabase
       .from('product')
       .select('*', { count: 'exact' })
-      .order(orderBy, { ascending: ascending })
+      .order(orderBy, { ascending })
       .range(from, to);
+
     if (error) throw error;
 
-    if (data) {
-      return {
-        data: data,
-        error: null,
-        message: `Products fetched successfully. Total: ${count}`,
-        status: 200
-      };
-    }
+    return {
+      data: data || [],
+      error: null,
+      message: `Fetched successfully. Total: ${count}`,
+      status: 200
+    };
 
-    return { data: null, error: 'No products found', message: null, status: 404 };
-
-  } catch (error) {
+  } catch (error: any) {
     console.error('[API GET /api/admin/products] exception:', error);
     return {
       data: null,
-      error: error instanceof Error ? error.message : 'Failed to fetch products',
+      error: error.message || 'Failed to fetch products',
       message: null,
       status: 500
     };
