@@ -1,3 +1,5 @@
+'use client'
+
 import { useQuery } from '@tanstack/react-query'
 import { API_ROUTES } from '../_constants/apiRouter'
 import type { ProductQueryOptions } from '../_dtos/get-product-list-option.dto'
@@ -17,7 +19,6 @@ function buildProductsQueryString(options: ProductQueryOptions): string {
 async function fetchAllProducts(
   options: ProductQueryOptions
 ): Promise<Data<Product[]>> {
-
   const query = buildProductsQueryString(options)
   const url = `${API_ROUTES.PRODUCTS.GET_ALL}?${query}`
 
@@ -28,9 +29,14 @@ async function fetchAllProducts(
 
 export function useGetAllProducts(options: ProductQueryOptions) {
   return useQuery({
-    queryKey: ['@get-all-products', options],
+    queryKey: [
+      '@get-all-products',
+      options.page,
+      options.size,
+      options.orderBy,
+      options.ascending,
+    ],
     queryFn: () => fetchAllProducts(options),
-    // Giúp trải nghiệm mượt hơn khi chuyển trang (giữ data cũ trong lúc load data mới)
-    placeholderData: (previousData) => previousData,
+    placeholderData: (prev) => prev,
   })
 }

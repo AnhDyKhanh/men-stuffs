@@ -14,7 +14,8 @@ export async function getAllProducts(
     ascending = false
   } = options;
 
-  const from = page * size;
+  const currentPage = Math.max(1, page); // Đảm bảo không bị số âm
+  const from = (currentPage - 1) * size;
   const to = from + size - 1;
 
   try {
@@ -23,7 +24,6 @@ export async function getAllProducts(
       .select('*', { count: 'exact' })
       .order(orderBy, { ascending: ascending })
       .range(from, to);
-
     if (error) throw error;
 
     if (data) {
