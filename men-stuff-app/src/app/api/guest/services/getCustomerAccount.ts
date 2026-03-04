@@ -18,8 +18,15 @@ export async function getCustomerAccount() {
     .from('customer')
     .select('*')
     .eq('account_id', accountId)
+    .single()
+
   if (error) throw error
-  return data
+  return {
+    data: data,
+    error: null,
+    message: 'Customer account information fetched successfully',
+    status: 200
+  }
 }
 
 export async function getCurrentCustomerId() {
