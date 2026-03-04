@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Men Stuffs - Cửa hàng thời trang nam',
   description: 'Cửa hàng thời trang nam',
+  icons: {
+    icon: '/icon',
+  },
 }
 
 export default function RootLayout({
