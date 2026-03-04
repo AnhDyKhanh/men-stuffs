@@ -34,11 +34,11 @@ export default function DashboardDashboardClient({
 }: {
   labels: typeof import('@/lib/labels').labels.admin
 }) {
+
   const { data: products } = useGetAllProducts({
     page: 1,
     size: 10,
     orderBy: 'created_at',
-    ascending: false,
   })
 
   const stats = {

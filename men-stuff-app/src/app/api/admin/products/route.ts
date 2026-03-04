@@ -8,7 +8,6 @@ import { createProduct } from './services/createProducts'
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-
   const options = {
     page: parseInt(searchParams.get('page') || '0'),
     size: parseInt(searchParams.get('size') || '10'),

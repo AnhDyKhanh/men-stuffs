@@ -1,3 +1,4 @@
+import Providers from '@/components/provider/providers'
 import { defaultLocale } from '@/lib/i18n'
 
 export function generateStaticParams() {
@@ -12,5 +13,10 @@ export default async function LocaleLayout({
   params: Promise<{ lang: string }>
 }) {
   await params
-  return <>{children}</>
+
+  return (
+    <Providers>
+      {children}
+    </Providers>
+  )
 }
