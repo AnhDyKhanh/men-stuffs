@@ -100,10 +100,10 @@ export default function StoreHomeClient() {
   const latestProductForBanner =
     newProductsFromApi.length > 0
       ? {
-          title: newProductsFromApi[0].name,
-          href: newProductsFromApi[0].href,
-          imageUrl: newProductsFromApi[0].imageUrl,
-        }
+        title: newProductsFromApi[0].name,
+        href: newProductsFromApi[0].href,
+        imageUrl: newProductsFromApi[0].imageUrl,
+      }
       : undefined
 
   const bannerRows = getTwoBannerRows(BASE_PATH, latestProductForBanner)
@@ -169,7 +169,7 @@ export default function StoreHomeClient() {
             </p>
           )}
           <FeaturedCategoriesSection
-            title={labels.home.featuredCategories}
+            title="Danh mục nổi bật"
             categories={featuredCategories}
           />
         </section>
