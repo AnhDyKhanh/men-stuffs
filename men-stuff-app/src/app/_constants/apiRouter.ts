@@ -1,5 +1,8 @@
 export const API_ROUTES = {
   GUEST: {
+    ACCOUNT: {
+      GET_CUSTOMER_ACCOUNT_INFOR: '/api/guest',
+    },
     CART: {
       GET_CUSTOMER_CURRENT_CART: '/api/guest/cart',
     },
