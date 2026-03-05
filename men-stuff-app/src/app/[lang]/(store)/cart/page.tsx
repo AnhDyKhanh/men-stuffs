@@ -1,10 +1,9 @@
+'use client'
+
 import { labels, BASE_PATH } from '@/lib/labels'
 import Link from 'next/link'
 import CartPageClient from './_components/CartPageClient'
-
-type PageProps = {
-  params: Promise<{ lang: string }>
-}
+import { useGetCustomerCurrentCart } from '@/app/_hooks/getCustomerCurrentCart'
 
 interface CartItem {
   id: number
@@ -16,9 +15,7 @@ interface CartItem {
   color: string
 }
 
-export default async function CartPage({ params }: PageProps) {
-  await params
-
+export default function CartPage() {
   const mockCartItems: CartItem[] = [
     {
       id: 1,
@@ -48,6 +45,10 @@ export default async function CartPage({ params }: PageProps) {
       color: 'White'
     }
   ]
+
+  const { data: cartItemsDataNew } = useGetCustomerCurrentCart()
+  //đây là dữ liệu api
+  console.log('cartItemsDataNew', cartItemsDataNew)
 
   const cartItems: CartItem[] = mockCartItems
 

@@ -114,11 +114,6 @@ export default function StoreHomeClient() {
     isError: isCategoriesError,
   } = useGetAllCategories()
 
-  const featuredCategories: FeaturedCategory[] = mapCategoriesToFeatured(
-    categoriesData ?? [],
-    BASE_PATH,
-  )
-
   return (
     <>
       <HeroSlideshow slides={heroSlides} />
@@ -128,9 +123,9 @@ export default function StoreHomeClient() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <h2
               id="new-products-heading"
-              className="text-2xl font-semibold text-neutral-900 md:text-3xl"
+              className="text-2xl font-semibold text-white md:text-3xl"
             >
-              {labels.home.newProducts}
+              Sản phẩm
             </h2>
             <Link
               href={`${BASE_PATH}/products`}
@@ -168,10 +163,10 @@ export default function StoreHomeClient() {
               Đang tải danh mục sản phẩm...
             </p>
           )}
-          <FeaturedCategoriesSection
+          {/* <FeaturedCategoriesSection
             title="Danh mục nổi bật"
             categories={featuredCategories}
-          />
+          /> */}
         </section>
       </div>
 
