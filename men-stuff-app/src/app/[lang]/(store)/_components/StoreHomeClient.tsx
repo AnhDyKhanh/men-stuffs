@@ -46,7 +46,7 @@ function mapProductsToPlaceholder(
       imageUrl:
         p.origin_image ||
         'https://placehold.co/400x400/f5f5f5/999?text=Product',
-      href: `${basePath}/products/${p.slug || p.id}`,
+      href: `${basePath}/product/${p.id}`,
       rating: 0,
       reviewCount: 0,
       label: 'new',
