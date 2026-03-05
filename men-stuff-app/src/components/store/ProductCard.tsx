@@ -44,6 +44,7 @@ export default function ProductCard({
   product,
   buyNowLabel = 'Buy now',
 }: ProductCardProps) {
+  console.log('produchuuhuhuht', product)
   return (
     <article className="group">
       <div className="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">

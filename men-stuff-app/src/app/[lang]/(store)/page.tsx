@@ -1,11 +1,6 @@
 import StoreHomeClient from './_components/StoreHomeClient'
 
-type PageProps = {
-  params: { lang: string }
-}
-
-export default function HomePage({ params }: PageProps) {
-  void params
+export default function HomePage() {
   return (
     <StoreHomeClient />
   )
