@@ -114,11 +114,6 @@ export default function StoreHomeClient() {
     isError: isCategoriesError,
   } = useGetAllCategories()
 
-  const featuredCategories: FeaturedCategory[] = mapCategoriesToFeatured(
-    categoriesData ?? [],
-    BASE_PATH,
-  )
-
   return (
     <>
       <HeroSlideshow slides={heroSlides} />
