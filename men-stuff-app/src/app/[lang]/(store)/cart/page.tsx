@@ -16,49 +16,35 @@ interface CartItem {
 }
 
 export default function CartPage() {
-  const mockCartItems: CartItem[] = [
-    {
-      id: 1,
-      name: 'Premium Cotton Shirt',
-      price: 50,
-      quantity: 1,
-      image: '',
-      size: 'M',
-      color: 'Black'
-    },
-    {
-      id: 2,
-      name: 'Classic Denim Jeans',
-      price: 799000,
-      quantity: 2,
-      image: '',
-      size: 'L',
-      color: 'Navy'
-    },
-    {
-      id: 3,
-      name: 'Casual T-Shirt',
-      price: 299000,
-      quantity: 1,
-      image: '',
-      size: 'S',
-      color: 'White'
-    }
-  ]
-
   const { data: cartItemsDataNew } = useGetCustomerCurrentCart()
-  //đây là dữ liệu api
-  console.log('cartItemsDataNew', cartItemsDataNew)
 
-  const cartItems: CartItem[] = mockCartItems
+  const cartItems: CartItem[] =
+    cartItemsDataNew?.data?.map((item: any, index: number) => {
+      const price =
+        item.product.discount_price ?? item.product.price
+
+      return {
+        id: index,
+        name: item.product.name,
+        price: price,
+        quantity: item.quantity,
+        image: item.product.origin_image,
+        size: 'Free size',
+        color: 'Default'
+      }
+    }) ?? []
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">{labels.common.cart}</h1>
+      <h1 className="text-4xl font-bold mb-8">
+        {labels.common.cart}
+      </h1>
 
       {cartItems.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">Giỏ hàng trống</p>
+          <p className="text-gray-600 mb-4">
+            Giỏ hàng trống
+          </p>
           <Link
             href={`${BASE_PATH}/products`}
             className="inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
@@ -67,7 +53,10 @@ export default function CartPage() {
           </Link>
         </div>
       ) : (
-        <CartPageClient cartItems={cartItems} basePath={BASE_PATH} />
+        <CartPageClient
+          cartItems={cartItems}
+          basePath={BASE_PATH}
+        />
       )}
     </div>
   )
