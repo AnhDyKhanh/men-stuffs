@@ -9,6 +9,8 @@ import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
 import type { Product } from '@/app/_models/product'
 import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
 
+type CategoryItem = { id: string; name?: string | null }
+
 const LOCALE_VI = 'vi-VN'
 const PAGE_SIZE = 20
 
@@ -86,9 +88,9 @@ export default function ProductsPageClient({
   const [searchApplied, setSearchApplied] = useState(initialSearchProp ?? '')
 
   const { data: categoriesData } = useGetAllCategories()
-  const categories = Array.isArray(categoriesData)
-    ? categoriesData
-    : (categoriesData as { data?: unknown[] })?.data ?? []
+  const categories: CategoryItem[] = Array.isArray(categoriesData)
+    ? (categoriesData as CategoryItem[])
+    : ((categoriesData as unknown) as { data?: CategoryItem[] })?.data ?? []
 
   useEffect(() => {
     setPage(initialPage)
@@ -216,7 +218,7 @@ export default function ProductsPageClient({
               >
                 Tất cả
               </button>
-              {categories.map((cat: { id: string; name?: string | null }) => (
+              {categories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"

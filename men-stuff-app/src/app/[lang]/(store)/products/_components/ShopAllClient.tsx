@@ -9,6 +9,8 @@ import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
 import type { Product } from '@/app/_models/product'
 import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
 
+type CategoryItem = { id: string; name?: string }
+
 const PAGE_SIZE = 20
 const CURRENCY = 'VND'
 const LOCALE_VI = 'vi-VN'
@@ -50,9 +52,9 @@ export default function ShopAllClient() {
   const [dateTo, setDateTo] = useState('')
 
   const { data: categoriesData } = useGetAllCategories()
-  const categories = Array.isArray(categoriesData)
-    ? categoriesData
-    : (categoriesData as { data?: unknown[] })?.data ?? []
+  const categories: CategoryItem[] = Array.isArray(categoriesData)
+    ? (categoriesData as CategoryItem[])
+    : ((categoriesData as unknown) as { data?: CategoryItem[] })?.data ?? []
 
   const {
     data: response,
@@ -131,7 +133,7 @@ export default function ShopAllClient() {
               className="w-full px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-neutral-500"
             >
               <option value="">Tất cả</option>
-              {categories.map((c: { id: string; name?: string }) => (
+              {categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name ?? c.id}
                 </option>
