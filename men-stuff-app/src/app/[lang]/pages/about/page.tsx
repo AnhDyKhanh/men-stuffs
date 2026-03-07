@@ -9,89 +9,90 @@ export default async function AboutPage({ params }: PageProps) {
   await params
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-4xl px-4 py-12 pb-20">
-        <Link
-          href={BASE_PATH}
-          className="mb-10 inline-block text-sm text-neutral-400 hover:text-white"
-        >
-          ← Về trang chủ
-        </Link>
+    <div className="min-h-screen bg-neutral-950">
+      <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
+        <h1 className="text-4xl font-bold text-white mb-4">Về chúng tôi</h1>
+        <p className="text-lg text-neutral-400 mb-12">
+          Chào mừng bạn đến với Men Stuffs — điểm đến uy tín cho thời trang nam.
+        </p>
 
-        <header className="mb-14">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Về chúng tôi
-          </h1>
-          <p className="mt-3 text-lg text-neutral-400">
-            Men Stuffs — điểm đến tin cậy cho thời trang nam
-          </p>
-        </header>
-
-        <section className="space-y-10" aria-labelledby="our-story-heading">
+        {/* Our Story */}
+        <section className="mb-16" aria-labelledby="our-story-heading">
           <h2
             id="our-story-heading"
-            className="text-2xl font-bold text-white"
+            className="text-2xl font-semibold text-white mb-6 md:text-3xl"
           >
-            Our story
+            Our Story
           </h2>
-
-          <div className="space-y-6 text-neutral-300">
-            <p className="text-base leading-relaxed">
-              Men Stuffs ra đời từ niềm đam mê mang đến cho nam giới những sản phẩm thời trang
-              chất lượng, thiết kế tinh gọn và dễ phối đồ. Chúng tôi tin rằng phong cách không
-              chỉ là vẻ bề ngoài mà còn là sự tự tin và thoải mái mỗi ngày.
+          <div className="space-y-6 text-neutral-300 leading-relaxed">
+            <p>
+              Men Stuffs ra đời từ niềm đam mê mang đến những trang phục chất lượng,
+              phong cách cho nam giới hiện đại. Chúng tôi tin rằng thời trang không chỉ
+              là vẻ bề ngoài mà còn là cách bạn thể hiện bản thân mỗi ngày.
             </p>
-            <p className="text-base leading-relaxed">
-              Từ những món căn bản như áo thun, quần jeans đến các item cao cấp hơn, mỗi sản phẩm
-              đều được chọn lọc kỹ về chất liệu và kiểu dáng, phù hợp với nhiều phong cách sống
-              và công việc. Chúng tôi không ngừng cập nhật bộ sưu tập mới để bạn luôn có lựa chọn
-              phù hợp với xu hướng và nhu cầu cá nhân.
+            <p>
+              Từ những sản phẩm đầu tiên đến nay, chúng tôi không ngừng cải tiến chất
+              liệu, kiểu dáng và trải nghiệm mua sắm. Mỗi mảnh trang phục đều được
+              chọn lọc và thiết kế để phù hợp với cuộc sống năng động của bạn.
             </p>
-          </div>
-
-          <div className="border-t border-neutral-800 pt-10">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Sứ mệnh
-            </h3>
-            <p className="text-neutral-400 leading-relaxed">
-              Mang đến trải nghiệm mua sắm trực tuyến thuận tiện, minh bạch và đáng tin cậy.
-              Mọi khách hàng đều xứng đáng có được sản phẩm ưng ý và dịch vụ chăm sóc tận tâm.
+            <p>
+              Hành trình của chúng tôi gắn với sự tin tưởng của khách hàng — từ
+              những bộ đồ công sở chỉn chu đến trang phục casual thoải mái, Men Stuffs
+              luôn đồng hành cùng bạn trong mọi khoảnh khắc.
             </p>
-          </div>
-
-          <div className="border-t border-neutral-800 pt-10">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Giá trị cốt lõi
-            </h3>
-            <ul className="space-y-3 text-neutral-400">
-              <li className="flex gap-3">
-                <span className="text-white font-medium min-w-[1.5rem]">·</span>
-                <span>Chất lượng sản phẩm và dịch vụ luôn đặt lên hàng đầu.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-white font-medium min-w-[1.5rem]">·</span>
-                <span>Minh bạch trong giao dịch và chính sách đổi trả rõ ràng.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-white font-medium min-w-[1.5rem]">·</span>
-                <span>Lắng nghe phản hồi để không ngừng cải thiện trải nghiệm khách hàng.</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="border-t border-neutral-800 pt-10">
-            <p className="text-neutral-500 text-sm">
-              Cảm ơn bạn đã tin tưởng và đồng hành cùng Men Stuffs. Nếu có bất kỳ câu hỏi hay
-              góp ý nào, hãy liên hệ với chúng tôi qua trang Liên hệ & Phản hồi.
-            </p>
-            <Link
-              href={`${BASE_PATH}/pages/contact`}
-              className="mt-4 inline-block rounded-lg border border-neutral-600 bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
-            >
-              Liên hệ & Phản hồi
-            </Link>
           </div>
         </section>
+
+        {/* Values / Highlights */}
+        <section className="mb-16" aria-labelledby="values-heading">
+          <h2
+            id="values-heading"
+            className="text-2xl font-semibold text-white mb-6 md:text-3xl"
+          >
+            Giá trị cốt lõi
+          </h2>
+          <ul className="grid gap-6 sm:grid-cols-2">
+            {[
+              {
+                title: 'Chất lượng',
+                desc: 'Sản phẩm được kiểm tra kỹ, chất liệu bền đẹp và phù hợp sử dụng lâu dài.',
+              },
+              {
+                title: 'Phong cách',
+                desc: 'Thiết kế hiện đại, dễ phối đồ, phù hợp nhiều hoàn cảnh và lứa tuổi.',
+              },
+              {
+                title: 'Trải nghiệm',
+                desc: 'Mua sắm dễ dàng, giao hàng nhanh và chính sách đổi trả rõ ràng.',
+              },
+              {
+                title: 'Khách hàng',
+                desc: 'Lắng nghe phản hồi và không ngừng cải thiện để phục vụ bạn tốt hơn.',
+              },
+            ].map((item) => (
+              <li
+                key={item.title}
+                className="p-5 rounded-xl bg-neutral-900/60 border border-neutral-800"
+              >
+                <h3 className="font-semibold text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-neutral-400">{item.desc}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* CTA */}
+        <div className="pt-8 border-t border-neutral-800">
+          <p className="text-neutral-400 mb-4">
+            Bạn có câu hỏi hoặc cần tư vấn? Hãy liên hệ với chúng tôi.
+          </p>
+          <Link
+            href={`${BASE_PATH}/pages/contact`}
+            className="inline-block px-6 py-3 rounded-lg bg-white text-black font-medium hover:bg-neutral-200 transition"
+          >
+            Liên hệ
+          </Link>
+        </div>
       </div>
     </div>
   )

@@ -8,17 +8,19 @@ export async function getAllProducts(
 ): Promise<PaginatedData<Product[]>> {
 
   const {
-    page = 0,
+    page = 1,
     size = 10,
     orderBy = 'created_at',
     ascending = false,
-    categoryId,
     search,
+    categoryId,
+    dateFrom,
+    dateTo,
   } = options;
 
-  const pageIndex = Math.max(0, Number(page));
-  const safeSize = Math.max(1, Math.min(100, Number(size)));
-  const from = pageIndex * safeSize;
+  const safePage = Math.max(1, Number(page));
+  const safeSize = Math.max(1, Number(size));
+  const from = (safePage - 1) * safeSize;
   const to = from + safeSize - 1;
 
   try {
@@ -28,13 +30,17 @@ export async function getAllProducts(
       .from('product')
       .select('*', { count: 'exact' });
 
-    if (categoryId && String(categoryId).trim()) {
-      query = query.eq('category_id', String(categoryId).trim());
+    if (search?.trim()) {
+      query = query.ilike('name', `%${search.trim()}%`);
     }
-
-    if (search && String(search).trim()) {
-      const term = `%${String(search).trim()}%`;
-      query = query.ilike('name', term);
+    if (categoryId?.trim()) {
+      query = query.eq('category_id', categoryId.trim());
+    }
+    if (dateFrom) {
+      query = query.gte('created_at', dateFrom);
+    }
+    if (dateTo) {
+      query = query.lte('created_at', dateTo);
     }
 
     const { data, error, count } = await query

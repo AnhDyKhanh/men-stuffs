@@ -8,15 +8,15 @@ import { createProduct } from './services/createProducts'
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const categoryParam = searchParams.get('category');
-  const searchParam = searchParams.get('q') ?? searchParams.get('search');
   const options = {
-    page: Math.max(0, parseInt(searchParams.get('page') || '0', 10)),
-    size: Math.min(100, Math.max(1, parseInt(searchParams.get('size') || '20', 10))),
+    page: parseInt(searchParams.get('page') || '1', 10),
+    size: parseInt(searchParams.get('size') || '10', 10),
     orderBy: searchParams.get('orderBy') || 'created_at',
     ascending: searchParams.get('ascending') === 'true',
-    categoryId: categoryParam && categoryParam.trim() ? categoryParam.trim() : undefined,
-    search: searchParam && searchParam.trim() ? searchParam.trim() : undefined,
+    search: searchParams.get('search') ?? undefined,
+    categoryId: searchParams.get('categoryId') ?? undefined,
+    dateFrom: searchParams.get('dateFrom') ?? undefined,
+    dateTo: searchParams.get('dateTo') ?? undefined,
   };
 
   const result = await getAllProducts(options);

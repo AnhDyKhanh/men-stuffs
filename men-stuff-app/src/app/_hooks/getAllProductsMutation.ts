@@ -8,13 +8,15 @@ import type { PaginatedData } from '../_types/response.type'
 
 function buildProductsQueryString(options: ProductQueryOptions): string {
   const params = new URLSearchParams({
-    page: String(options.page ?? 0),
-    size: String(options.size ?? 20),
+    page: String(options.page ?? 1),
+    size: String(options.size ?? 10),
     orderBy: options.orderBy ?? 'created_at',
     ascending: String(options.ascending ?? false),
   })
-  if (options.categoryId) params.set('category', options.categoryId)
-  if (options.search) params.set('q', options.search)
+  if (options.search?.trim()) params.set('search', options.search.trim())
+  if (options.categoryId?.trim()) params.set('categoryId', options.categoryId.trim())
+  if (options.dateFrom) params.set('dateFrom', options.dateFrom)
+  if (options.dateTo) params.set('dateTo', options.dateTo)
   return params.toString()
 }
 
@@ -37,8 +39,10 @@ export function useGetAllProducts(options: ProductQueryOptions) {
       options.size,
       options.orderBy,
       options.ascending,
-      options.categoryId,
       options.search,
+      options.categoryId,
+      options.dateFrom,
+      options.dateTo,
     ],
     queryFn: () => fetchAllProducts(options),
     placeholderData: (prev) => prev,

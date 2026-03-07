@@ -5,13 +5,17 @@ import { labels, BASE_PATH } from '@/lib/labels'
 import {
   getHeroSlides,
   getNewProducts as getPlaceholderNewProducts,
+  getFeaturedCategories as getPlaceholderFeaturedCategories,
   getTwoBannerRows,
   type PlaceholderProduct,
 } from '@/app/_constants/placeholderData'
+import type { FeaturedCategory } from '@/app/_constants/placeholderData'
 import HeroSlideshow from '@/components/store/HeroSlideshow'
 import ProductGrid from '@/components/store/ProductGrid'
 import TwoBannerSection from '@/components/store/TwoBannerSection'
+import FeaturedCategoriesSection from '@/components/store/FeaturedCategoriesSection'
 import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
+import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
 import type { Product } from '@/app/_models/product'
 
 const CURRENCY = 'VND'
@@ -42,12 +46,30 @@ function mapProductsToPlaceholder(
       imageUrl:
         p.origin_image ||
         'https://placehold.co/400x400/f5f5f5/999?text=Product',
-      href: `${basePath}/products/${p.slug || p.id}`,
+      href: `${basePath}/product/${p.id}`,
       rating: 0,
       reviewCount: 0,
       label: 'new',
     }
   })
+}
+
+function mapCategoriesToFeatured(
+  categories: { id: string; name?: string; slug?: string }[] | null | undefined,
+  basePath: string,
+  limit = 4,
+): FeaturedCategory[] {
+  if (!categories || categories.length === 0) {
+    return getPlaceholderFeaturedCategories(basePath, 'vi')
+  }
+  return categories
+    .slice(0, limit)
+    .map((cat, index): FeaturedCategory => ({
+      id: cat.id,
+      title: cat.name || `Danh mục ${index + 1}`,
+      imageUrl: '/categories/default.png',
+      href: `${basePath}/products?categoryId=${encodeURIComponent(cat.slug || cat.id)}`,
+    }))
 }
 
 export default function StoreHomeClient() {
@@ -81,6 +103,18 @@ export default function StoreHomeClient() {
       : undefined
 
   const bannerRows = getTwoBannerRows(BASE_PATH, latestProductForBanner)
+
+  const {
+    data: categoriesData,
+    isLoading: isLoadingCategories,
+    isError: isCategoriesError,
+  } = useGetAllCategories()
+
+  const featuredCategories = mapCategoriesToFeatured(
+    categoriesData as { id: string; name?: string; slug?: string }[] | null,
+    BASE_PATH,
+    4,
+  )
 
   return (
     <>
@@ -122,12 +156,20 @@ export default function StoreHomeClient() {
         </section>
 
         <section aria-labelledby="featured-categories-heading">
-          <h2
-            id="featured-categories-heading"
-            className="text-2xl font-semibold text-white mb-8 md:text-3xl"
-          >
-            Danh mục nổi bật
-          </h2>
+          {isCategoriesError && (
+            <p className="mb-4 text-sm text-red-500">
+              Không thể tải danh mục. Đang hiển thị dữ liệu mẫu.
+            </p>
+          )}
+          {isLoadingCategories && !categoriesData && (
+            <p className="text-sm text-neutral-600">
+              Đang tải danh mục sản phẩm...
+            </p>
+          )}
+          <FeaturedCategoriesSection
+            title="Danh mục nổi bật"
+            categories={featuredCategories}
+          />
         </section>
       </div>
 
