@@ -64,7 +64,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
 
 
-            <ProductForm />
+            <ProductForm product={product} />
 
             <div className="mt-10 pt-10 border-t border-zinc-800">
               <p className="text-sm leading-relaxed text-zinc-400 italic">

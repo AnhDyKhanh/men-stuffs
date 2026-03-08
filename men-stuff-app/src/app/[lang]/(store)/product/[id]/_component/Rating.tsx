@@ -15,7 +15,7 @@ export default function Rating({ score = 5, reviews = 120 }) {
                     />
                 ))}
             </div>
-
+            =
             <span
                 onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-xs text-zinc-500 tracking-widest uppercase cursor-pointer hover:text-white transition"
