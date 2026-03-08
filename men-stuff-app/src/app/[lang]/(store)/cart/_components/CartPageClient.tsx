@@ -3,49 +3,28 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-
-/* =======================
-   Types
-======================= */
-interface CartItem {
-  id: number
-  name: string
-  price: number
-  quantity: number
-  image: string
-  size: string
-  color: string
-}
+import { useRouter } from 'next/navigation'
+import { CartItem } from '@/app/_types/cart'
 
 interface CartPageClientProps {
   cartItems: CartItem[]
   basePath: string
 }
 
-/* =======================
-   Main Component
-======================= */
 export default function CartPageClient({
-  cartItems: initialItems,
+  cartItems,
   basePath,
 }: CartPageClientProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialItems)
   const [discountCode, setDiscountCode] = useState('')
   const [discountPercent, setDiscountPercent] = useState(0)
-  const [showInvoice, setShowInvoice] = useState(false)
+  const router = useRouter()
 
-  /* =======================
-     Logic (unchanged)
-  ======================= */
   const updateQuantity = (id: number, quantity: number) => {
     if (quantity <= 0) return removeItem(id)
-    setCartItems(items =>
-      items.map(i => (i.id === id ? { ...i, quantity } : i))
-    )
   }
 
+  //ĐOẠN NÀY SAU NÀY CALL API SAU, KHÔNG LÀM TRÊN GIAO DIỆN NHƯ NÀY 
   const removeItem = (id: number) => {
-    setCartItems(items => items.filter(i => i.id !== id))
   }
 
   const applyDiscount = () => {
@@ -66,9 +45,10 @@ export default function CartPageClient({
   const tax = (subtotal - discount) * 0.08
   const total = subtotal - discount + shipping + tax
 
-  /* =======================
-     UI
-  ======================= */
+  const handleCheckout = () => {
+    router.push(`${basePath}/checkout`)
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 bg-gray-50 dark:bg-neutral-950">
       {/* ================= LEFT ================= */}
@@ -106,31 +86,19 @@ export default function CartPageClient({
 
       {/* ================= RIGHT ================= */}
       <div className="lg:col-span-1">
-        {!showInvoice ? (
-          <CartSummaryBox
-            subtotal={subtotal}
-            discount={discount}
-            discountPercent={discountPercent}
-            shipping={shipping}
-            tax={tax}
-            total={total}
-            discountCode={discountCode}
-            onDiscountCodeChange={setDiscountCode}
-            onApplyDiscount={applyDiscount}
-            onCheckout={() => setShowInvoice(true)}
-            basePath={basePath}
-          />
-        ) : (
-          <InvoiceBox
-            items={cartItems}
-            subtotal={subtotal}
-            discount={discount}
-            shipping={shipping}
-            tax={tax}
-            total={total}
-            onBack={() => setShowInvoice(false)}
-          />
-        )}
+        <CartSummaryBox
+          subtotal={subtotal}
+          discount={discount}
+          discountPercent={discountPercent}
+          shipping={shipping}
+          tax={tax}
+          total={total}
+          discountCode={discountCode}
+          onDiscountCodeChange={setDiscountCode}
+          onApplyDiscount={applyDiscount}
+          onCheckout={handleCheckout}
+          basePath={basePath}
+        />
       </div>
     </div>
   )
@@ -145,21 +113,21 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: any) {
       {/* Product */}
       <div className="col-span-5 flex gap-4">
         <div className="relative w-16 h-16 rounded-md overflow-hidden bg-gray-300 dark:bg-neutral-700">
-          <Image src={item.image} alt={item.name} fill className="object-cover" />
+          <Image src={item.product.origin_image} alt={item.product.name} fill className="object-cover" />
         </div>
         <div>
           <h3 className="font-medium text-gray-900 dark:text-white">
-            {item.name}
+            {item.product.name}
           </h3>
           <p className="text-xs text-gray-500 dark:text-neutral-400">
-            {item.color} · {item.size}
+            {item.product.color} · {item.product.size}
           </p>
         </div>
       </div>
 
       {/* Price */}
       <div className="col-span-2 text-center font-medium">
-        {item.price.toLocaleString()} đ
+        {item.price.toLocaleString()} VND
       </div>
 
       {/* Quantity */}
@@ -187,7 +155,7 @@ function CartItemRow({ item, onUpdateQuantity, onRemove }: any) {
 
       {/* Total */}
       <div className="col-span-2 text-right font-semibold">
-        {(item.price * item.quantity).toLocaleString()} đ
+        {(item.price * item.quantity).toLocaleString()} VND
       </div>
 
       {/* Remove */}
@@ -255,7 +223,7 @@ function CartSummaryBox({
       <div className="bg-gray-900 text-white rounded-xl p-4 mb-6">
         <div className="flex justify-between text-lg font-semibold">
           <span>Total</span>
-          <span>{total.toLocaleString()} đ</span>
+          <span>{total.toLocaleString()} VND</span>
         </div>
       </div>
 
@@ -263,7 +231,7 @@ function CartSummaryBox({
         onClick={onCheckout}
         className="w-full bg-gray-900 text-white py-3 rounded-md hover:bg-gray-800 mb-3"
       >
-        Checkout
+        Thanh toán
       </button>
 
       <Link
@@ -276,38 +244,11 @@ function CartSummaryBox({
   )
 }
 
-/* =======================
-   Invoice (kept minimal)
-======================= */
-function InvoiceBox({ items, total, onBack }: any) {
-  return (
-    <div className="rounded-2xl border border-gray-200 dark:border-neutral-800 bg-gray-100 dark:bg-neutral-900 p-6">
-      <h2 className="font-semibold mb-4">Invoice</h2>
-      {items.map((i: CartItem) => (
-        <div key={i.id} className="flex justify-between text-sm mb-2">
-          <span>{i.name} × {i.quantity}</span>
-          <span>{(i.price * i.quantity).toLocaleString()} đ</span>
-        </div>
-      ))}
-      <div className="border-t mt-4 pt-4 flex justify-between font-semibold">
-        <span>Total</span>
-        <span>{total.toLocaleString()} đ</span>
-      </div>
-      <button
-        onClick={onBack}
-        className="mt-6 w-full bg-gray-300 dark:bg-neutral-800 py-2 rounded-md"
-      >
-        ← Back to cart
-      </button>
-    </div>
-  )
-}
-
 function Row({ label, value }: any) {
   return (
     <div className="flex justify-between">
       <span>{label}</span>
-      <span>{value === 0 ? 'Free' : value.toLocaleString() + ' đ'}</span>
+      <span>{value === 0 ? 'Free' : value.toLocaleString() + ' VND'}</span>
     </div>
   )
 }
