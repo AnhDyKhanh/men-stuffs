@@ -5,6 +5,7 @@ import Image from 'next/image'
 interface ProductCardProps {
   product: PlaceholderProduct
   buyNowLabel?: string
+  variant?: 'default' | 'dark'
 }
 
 const STAR_COUNT = 5
@@ -12,11 +13,12 @@ const STAR_COUNT = 5
 function StarRating({
   rating = 0,
   reviewCount,
+  isDark = false,
 }: {
   rating?: number
   reviewCount?: number
+  isDark?: boolean
 }) {
-  // if (reviewCount === undefined || reviewCount === 0) return null
   const value = Math.min(STAR_COUNT, Math.max(0, rating))
   return (
     <div
@@ -33,7 +35,7 @@ function StarRating({
           ★
         </span>
       ))}
-      <span className="text-xs text-neutral-500 ml-1" aria-hidden>
+      <span className={`text-xs ml-1 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`} aria-hidden>
         {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
       </span>
     </div>
@@ -43,10 +45,12 @@ function StarRating({
 export default function ProductCard({
   product,
   buyNowLabel = 'Buy now',
+  variant = 'default',
 }: ProductCardProps) {
+  const isDark = variant === 'dark'
   return (
     <article className="group">
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">
+      <div className={`relative aspect-square overflow-hidden rounded-lg ${isDark ? 'bg-neutral-800' : 'bg-neutral-100'}`}>
         <Link
           href={product.href}
           className="block aspect-square"
@@ -63,7 +67,7 @@ export default function ProductCard({
         </Link>
         {product.label && (
           <span
-            className="absolute top-2 left-2 rounded bg-neutral-900 px-2 py-1 text-xs font-medium uppercase text-white"
+            className={`absolute top-2 left-2 rounded px-2 py-1 text-xs font-medium uppercase ${isDark ? 'bg-white text-black' : 'bg-neutral-900 text-white'}`}
             aria-hidden
           >
             {product.label}
@@ -73,17 +77,21 @@ export default function ProductCard({
       <div className="mt-3">
         <Link
           href={product.href}
-          className="font-medium text-neutral-200 hover:text-neutral-600 line-clamp-2"
+          className={`font-medium line-clamp-2 ${isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-800 hover:text-neutral-600'}`}
         >
           {product.name}
         </Link>
-        <p className="mt-1 text-lg font-semibold text-neutral-200">
+        <p className={`mt-1 text-lg font-semibold ${isDark ? 'text-neutral-200' : 'text-neutral-800'}`}>
           {product.priceFormatted}
         </p>
-        <StarRating rating={product.rating} reviewCount={product.reviewCount} />
+        <StarRating rating={product.rating} reviewCount={product.reviewCount} isDark={isDark} />
         <Link
           href={product.href}
-          className="mt-3 inline-block w-full rounded-lg border border-neutral-900 py-2.5 text-center text-sm font-medium text-neutral-200 transition hover:bg-neutral-900 hover:text-white"
+          className={`mt-3 inline-block w-full rounded-lg py-2.5 text-center text-sm font-medium transition ${
+            isDark
+              ? 'border border-white text-white hover:bg-white hover:text-black'
+              : 'border border-neutral-900 text-neutral-200 hover:bg-neutral-900 hover:text-white'
+          }`}
         >
           {buyNowLabel}
         </Link>

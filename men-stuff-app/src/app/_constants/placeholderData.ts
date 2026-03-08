@@ -314,7 +314,7 @@ export function getFooterColumns(basePath: string): FooterColumn[] {
 export function getMainNavLinks(basePath: string): NavLink[] {
   return [
     { key: 'nav-shop-all', label: 'Shop all', href: `${basePath}/products` },
-    { key: 'nav-new-in', label: 'New in', href: `${basePath}/products` },
+    { key: 'nav-new-in', label: 'New in', href: `${basePath}/new-in` },
     { key: 'nav-feedback', label: 'Feedback', href: `${basePath}/pages/contact` },
     { key: 'nav-collections', label: 'Collections', href: `${basePath}/products` },
   ]

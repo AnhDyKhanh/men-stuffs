@@ -4,21 +4,25 @@ import { useQuery } from '@tanstack/react-query'
 import { API_ROUTES } from '../_constants/apiRouter'
 import type { ProductQueryOptions } from '../_dtos/get-product-list-option.dto'
 import type { Product } from '../_models/product'
-import type { Data } from '../_types/response.type'
+import type { PaginatedData } from '../_types/response.type'
 
 function buildProductsQueryString(options: ProductQueryOptions): string {
   const params = new URLSearchParams({
-    page: String(options.page ?? 0),
+    page: String(options.page ?? 1),
     size: String(options.size ?? 10),
     orderBy: options.orderBy ?? 'created_at',
     ascending: String(options.ascending ?? false),
   })
+  if (options.search?.trim()) params.set('search', options.search.trim())
+  if (options.categoryId?.trim()) params.set('categoryId', options.categoryId.trim())
+  if (options.dateFrom) params.set('dateFrom', options.dateFrom)
+  if (options.dateTo) params.set('dateTo', options.dateTo)
   return params.toString()
 }
 
 async function fetchAllProducts(
   options: ProductQueryOptions
-): Promise<Data<Product[]>> {
+): Promise<PaginatedData<Product[]>> {
   const query = buildProductsQueryString(options)
   const url = `${API_ROUTES.PRODUCTS.GET_ALL}?${query}`
 
@@ -35,6 +39,10 @@ export function useGetAllProducts(options: ProductQueryOptions) {
       options.size,
       options.orderBy,
       options.ascending,
+      options.search,
+      options.categoryId,
+      options.dateFrom,
+      options.dateTo,
     ],
     queryFn: () => fetchAllProducts(options),
     placeholderData: (prev) => prev,

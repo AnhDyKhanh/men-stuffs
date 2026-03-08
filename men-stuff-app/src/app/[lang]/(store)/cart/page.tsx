@@ -1,73 +1,72 @@
-import { labels, BASE_PATH } from '@/lib/labels'
+'use client'
+
+import { useGetCustomerCurrentCart } from '@/app/_hooks/getCustomerCurrentCart'
+import { BASE_PATH } from '@/lib/labels'
 import Link from 'next/link'
 import CartPageClient from './_components/CartPageClient'
 
-type PageProps = {
-  params: Promise<{ lang: string }>
-}
+// export type GetUserCartItemsApiResponse = {
+//   data: {
+//     cartItems: CartItem[]
+//     cartId: string | null
+//   }
+//   error: string | null
+//   message: string
+//   status: number
+// }
 
-interface CartItem {
-  id: number
-  name: string
-  price: number
-  quantity: number
-  image: string
-  size: string
-  color: string
-}
+// export type CartItem = {
+//   id: string
+//   product_id: string
+//   quantity: number
+//   price: number
+//   product: Product
+// }
 
-export default async function CartPage({ params }: PageProps) {
-  await params
+// export type Product = {
+//   id: string
+//   name: string
+//   price: number
+//   discount_price: number
+//   description: string
+//   origin_image: string
+// }
 
-  const mockCartItems: CartItem[] = [
-    {
-      id: 1,
-      name: 'Premium Cotton Shirt',
-      price: 50,
-      quantity: 1,
-      image: '',
-      size: 'M',
-      color: 'Black'
-    },
-    {
-      id: 2,
-      name: 'Classic Denim Jeans',
-      price: 799000,
-      quantity: 2,
-      image: '',
-      size: 'L',
-      color: 'Navy'
-    },
-    {
-      id: 3,
-      name: 'Casual T-Shirt',
-      price: 299000,
-      quantity: 1,
-      image: '',
-      size: 'S',
-      color: 'White'
-    }
-  ]
 
-  const cartItems: CartItem[] = mockCartItems
+export default function CartPage() {
+  const { data: cartItemsDataNew, isLoading } = useGetCustomerCurrentCart()
+  const cartItems = cartItemsDataNew?.data?.cartItems ?? []
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">{labels.common.cart}</h1>
-
-      {cartItems.length === 0 ? (
+      <h1 className="text-4xl font-bold mb-8">
+        Giỏ hàng
+      </h1>
+      {isLoading ? (
         <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">Giỏ hàng trống</p>
-          <Link
-            href={`${BASE_PATH}/products`}
-            className="inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
-          >
-            Tiếp tục mua sắm
-          </Link>
+          <p className="text-gray-600 mb-4">
+            Đang tải giỏ hàng...
+          </p>
         </div>
       ) : (
-        <CartPageClient cartItems={cartItems} basePath={BASE_PATH} />
-      )}
+        cartItems.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-4">
+              Giỏ hàng trống
+            </p>
+            <Link
+              href={`${BASE_PATH}/products`}
+              className="inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
+            >
+              Tiếp tục mua sắm
+            </Link>
+          </div>
+        ) : (
+          <CartPageClient
+            cartItems={cartItems}
+            basePath={BASE_PATH}
+          />
+        ))}
     </div>
   )
 }

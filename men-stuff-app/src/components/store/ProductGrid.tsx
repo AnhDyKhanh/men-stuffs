@@ -6,6 +6,8 @@ interface ProductGridProps {
   buyNowLabel?: string
   /** Number of columns on large screens (default 4) */
   columns?: 2 | 3 | 4
+  /** Dark background variant (light text, light borders) */
+  variant?: 'default' | 'dark'
 }
 
 const COLUMN_CLASSES = {
@@ -18,10 +20,11 @@ export default function ProductGrid({
   products,
   buyNowLabel,
   columns = 4,
+  variant = 'default',
 }: ProductGridProps) {
   if (products.length === 0) {
     return (
-      <p className="text-center">
+      <p className="text-center text-neutral-400">
         No products to display.
       </p>
     )
@@ -35,7 +38,7 @@ export default function ProductGrid({
     >
       {products.map((product) => (
         <li key={product.id}>
-          <ProductCard product={product} buyNowLabel={buyNowLabel} />
+          <ProductCard product={product} buyNowLabel={buyNowLabel} variant={variant} />
         </li>
       ))}
     </ul>

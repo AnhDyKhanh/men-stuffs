@@ -1,46 +1,67 @@
 import { ProductQueryOptions } from "@/app/_dtos/get-product-list-option.dto";
 import { Product } from "@/app/_models/product";
-import { Data } from "@/app/_types/response.type";
+import { PaginatedData } from "@/app/_types/response.type";
 import { getSupabase } from "@/lib/supabase";
 
 export async function getAllProducts(
   options: ProductQueryOptions = {}
-): Promise<Data<Product[]>> {
+): Promise<PaginatedData<Product[]>> {
 
   const {
-    page = 0,
+    page = 1,
     size = 10,
     orderBy = 'created_at',
-    ascending = false
+    ascending = false,
+    search,
+    categoryId,
+    dateFrom,
+    dateTo,
   } = options;
 
-  const currentPage = Math.max(1, page); // Đảm bảo không bị số âm
-  const from = (currentPage - 1) * size;
-  const to = from + size - 1;
+  const safePage = Math.max(1, Number(page));
+  const safeSize = Math.max(1, Number(size));
+  const from = (safePage - 1) * safeSize;
+  const to = from + safeSize - 1;
 
   try {
-    const { data, error, count } = await getSupabase()
-      .from('product')
-      .select('*', { count: 'exact' })
-      .order(orderBy, { ascending: ascending })
-      .range(from, to);
-    if (error) throw error;
+    const supabase = getSupabase();
 
-    if (data) {
-      return {
-        data: data,
-        error: null,
-        message: `Products fetched successfully. Total: ${count}`,
-        status: 200
-      };
+    let query = supabase
+      .from('product')
+      .select('*', { count: 'exact' });
+
+    if (search?.trim()) {
+      query = query.ilike('name', `%${search.trim()}%`);
+    }
+    if (categoryId?.trim()) {
+      query = query.eq('category_id', categoryId.trim());
+    }
+    if (dateFrom) {
+      query = query.gte('created_at', dateFrom);
+    }
+    if (dateTo) {
+      query = query.lte('created_at', dateTo);
     }
 
-    return { data: null, error: 'No products found', message: null, status: 404 };
+    const { data, error, count } = await query
+      .order(orderBy, { ascending })
+      .range(from, to);
 
-  } catch (error) {
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      total: count ?? 0,
+      error: null,
+      message: null,
+      status: 200
+    };
+
+  } catch (error: unknown) {
     console.error('[API GET /api/admin/products] exception:', error);
     return {
       data: null,
+      total: 0,
       error: error instanceof Error ? error.message : 'Failed to fetch products',
       message: null,
       status: 500

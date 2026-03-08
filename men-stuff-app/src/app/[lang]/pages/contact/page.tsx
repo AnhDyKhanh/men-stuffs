@@ -1,3 +1,7 @@
+import Link from 'next/link'
+import { BASE_PATH } from '@/lib/labels'
+import ContactFeedbackClient from './_components/ContactFeedbackClient'
+
 type PageProps = {
   params: Promise<{ lang: string }>
 }
@@ -6,41 +10,23 @@ export default async function ContactPage({ params }: PageProps) {
   await params
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">Liên hệ</h1>
-      <div className="max-w-2xl">
-        <form className="space-y-6">
-          <div>
-            <label className="block mb-2 font-medium">Họ tên</label>
-            <input
-              type="text"
-              className="w-full border rounded px-4 py-2"
-              placeholder="Nhập họ tên"
-            />
-          </div>
-          <div>
-            <label className="block mb-2 font-medium">Email</label>
-            <input
-              type="email"
-              className="w-full border rounded px-4 py-2"
-              placeholder="email@example.com"
-            />
-          </div>
-          <div>
-            <label className="block mb-2 font-medium">Nội dung</label>
-            <textarea
-              rows={6}
-              className="w-full border rounded px-4 py-2"
-              placeholder="Nhập nội dung"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
-          >
-            Gửi tin nhắn
-          </button>
-        </form>
+    <div className="min-h-screen bg-black">
+      <div className="mx-auto max-w-7xl px-4 pt-12 pb-16">
+        <Link
+          href={BASE_PATH}
+          className="mb-10 inline-block text-sm text-neutral-400 hover:text-white"
+        >
+          ← Về trang chủ
+        </Link>
+        <header className="mb-12">
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Liên hệ & Phản hồi
+          </h1>
+          <p className="mt-2 text-neutral-400">
+            Gửi tin nhắn hoặc đánh giá trải nghiệm của bạn.
+          </p>
+        </header>
+        <ContactFeedbackClient />
       </div>
     </div>
   )
