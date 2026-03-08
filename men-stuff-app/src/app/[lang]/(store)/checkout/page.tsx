@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
+import AddressSelector from './_components/AddressSelector'
 
 export default function CheckoutPage() {
   return (
@@ -41,22 +42,46 @@ export default function CheckoutPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-medium">Shipping Address</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <input type="text" placeholder="First name" className="bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none" />
-              <input type="text" placeholder="Last name" className="bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none" />
+            <h2 className="text-lg font-medium mb-2 tracking-tight">Shipping Address</h2>
+
+            {/* Hàng 1: Họ và Tên */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="First name"
+                className="bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none transition"
+              />
+              <input
+                type="text"
+                placeholder="Last name"
+                className="bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none transition"
+              />
             </div>
-            <input type="text" placeholder="Address" className="w-full bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none" />
-            <div className="grid grid-cols-3 gap-4">
-              <select className="bg-black border border-zinc-800 p-4 rounded-md text-gray-400">
-                <option>City</option>
-              </select>
-              <select className="bg-black border border-zinc-800 p-4 rounded-md text-gray-400">
-                <option>District</option>
-              </select>
-              <input type="text" placeholder="Postal code" className="bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none" />
+
+            {/* Hàng 2: Địa chỉ nhà */}
+            <input
+              type="text"
+              placeholder="Address (Street, House number...)"
+              className="w-full bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none transition"
+            />
+
+            {/* Hàng 3: Bộ chọn City & District tự động */}
+            {/* Lưu ý: Không bọc AddressSelector vào thẻ select hay div grid nào khác nữa */}
+            <AddressSelector />
+
+            {/* Hàng 4: Postal code và Phone number */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="Postal code (Optional)"
+                className="bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none transition"
+              />
+              <input
+                type="text"
+                placeholder="Phone number"
+                className="bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none transition"
+              />
             </div>
-            <input type="text" placeholder="Phone number" className="w-full bg-transparent border border-zinc-800 p-4 rounded-md focus:border-white outline-none" />
           </section>
 
           {/* Navigation Buttons */}
