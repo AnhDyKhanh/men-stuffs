@@ -25,10 +25,10 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'bank_transfer' | 'momo'>('cod')
 
   const cartItems = useMemo(
-    () => cartResponse?.data?.cartItems ?? [],
-    [cartResponse?.data?.cartItems]
+    () => cartResponse?.cartItems ?? [],
+    [cartResponse?.cartItems]
   )
-  const cartId = cartResponse?.data?.cartId ?? ''
+  const cartId = cartResponse?.cartId ?? ''
 
   // Tính toán logic (Dùng useMemo để tránh re-render rác)
   const subtotal = useMemo(() => {

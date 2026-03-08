@@ -1,6 +1,7 @@
 'use client'
 import { useQuery } from "@tanstack/react-query"
 import { API_ROUTES } from "../_constants/apiRouter"
+import { GetUserCartItemsApiResponse } from "../_types/cart"
 
 //phải call url api, chứu ko gọi thăngt hàm vì sẽ xung đột với server component
 async function fetchCustomerCurrentCart() {
@@ -15,6 +16,7 @@ export function useGetCustomerCurrentCart() {
     queryKey: ['customer-current-cart'],
     queryFn: fetchCustomerCurrentCart,
     placeholderData: (prev) => prev,
+    select: (data: GetUserCartItemsApiResponse) => data.data ?? { cartItems: [], cartId: null },
   })
 }
 
