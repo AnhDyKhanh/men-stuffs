@@ -35,7 +35,7 @@ import CartPageClient from './_components/CartPageClient'
 
 export default function CartPage() {
   const { data: cartItemsDataNew, isLoading } = useGetCustomerCurrentCart()
-  const cartItems = cartItemsDataNew?.data?.cartItems ?? []
+  const cartItems = cartItemsDataNew?.cartItems ?? []
 
   return (
     <div className="container mx-auto px-4 py-12">
