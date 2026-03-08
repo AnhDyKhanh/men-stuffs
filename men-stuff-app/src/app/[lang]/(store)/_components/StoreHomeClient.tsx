@@ -9,6 +9,7 @@ import {
   getTwoBannerRows,
   type PlaceholderProduct,
 } from '@/app/_constants/placeholderData'
+import type { FeaturedCategory } from '@/app/_constants/placeholderData'
 import HeroSlideshow from '@/components/store/HeroSlideshow'
 import ProductGrid from '@/components/store/ProductGrid'
 import TwoBannerSection from '@/components/store/TwoBannerSection'
@@ -16,7 +17,6 @@ import FeaturedCategoriesSection from '@/components/store/FeaturedCategoriesSect
 import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
 import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
 import type { Product } from '@/app/_models/product'
-import type { FeaturedCategory } from '@/app/_constants/placeholderData'
 
 const CURRENCY = 'VND'
 const LOCALE_VI = 'vi-VN'
@@ -62,17 +62,13 @@ function mapCategoriesToFeatured(
   if (!categories || categories.length === 0) {
     return getPlaceholderFeaturedCategories(basePath, 'vi')
   }
-
   return categories
     .slice(0, limit)
     .map((cat, index): FeaturedCategory => ({
       id: cat.id,
       title: cat.name || `Danh mục ${index + 1}`,
-      imageUrl:
-        '/categories/default.png',
-      href: `${basePath}/products?category=${encodeURIComponent(
-        cat.slug || cat.id,
-      )}`,
+      imageUrl: '/categories/default.png',
+      href: `${basePath}/products?categoryId=${encodeURIComponent(cat.slug || cat.id)}`,
     }))
 }
 
@@ -114,45 +110,52 @@ export default function StoreHomeClient() {
     isError: isCategoriesError,
   } = useGetAllCategories()
 
+  const featuredCategories = mapCategoriesToFeatured(
+    categoriesData as { id: string; name?: string; slug?: string }[] | null,
+    BASE_PATH,
+    4,
+  )
+
   return (
     <>
       <HeroSlideshow slides={heroSlides} />
 
-      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-16">
+      <div className="bg-black max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-16">
         <section aria-labelledby="new-products-heading">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <h2
               id="new-products-heading"
               className="text-2xl font-semibold text-white md:text-3xl"
             >
-              Sản phẩm
+              {labels.home.newProducts}
             </h2>
             <Link
               href={`${BASE_PATH}/products`}
-              className="text-sm font-medium text-neutral-600 hover:text-neutral-900 underline underline-offset-2"
+              className="text-sm font-medium text-neutral-300 hover:text-white underline underline-offset-2"
             >
               {labels.home.viewAll}
             </Link>
           </div>
 
           {isProductsError && (
-            <p className="mb-4 text-sm text-red-500">
+            <p className="mb-4 text-sm text-red-400">
               Không thể tải sản phẩm. Đang hiển thị dữ liệu mẫu.
             </p>
           )}
 
           {isLoadingProducts && newProductsFromApi.length === 0 ? (
-            <p className="text-sm text-neutral-600">Đang tải sản phẩm...</p>
+            <p className="text-sm text-neutral-400">Đang tải sản phẩm...</p>
           ) : (
             <ProductGrid
               products={newProducts}
               buyNowLabel={labels.products.addToCart}
               columns={4}
+              variant="dark"
             />
           )}
         </section>
 
-        <section>
+        <section aria-labelledby="featured-categories-heading">
           {isCategoriesError && (
             <p className="mb-4 text-sm text-red-500">
               Không thể tải danh mục. Đang hiển thị dữ liệu mẫu.
@@ -163,10 +166,10 @@ export default function StoreHomeClient() {
               Đang tải danh mục sản phẩm...
             </p>
           )}
-          {/* <FeaturedCategoriesSection
+          <FeaturedCategoriesSection
             title="Danh mục nổi bật"
             categories={featuredCategories}
-          /> */}
+          />
         </section>
       </div>
 

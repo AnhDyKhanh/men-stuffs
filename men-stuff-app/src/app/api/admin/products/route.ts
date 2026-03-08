@@ -9,10 +9,14 @@ import { createProduct } from './services/createProducts'
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const options = {
-    page: parseInt(searchParams.get('page') || '0'),
-    size: parseInt(searchParams.get('size') || '10'),
+    page: parseInt(searchParams.get('page') || '1', 10),
+    size: parseInt(searchParams.get('size') || '10', 10),
     orderBy: searchParams.get('orderBy') || 'created_at',
-    ascending: searchParams.get('ascending') === 'true'
+    ascending: searchParams.get('ascending') === 'true',
+    search: searchParams.get('search') ?? undefined,
+    categoryId: searchParams.get('categoryId') ?? undefined,
+    dateFrom: searchParams.get('dateFrom') ?? undefined,
+    dateTo: searchParams.get('dateTo') ?? undefined,
   };
 
   const result = await getAllProducts(options);

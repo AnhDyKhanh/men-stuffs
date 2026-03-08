@@ -1,20 +1,23 @@
 import { ProductQueryOptions } from "@/app/_dtos/get-product-list-option.dto";
 import { Product } from "@/app/_models/product";
-import { Data } from "@/app/_types/response.type";
+import { PaginatedData } from "@/app/_types/response.type";
 import { getSupabase } from "@/lib/supabase";
 
 export async function getAllProducts(
   options: ProductQueryOptions = {}
-): Promise<Data<Product[]>> {
+): Promise<PaginatedData<Product[]>> {
 
   const {
-    page = 1, // Mặc định nên là 1
+    page = 1,
     size = 10,
     orderBy = 'created_at',
-    ascending = false
+    ascending = false,
+    search,
+    categoryId,
+    dateFrom,
+    dateTo,
   } = options;
 
-  // Fix logic tính toán range chuẩn xác
   const safePage = Math.max(1, Number(page));
   const safeSize = Math.max(1, Number(size));
   const from = (safePage - 1) * safeSize;
@@ -23,9 +26,24 @@ export async function getAllProducts(
   try {
     const supabase = getSupabase();
 
-    const { data, error, count } = await supabase
+    let query = supabase
       .from('product')
-      .select('*', { count: 'exact' })
+      .select('*', { count: 'exact' });
+
+    if (search?.trim()) {
+      query = query.ilike('name', `%${search.trim()}%`);
+    }
+    if (categoryId?.trim()) {
+      query = query.eq('category_id', categoryId.trim());
+    }
+    if (dateFrom) {
+      query = query.gte('created_at', dateFrom);
+    }
+    if (dateTo) {
+      query = query.lte('created_at', dateTo);
+    }
+
+    const { data, error, count } = await query
       .order(orderBy, { ascending })
       .range(from, to);
 
@@ -33,16 +51,18 @@ export async function getAllProducts(
 
     return {
       data: data || [],
+      total: count ?? 0,
       error: null,
-      message: `Fetched successfully. Total: ${count}`,
+      message: null,
       status: 200
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[API GET /api/admin/products] exception:', error);
     return {
       data: null,
-      error: error.message || 'Failed to fetch products',
+      total: 0,
+      error: error instanceof Error ? error.message : 'Failed to fetch products',
       message: null,
       status: 500
     };

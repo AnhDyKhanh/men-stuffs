@@ -4,3 +4,8 @@ export type Data<T> = {
   message: string | null
   status: number | null
 }
+
+export type PaginatedData<T> = Data<T> & { total?: number }
+
+/** Response from GET /api/admin/products (includes total for pagination) */
+export type ProductsListResponse<T = unknown> = Data<T> & { total?: number }
