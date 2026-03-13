@@ -15,6 +15,14 @@ const PAGE_SIZE = 20
 const CURRENCY = 'VND'
 const LOCALE_VI = 'vi-VN'
 
+const SEARCH_HISTORY_KEY = 'menstuffs_search_history'
+
+type SearchHistoryItem = {
+  term: string
+  categoryId?: string
+  date: string
+}
+
 function formatPrice(value: number): string {
   return new Intl.NumberFormat(LOCALE_VI, {
     style: 'currency',
@@ -41,6 +49,26 @@ function mapProductsToPlaceholder(
     reviewCount: 0,
     label: 'new',
   }))
+}
+
+function saveSearchHistory(entry: SearchHistoryItem) {
+  if (typeof window === 'undefined') return
+  try {
+    const raw = window.localStorage.getItem(SEARCH_HISTORY_KEY)
+    const parsed: SearchHistoryItem[] = raw ? JSON.parse(raw) : []
+    const next = [
+      entry,
+      // tránh trùng lặp nhiều entry giống hệt nhau liên tiếp
+      ...parsed.filter(
+        (item) =>
+          item.term !== entry.term ||
+          item.categoryId !== entry.categoryId
+      ),
+    ].slice(0, 20)
+    window.localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(next))
+  } catch {
+    // ignore
+  }
 }
 
 export default function ShopAllClient() {
@@ -81,6 +109,13 @@ export default function ShopAllClient() {
   const applyFilters = useCallback(() => {
     setSearch(searchInput.trim())
     setCategoryId((c) => c)
+    if (searchInput.trim() || categoryId) {
+      saveSearchHistory({
+        term: searchInput.trim(),
+        categoryId: categoryId || undefined,
+        date: new Date().toISOString(),
+      })
+    }
     setPage(1)
   }, [searchInput])
 
@@ -206,6 +241,7 @@ export default function ShopAllClient() {
             products={products}
             buyNowLabel="Thêm vào giỏ"
             columns={4}
+            variant="dark"
           />
 
           {/* Pagination */}

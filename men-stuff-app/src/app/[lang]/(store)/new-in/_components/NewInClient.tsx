@@ -82,6 +82,7 @@ export default function NewInClient() {
             products={products}
             buyNowLabel="Thêm vào giỏ"
             columns={4}
+            variant="dark"
           />
           <div className="mt-8 text-center">
             <Link
