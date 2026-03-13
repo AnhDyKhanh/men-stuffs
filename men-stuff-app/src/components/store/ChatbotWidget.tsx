@@ -2,8 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react'
 
-const PLACEHOLDER_REPLY =
-  'Tính năng chatbot đang được phát triển. Bạn vui lòng quay lại sau hoặc liên hệ qua trang Liên hệ. Cảm ơn bạn!'
+type SearchHistoryItem = {
+  term: string
+  categoryId?: string
+  date: string
+}
+
+const SEARCH_HISTORY_KEY = 'menstuffs_search_history'
 
 type Message = {
   id: string
@@ -16,10 +21,64 @@ export default function ChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
+  const [history, setHistory] = useState<SearchHistoryItem[]>([])
 
   useEffect(() => {
     listRef.current?.scrollTo(0, listRef.current.scrollHeight)
   }, [messages])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = window.localStorage.getItem(SEARCH_HISTORY_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw) as SearchHistoryItem[]
+      setHistory(parsed)
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  const buildSuggestionReply = (userText: string): string => {
+    const latest = history[0]
+    const baseIntro =
+      'Mình là trợ lý gợi ý sản phẩm của Men Stuffs. Dựa trên lịch sử tìm kiếm và câu hỏi của bạn, đây là vài gợi ý:'
+
+    const lowerUser = userText.toLowerCase()
+    const allTerms = [
+      latest?.term?.toLowerCase?.() ?? '',
+      lowerUser,
+    ].join(' ')
+
+    let styleHint = 'Bạn có thể bắt đầu tại trang “Shop All” và dùng bộ lọc theo danh mục, thời gian và từ khóa để thu hẹp kết quả.'
+
+    if (allTerms.includes('nhẫn') || allTerms.includes('ring')) {
+      styleHint =
+        'Bạn có vẻ quan tâm tới nhẫn. Gợi ý style: nhẫn bạc bản vừa, thiết kế tối giản (minimal), dễ phối với streetwear và smart-casual.'
+    } else if (
+      allTerms.includes('vòng') ||
+      allTerms.includes('bracelet')
+    ) {
+      styleHint =
+        'Bạn đang tìm vòng tay. Gợi ý style: vòng bạc kết hợp dây da hoặc dạng chain mảnh, phù hợp layering với đồng hồ.'
+    } else if (
+      allTerms.includes('dây chuyền') ||
+      allTerms.includes('pendant') ||
+      allTerms.includes('necklace')
+    ) {
+      styleHint =
+        'Bạn đang quan tâm tới dây chuyền/mặt dây. Gợi ý style: mặt dây nhỏ, tông bạc tối, đeo ngoài áo thun trơn hoặc sơ mi để tạo điểm nhấn.'
+    }
+
+    const historyPart =
+      latest && (latest.term || latest.categoryId)
+        ? `Lần gần nhất bạn tìm kiếm: “${latest.term || '—'}”${
+            latest.categoryId ? ` (danh mục: ${latest.categoryId})` : ''
+          }. Bạn có thể tiếp tục refine với các từ khóa chi tiết hơn (ví dụ: “bản to”, “tối giản”, “phong cách Hàn”).`
+        : 'Hiện mình chưa thấy lịch sử tìm kiếm nào. Bạn có thể qua trang “Shop All” để tìm thử một vài sản phẩm, mình sẽ gợi ý chính xác hơn.'
+
+    return `${baseIntro}\n\n- ${historyPart}\n- ${styleHint}\n\nNếu bạn mô tả rõ hơn về dịp sử dụng (đi làm, đi chơi, dự tiệc, v.v.) mình có thể gợi ý cụ thể hơn.`
+  }
 
   const handleSend = () => {
     const text = input.trim()
@@ -36,7 +95,7 @@ export default function ChatbotWidget() {
     const botMsg: Message = {
       id: `b-${Date.now()}`,
       role: 'bot',
-      text: PLACEHOLDER_REPLY,
+      text: buildSuggestionReply(text),
     }
     setMessages((prev) => [...prev, botMsg])
   }
@@ -69,8 +128,8 @@ export default function ChatbotWidget() {
           aria-label="Chatbot (đang phát triển)"
         >
           <div className="flex items-center justify-between border-b border-neutral-700 px-4 py-3">
-            <span className="font-semibold text-white">Chatbot</span>
-            <span className="text-xs text-neutral-500">Upcoming</span>
+            <span className="font-semibold text-white">Trợ lý Men Stuffs</span>
+            <span className="text-xs text-neutral-500">Gợi ý sản phẩm</span>
           </div>
 
           <div
@@ -79,7 +138,8 @@ export default function ChatbotWidget() {
           >
             {messages.length === 0 && (
               <p className="text-center text-sm text-neutral-500 py-4">
-                Chào bạn! Tính năng đang được phát triển. Thử gửi tin nhắn để xem phản hồi mẫu.
+                Chào bạn! Mình có thể gợi ý sản phẩm và style dựa trên lịch sử tìm kiếm của bạn trên trang Shop All.
+                Hãy thử hỏi: "Tư vấn cho mình nhẫn đeo đi làm" hoặc mô tả dịp sử dụng mà bạn muốn phối đồ.
               </p>
             )}
             {messages.map((m) => (
