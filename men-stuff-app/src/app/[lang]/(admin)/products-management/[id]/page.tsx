@@ -18,17 +18,14 @@ export default async function EditProductPage({ params }: PageProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">{dict.editProduct}</h1>
-        <Link
-          href={`${BASE_PATH}/products-management`}
-          className="text-gray-600 hover:text-black"
-        >
+        <Link href={`${BASE_PATH}/products-management`} className="text-gray-600 hover:text-black">
           ← {dict.backToProducts}
         </Link>
       </div>
 
-      <div className="bg-white border rounded-lg p-8 max-w-2xl shadow-sm">
+      <div className="max-w-2xl rounded-lg border bg-white p-8 shadow-sm">
         <ProductForm
           product={product}
           lang="vi"

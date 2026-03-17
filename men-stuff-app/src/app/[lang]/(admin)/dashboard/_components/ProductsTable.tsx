@@ -5,14 +5,7 @@ import { useState } from 'react'
 import type { Product } from '@/app/_types/product'
 import DeleteProductButton from '@/app/[lang]/_components/admin/DeleteProductButton'
 import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 const PAGE_SIZES = [5, 10, 20, 50] as const
@@ -71,8 +64,7 @@ export default function ProductsTable({
       currency: 'VND',
     }).format(value)
 
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US')
+  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US')
 
   if (products.length === 0) {
     return (
@@ -109,12 +101,7 @@ export default function ProductsTable({
             </select>
           </span>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-            >
+            <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
               {dict.prev}
             </Button>
             <span className={`min-w-[120px] text-center text-sm ${mutedClass}`}>
@@ -166,10 +153,8 @@ export default function ProductsTable({
                 </TableCell>
                 <TableCell className={`px-6 py-4 text-right ${cellClass}`}>
                   <div className="flex justify-end gap-3">
-                    <Button variant="link" size="sm" className="p-0 h-auto" asChild>
-                      <Link href={`/${locale}/products-management/${product.id}`}>
-                        {dict.editProduct}
-                      </Link>
+                    <Button variant="link" size="sm" className="h-auto p-0" asChild>
+                      <Link href={`/${locale}/products-management/${product.id}`}>{dict.editProduct}</Link>
                     </Button>
                     <DeleteProductButton productId={product.id} lang={locale} />
                   </div>

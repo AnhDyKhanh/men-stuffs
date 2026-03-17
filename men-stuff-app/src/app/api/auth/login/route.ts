@@ -13,10 +13,7 @@ export async function POST(request: Request) {
     const { email, password } = body as { email?: string; password?: string }
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 },
-      )
+      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
     const supabase = getSupabase()
@@ -28,17 +25,11 @@ export async function POST(request: Request) {
       .maybeSingle()
 
     if (accountError || !account) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 },
-      )
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
     if (account.password !== password) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 },
-      )
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
     const isStaff = await isStaffByAccountId(account.id)
@@ -60,9 +51,6 @@ export async function POST(request: Request) {
 
     return response
   } catch {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

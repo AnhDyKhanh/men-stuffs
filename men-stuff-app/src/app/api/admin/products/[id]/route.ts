@@ -8,10 +8,7 @@ import { deleteProductById, getProductById } from './services/getProductById'
 type GetProductByIdParams = {
   params: Promise<{ id: string }>
 }
-export async function GET(
-  request: Request,
-  { params }: GetProductByIdParams,
-) {
+export async function GET(request: Request, { params }: GetProductByIdParams) {
   const { id } = await params
   const product = await getProductById({ id })
 
@@ -25,10 +22,7 @@ export async function GET(
  * PUT /api/admin/products/[id]
  * Update product
  */
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await request.json()
@@ -48,10 +42,7 @@ export async function PUT(
 
     // return NextResponse.json(product)
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to update product' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
   }
 }
 
@@ -59,10 +50,7 @@ export async function PUT(
  * DELETE /api/admin/products/[id]
  * Delete product
  */
-export async function DELETE(
-  request: Request,
-  { params }: GetProductByIdParams,
-) {
+export async function DELETE(request: Request, { params }: GetProductByIdParams) {
   const { id } = await params
   const { statusText } = await deleteProductById({ id })
 

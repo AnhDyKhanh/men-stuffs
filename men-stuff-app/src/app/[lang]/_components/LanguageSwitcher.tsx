@@ -15,17 +15,11 @@ export default function LanguageSwitcher({ lang }: { lang: string }) {
 
   return (
     <div className="flex gap-2">
-      <Link
-        href={`/vi${pathWithoutLocale}`}
-        className={lang === 'vi' ? 'font-bold' : ''}
-      >
+      <Link href={`/vi${pathWithoutLocale}`} className={lang === 'vi' ? 'font-bold' : ''}>
         VI
       </Link>
       <span>|</span>
-      <Link
-        href={`/en${pathWithoutLocale}`}
-        className={lang === 'en' ? 'font-bold' : ''}
-      >
+      <Link href={`/en${pathWithoutLocale}`} className={lang === 'en' ? 'font-bold' : ''}>
         EN
       </Link>
     </div>

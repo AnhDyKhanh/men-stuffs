@@ -1,10 +1,8 @@
-import { getSupabase } from "@/lib/supabase"
+import { getSupabase } from '@/lib/supabase'
 
 export async function getAllCategories() {
   try {
-    const { data } = await getSupabase()
-      .from('category')
-      .select('*')
+    const { data } = await getSupabase().from('category').select('*')
     if (data) {
       return data || []
     }

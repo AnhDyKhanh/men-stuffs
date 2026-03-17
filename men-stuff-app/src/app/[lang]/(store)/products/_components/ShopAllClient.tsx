@@ -23,19 +23,14 @@ function formatPrice(value: number): string {
   }).format(value)
 }
 
-function mapProductsToPlaceholder(
-  products: Product[] | null | undefined,
-  basePath: string
-): PlaceholderProduct[] {
+function mapProductsToPlaceholder(products: Product[] | null | undefined, basePath: string): PlaceholderProduct[] {
   if (!products) return []
   return products.map((p) => ({
     id: p.id,
     name: p.name ?? 'Sản phẩm',
     price: p.price ?? 0,
     priceFormatted: formatPrice(p.price ?? 0),
-    imageUrl:
-      p.origin_image ||
-      'https://placehold.co/400x400/f5f5f5/999?text=Product',
+    imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
     href: `${basePath}/product/${p.id}`,
     rating: 0,
     reviewCount: 0,
@@ -54,7 +49,7 @@ export default function ShopAllClient() {
   const { data: categoriesData } = useGetAllCategories()
   const categories: CategoryItem[] = Array.isArray(categoriesData)
     ? (categoriesData as CategoryItem[])
-    : ((categoriesData as unknown) as { data?: CategoryItem[] })?.data ?? []
+    : ((categoriesData as unknown as { data?: CategoryItem[] })?.data ?? [])
 
   const {
     data: response,
@@ -71,10 +66,7 @@ export default function ShopAllClient() {
     dateTo: dateTo || undefined,
   })
 
-  const products = mapProductsToPlaceholder(
-    (response as { data?: Product[] })?.data ?? null,
-    BASE_PATH
-  )
+  const products = mapProductsToPlaceholder((response as { data?: Product[] })?.data ?? null, BASE_PATH)
   const total = (response as { total?: number })?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
@@ -94,43 +86,35 @@ export default function ShopAllClient() {
   }, [])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+    <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white md:text-4xl mb-2">
-          Shop All
-        </h1>
-        <p className="text-neutral-400">
-          Khám phá toàn bộ sản phẩm — tìm kiếm, lọc theo danh mục và thời gian.
-        </p>
+        <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">Shop All</h1>
+        <p className="text-neutral-400">Khám phá toàn bộ sản phẩm — tìm kiếm, lọc theo danh mục và thời gian.</p>
       </div>
 
       {/* Filters */}
-      <div className="mb-8 p-4 rounded-xl bg-neutral-900/50 border border-neutral-800">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+      <div className="mb-8 rounded-xl border border-neutral-800 bg-neutral-900/50 p-4">
+        <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-5">
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Tìm kiếm
-            </label>
+            <label className="mb-1 block text-sm font-medium text-neutral-300">Tìm kiếm</label>
             <input
               type="search"
               placeholder="Tên sản phẩm..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-              className="w-full px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white placeholder-neutral-500 focus:ring-2 focus:ring-neutral-500 focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Danh mục
-            </label>
+            <label className="mb-1 block text-sm font-medium text-neutral-300">Danh mục</label>
             <select
               value={categoryId}
               onChange={(e) => {
                 setCategoryId(e.target.value)
                 setPage(1)
               }}
-              className="w-full px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:ring-2 focus:ring-neutral-500 focus:outline-none"
             >
               <option value="">Tất cả</option>
               {categories.map((c) => (
@@ -141,9 +125,7 @@ export default function ShopAllClient() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Từ ngày
-            </label>
+            <label className="mb-1 block text-sm font-medium text-neutral-300">Từ ngày</label>
             <input
               type="date"
               value={dateFrom}
@@ -151,13 +133,11 @@ export default function ShopAllClient() {
                 setDateFrom(e.target.value)
                 setPage(1)
               }}
-              className="w-full px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:ring-2 focus:ring-neutral-500 focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">
-              Đến ngày
-            </label>
+            <label className="mb-1 block text-sm font-medium text-neutral-300">Đến ngày</label>
             <input
               type="date"
               value={dateTo}
@@ -165,21 +145,21 @@ export default function ShopAllClient() {
                 setDateTo(e.target.value)
                 setPage(1)
               }}
-              className="w-full px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:ring-2 focus:ring-neutral-500 focus:outline-none"
             />
           </div>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={applyFilters}
-              className="px-4 py-2 rounded-lg bg-white text-black font-medium hover:bg-neutral-200 transition"
+              className="rounded-lg bg-white px-4 py-2 font-medium text-black transition hover:bg-neutral-200"
             >
               Áp dụng
             </button>
             <button
               type="button"
               onClick={clearFilters}
-              className="px-4 py-2 rounded-lg border border-neutral-600 text-neutral-300 hover:bg-neutral-800 transition"
+              className="rounded-lg border border-neutral-600 px-4 py-2 text-neutral-300 transition hover:bg-neutral-800"
             >
               Xóa lọc
             </button>
@@ -187,38 +167,27 @@ export default function ShopAllClient() {
         </div>
       </div>
 
-      {isError && (
-        <p className="mb-4 text-sm text-red-400">
-          Không thể tải sản phẩm. Vui lòng thử lại.
-        </p>
-      )}
+      {isError && <p className="mb-4 text-sm text-red-400">Không thể tải sản phẩm. Vui lòng thử lại.</p>}
 
       {isLoading && products.length === 0 ? (
-        <p className="text-neutral-400 py-12">Đang tải...</p>
+        <p className="py-12 text-neutral-400">Đang tải...</p>
       ) : products.length === 0 ? (
-        <p className="text-neutral-400 py-12">Không có sản phẩm nào phù hợp.</p>
+        <p className="py-12 text-neutral-400">Không có sản phẩm nào phù hợp.</p>
       ) : (
         <>
-          <p className="text-sm text-neutral-500 mb-4">
+          <p className="mb-4 text-sm text-neutral-500">
             Hiển thị {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} / {total} sản phẩm
           </p>
-          <ProductGrid
-            products={products}
-            buyNowLabel="Thêm vào giỏ"
-            columns={4}
-          />
+          <ProductGrid products={products} buyNowLabel="Thêm vào giỏ" columns={4} />
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <nav
-              className="mt-10 flex items-center justify-center gap-2"
-              aria-label="Phân trang"
-            >
+            <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Phân trang">
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-4 py-2 rounded-lg border border-neutral-600 text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800 transition"
+                className="rounded-lg border border-neutral-600 px-4 py-2 text-neutral-300 transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Trước
               </button>
@@ -229,7 +198,7 @@ export default function ShopAllClient() {
                 type="button"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-4 py-2 rounded-lg border border-neutral-600 text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800 transition"
+                className="rounded-lg border border-neutral-600 px-4 py-2 text-neutral-300 transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Sau
               </button>

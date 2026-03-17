@@ -1,5 +1,5 @@
-import { getSupabase } from "@/lib/supabase"
-import { getCurrentCustomerId } from "./getCustomerAccount"
+import { getSupabase } from '@/lib/supabase'
+import { getCurrentCustomerId } from './getCustomerAccount'
 
 export type AddProductToCartDTO = {
   productId: string
@@ -68,16 +68,15 @@ export async function addProductToCart(body: AddProductToCartDTO) {
       data: finalItem,
       error: null,
       message: 'Sản phẩm đã nằm gọn trong giỏ!',
-      status: 200
+      status: 200,
     }
-
   } catch (error: any) {
     console.error('[ADD_TO_CART_ERROR]:', error.message)
     return {
       data: null,
       error: error.message,
       message: 'Có lỗi xảy ra, vui lòng thử lại sau!',
-      status: 500
+      status: 500,
     }
   }
 }

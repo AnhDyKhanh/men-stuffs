@@ -6,13 +6,7 @@ import { useState } from 'react'
 /**
  * Delete product button component
  */
-export default function DeleteProductButton({
-  productId,
-  lang,
-}: {
-  productId: string
-  lang: string
-}) {
+export default function DeleteProductButton({ productId, lang }: { productId: string; lang: string }) {
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
 

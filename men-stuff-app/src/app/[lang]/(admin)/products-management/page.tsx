@@ -24,19 +24,15 @@ export default async function AdminProductsPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl text-black font-bold tracking-tight">{dict.products}</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-black">{dict.products}</h1>
         <Button asChild>
-          <Link href={`${BASE_PATH}/products-management/new`}>
-            {dict.createProduct}
-          </Link>
+          <Link href={`${BASE_PATH}/products-management/new`}>{dict.createProduct}</Link>
         </Button>
       </div>
 
       {error && (
         <Card className="border-destructive/50 bg-destructive/5">
-          <CardContent className="py-3 text-sm text-destructive">
-            {error}
-          </CardContent>
+          <CardContent className="text-destructive py-3 text-sm">{error}</CardContent>
         </Card>
       )}
 

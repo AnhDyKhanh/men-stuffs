@@ -9,13 +9,13 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center bg-background"
+      className="bg-background flex min-h-screen w-full items-center justify-center"
       style={{
         // BỎ chữ /public đi, chỉ bắt đầu từ /bg
         backgroundImage: `url('/bg/backGround.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
       }}
     >
       <LoginForm basePath={BASE_PATH} open={true} onOpenChange={setOpen} />

@@ -1,10 +1,7 @@
 import { cookies } from 'next/headers'
 import { labels, BASE_PATH } from '@/lib/labels'
 import { getUserRole } from '@/lib/auth'
-import {
-  getMainNavLinks,
-  getFooterColumns,
-} from '@/app/_constants/placeholderData'
+import { getMainNavLinks, getFooterColumns } from '@/app/_constants/placeholderData'
 import AnnouncementBar from '@/components/store/AnnouncementBar'
 import Header from '@/components/store/Header'
 import Footer from '@/components/store/Footer'
@@ -27,17 +24,12 @@ export default async function StoreLayout({
   const navLinks = getMainNavLinks(BASE_PATH)
   const footerColumns = getFooterColumns(BASE_PATH)
 
-  const accountHref =
-    userRole === 'guest' ? `${BASE_PATH}/login` : `${BASE_PATH}/account`
-  const accountLabel =
-    userRole === 'guest' ? labels.common.login : labels.common.account
+  const accountHref = userRole === 'guest' ? `${BASE_PATH}/login` : `${BASE_PATH}/account`
+  const accountLabel = userRole === 'guest' ? labels.common.login : labels.common.account
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <AnnouncementBar
-        storeLink={`${BASE_PATH}/pages/contact`}
-        storeLabel="Hệ thống cửa hàng"
-      />
+    <div className="flex min-h-screen flex-col">
+      <AnnouncementBar storeLink={`${BASE_PATH}/pages/contact`} storeLabel="Hệ thống cửa hàng" />
       <Header
         lang="vi"
         logoLabel={SITE_NAME}

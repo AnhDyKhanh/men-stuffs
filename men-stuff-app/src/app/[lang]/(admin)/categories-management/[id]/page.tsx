@@ -17,7 +17,9 @@ export default async function AdminCategoryEditPage({ params }: PageProps) {
           <Link href={`${BASE_PATH}/categories-management`}>{dict.backToCategories}</Link>
         </Button>
       </div>
-      <h1 className="text-3xl font-bold tracking-tight">{dict.editCategory} – {id}</h1>
+      <h1 className="text-3xl font-bold tracking-tight">
+        {dict.editCategory} – {id}
+      </h1>
       <p className="text-muted-foreground">Form chỉnh sửa danh mục (chưa implement).</p>
     </div>
   )

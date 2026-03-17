@@ -79,15 +79,11 @@ export default function ContactFeedbackClient() {
         <h2 id="contact-heading" className="text-2xl font-bold text-white">
           Liên hệ
         </h2>
-        <p className="mt-2 text-neutral-400">
-          Gửi câu hỏi hoặc yêu cầu hỗ trợ, chúng tôi sẽ phản hồi sớm.
-        </p>
+        <p className="mt-2 text-neutral-400">Gửi câu hỏi hoặc yêu cầu hỗ trợ, chúng tôi sẽ phản hồi sớm.</p>
         {contactSent ? (
           <div className="mt-6 rounded-lg border border-neutral-700 bg-neutral-800/50 p-6 text-center">
             <p className="font-medium text-white">Đã gửi tin nhắn thành công.</p>
-            <p className="mt-1 text-sm text-neutral-400">
-              Chúng tôi sẽ liên hệ lại qua email của bạn.
-            </p>
+            <p className="mt-1 text-sm text-neutral-400">Chúng tôi sẽ liên hệ lại qua email của bạn.</p>
           </div>
         ) : (
           <form onSubmit={submitContact} className="mt-6 space-y-4">
@@ -151,15 +147,11 @@ export default function ContactFeedbackClient() {
         <h2 id="feedback-heading" className="text-2xl font-bold text-white">
           Gửi phản hồi
         </h2>
-        <p className="mt-2 text-neutral-400">
-          Đánh giá trải nghiệm của bạn giúp chúng tôi cải thiện dịch vụ.
-        </p>
+        <p className="mt-2 text-neutral-400">Đánh giá trải nghiệm của bạn giúp chúng tôi cải thiện dịch vụ.</p>
         {sent ? (
           <div className="mt-6 rounded-lg border border-neutral-700 bg-neutral-800/50 p-6 text-center">
             <p className="font-medium text-white">Cảm ơn bạn đã gửi phản hồi!</p>
-            <p className="mt-1 text-sm text-neutral-400">
-              Ý kiến của bạn rất có giá trị với chúng tôi.
-            </p>
+            <p className="mt-1 text-sm text-neutral-400">Ý kiến của bạn rất có giá trị với chúng tôi.</p>
           </div>
         ) : (
           <form onSubmit={submitFeedback} className="mt-6 space-y-4">
@@ -173,7 +165,7 @@ export default function ContactFeedbackClient() {
                     onClick={() => setRating(i + 1)}
                     onMouseEnter={() => setHoverRating(i + 1)}
                     onMouseLeave={() => setHoverRating(0)}
-                    className="text-2xl text-amber-400 transition hover:scale-110 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-black"
+                    className="text-2xl text-amber-400 transition hover:scale-110 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-black focus:outline-none"
                     aria-pressed={rating === i + 1}
                     aria-label={`${i + 1} sao`}
                   >

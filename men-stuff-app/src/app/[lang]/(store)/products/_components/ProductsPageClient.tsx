@@ -22,19 +22,14 @@ function formatPrice(value: number): string {
   }).format(value)
 }
 
-function mapProductsToPlaceholder(
-  products: Product[] | null | undefined,
-  basePath: string
-): PlaceholderProduct[] {
+function mapProductsToPlaceholder(products: Product[] | null | undefined, basePath: string): PlaceholderProduct[] {
   if (!products) return []
   return products.map((p) => ({
     id: p.id,
     name: p.name ?? 'Sản phẩm',
     price: p.price ?? 0,
     priceFormatted: formatPrice(p.price ?? 0),
-    imageUrl:
-      p.origin_image ||
-      'https://placehold.co/400x400/f5f5f5/999?text=Product',
+    imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
     href: `${basePath}/products/${p.slug || p.id}`,
     rating: 0,
     reviewCount: 0,
@@ -90,7 +85,7 @@ export default function ProductsPageClient({
   const { data: categoriesData } = useGetAllCategories()
   const categories: CategoryItem[] = Array.isArray(categoriesData)
     ? (categoriesData as CategoryItem[])
-    : ((categoriesData as unknown) as { data?: CategoryItem[] })?.data ?? []
+    : ((categoriesData as unknown as { data?: CategoryItem[] })?.data ?? [])
 
   useEffect(() => {
     setPage(initialPage)
@@ -123,7 +118,7 @@ export default function ProductsPageClient({
       const url = `${BASE_PATH}/products${q ? `?${q}` : ''}`
       router.replace(url, { scroll: false })
     },
-    [view, searchParams, router]
+    [view, searchParams, router],
   )
 
   const applySearch = useCallback(() => {
@@ -168,7 +163,7 @@ export default function ProductsPageClient({
       setPage(next)
       updateUrl({ page: next })
     },
-    [totalPages, updateUrl]
+    [totalPages, updateUrl],
   )
 
   const handleCategoryChange = useCallback(
@@ -177,23 +172,18 @@ export default function ProductsPageClient({
       setPage(0)
       updateUrl({ page: 0, categoryId: id ?? null })
     },
-    [updateUrl]
+    [updateUrl],
   )
 
   const title = view === 'new-in' ? 'New In' : labels.products.allProducts
-  const subtitle =
-    view === 'new-in'
-      ? 'Sản phẩm mới nhất vừa về'
-      : 'Khám phá toàn bộ sản phẩm của chúng tôi'
+  const subtitle = view === 'new-in' ? 'Sản phẩm mới nhất vừa về' : 'Khám phá toàn bộ sản phẩm của chúng tôi'
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            {title}
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h1>
           <p className="mt-2 text-base text-neutral-300">{subtitle}</p>
           {total > 0 && (
             <p className="mt-1 text-sm text-neutral-400">
@@ -241,7 +231,7 @@ export default function ProductsPageClient({
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applySearch()}
               placeholder="Tìm sản phẩm..."
-              className="w-full min-w-0 flex-1 rounded-lg border border-neutral-600 bg-neutral-900 px-3 py-2 text-white placeholder-neutral-500 focus:border-white focus:outline-none focus:ring-1 focus:ring-white sm:w-48"
+              className="w-full min-w-0 flex-1 rounded-lg border border-neutral-600 bg-neutral-900 px-3 py-2 text-white placeholder-neutral-500 focus:border-white focus:ring-1 focus:ring-white focus:outline-none sm:w-48"
               aria-label="Tìm sản phẩm"
             />
             <button
@@ -290,10 +280,7 @@ export default function ProductsPageClient({
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <nav
-                className="mt-14 flex flex-wrap items-center justify-center gap-2"
-                aria-label="Phân trang"
-              >
+              <nav className="mt-14 flex flex-wrap items-center justify-center gap-2" aria-label="Phân trang">
                 <button
                   type="button"
                   onClick={() => goToPage(page - 1)}
@@ -321,7 +308,7 @@ export default function ProductsPageClient({
                       >
                         {n + 1}
                       </button>
-                    )
+                    ),
                   )}
                 </div>
                 <button

@@ -1,5 +1,5 @@
-import { getSupabase } from "@/lib/supabase";
-import { getCurrentCustomerId } from "../../services/getCustomerAccount";
+import { getSupabase } from '@/lib/supabase'
+import { getCurrentCustomerId } from '../../services/getCustomerAccount'
 
 export async function getUserCartItems() {
   const customerId = await getCurrentCustomerId()
@@ -7,7 +7,8 @@ export async function getUserCartItems() {
   // Chỉ cần 1 lần gọi duy nhất với cú pháp join của Supabase
   const { data: cartData, error } = await getSupabase()
     .from('cart')
-    .select(`
+    .select(
+      `
       id,
       cart_items (
         id,
@@ -22,7 +23,8 @@ export async function getUserCartItems() {
           origin_image
         )
       )
-    `)
+    `,
+    )
     .eq('customer_id', customerId)
     .eq('status', 'active')
     .single() // Lấy duy nhất 1 giỏ hàng active
@@ -45,7 +47,17 @@ export async function getUserCartItems() {
     }
     const rawProduct = r.product
     const p = Array.isArray(rawProduct) ? rawProduct[0] : rawProduct
-    const prod = p as { id?: string; name?: string; price?: number; discount_price?: number | null; description?: string; origin_image?: string } | null | undefined
+    const prod = p as
+      | {
+          id?: string
+          name?: string
+          price?: number
+          discount_price?: number | null
+          description?: string
+          origin_image?: string
+        }
+      | null
+      | undefined
     const unitPrice = r.price_at_time ?? prod?.discount_price ?? prod?.price ?? 0
     return {
       id: r.id,

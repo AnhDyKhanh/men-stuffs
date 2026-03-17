@@ -22,8 +22,8 @@ export default function AnnouncementBar({
   storeLabel,
 }: AnnouncementBarProps) {
   return (
-    <div className="bg-neutral-100 border-b border-neutral-200">
-      <div className="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-4 text-sm">
+    <div className="border-b border-neutral-200 bg-neutral-100">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-2 text-sm">
         <div className="flex flex-wrap items-center gap-6">
           <a
             href={`tel:${hotline.replace(/\D/g, '')}`}
@@ -32,28 +32,20 @@ export default function AnnouncementBar({
             <PhoneIcon />
             <span>Hotline: {hotline}</span>
           </a>
-          <a
-            href={`mailto:${email}`}
-            className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900"
-          >
+          <a href={`mailto:${email}`} className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900">
             <EmailIcon />
             <span>Email: {email}</span>
           </a>
         </div>
 
-        <div className="flex-1 min-w-0 flex justify-center">
+        <div className="flex min-w-0 flex-1 justify-center">
           <div className="overflow-hidden text-center">
-            <p className="text-neutral-700 truncate">
-              {ANNOUNCEMENT_MESSAGES[0]}
-            </p>
+            <p className="truncate text-neutral-700">{ANNOUNCEMENT_MESSAGES[0]}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Link
-            href={storeLink}
-            className="text-neutral-700 hover:text-neutral-900 flex items-center gap-1"
-          >
+          <Link href={storeLink} className="flex items-center gap-1 text-neutral-700 hover:text-neutral-900">
             {storeLabel}
             <LocationIcon />
           </Link>
@@ -65,13 +57,7 @@ export default function AnnouncementBar({
 
 function PhoneIcon() {
   return (
-    <svg
-      className="w-5 h-5 shrink-0"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      aria-hidden
-    >
+    <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -84,13 +70,7 @@ function PhoneIcon() {
 
 function EmailIcon() {
   return (
-    <svg
-      className="w-5 h-5 shrink-0"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      aria-hidden
-    >
+    <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
       <rect width="18" height="14" x="3" y="5" rx="1" strokeWidth={1.5} />
       <path strokeWidth={1.5} strokeLinecap="round" d="M20 5.5 12 13 4 5.5" />
     </svg>
@@ -99,25 +79,14 @@ function EmailIcon() {
 
 function LocationIcon() {
   return (
-    <svg
-      className="w-5 h-5 shrink-0"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      aria-hidden
-    >
+    <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={1.5}
         d="M6.032 15.287 12 22l5.968-6.713C22.545 10.14 18.889 2 12 2 5.11 2 1.455 10.139 6.032 15.287Z"
       />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M12 7a3 3 0 1 0 0 6 3 3 0 1 0 0-6z"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 7a3 3 0 1 0 0 6 3 3 0 1 0 0-6z" />
     </svg>
   )
 }

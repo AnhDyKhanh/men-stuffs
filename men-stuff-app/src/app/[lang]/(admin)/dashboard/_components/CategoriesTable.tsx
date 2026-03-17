@@ -4,14 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import type { Category } from '@/app/_types/category'
 import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 const PAGE_SIZES = [5, 10, 20, 50] as const
@@ -95,12 +88,7 @@ export default function CategoriesTable({
             </select>
           </span>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-            >
+            <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
               {dict.prev}
             </Button>
             <span className={`min-w-[120px] text-center text-sm ${mutedClass}`}>
@@ -133,14 +121,10 @@ export default function CategoriesTable({
                   <div className="font-medium">{cat.name ?? '-'}</div>
                   <div className={`text-xs ${mutedClass}`}>ID: {cat.id}</div>
                 </TableCell>
-                <TableCell className={`px-6 py-4 ${cellClass} ${mutedClass}`}>
-                  {cat.slug ?? '-'}
-                </TableCell>
+                <TableCell className={`px-6 py-4 ${cellClass} ${mutedClass}`}>{cat.slug ?? '-'}</TableCell>
                 <TableCell className={`px-6 py-4 text-right ${cellClass}`}>
-                  <Button variant="link" size="sm" className="p-0 h-auto" asChild>
-                    <Link href={`/${locale}/categories-management/${cat.id}`}>
-                      {dict.editCategory}
-                    </Link>
+                  <Button variant="link" size="sm" className="h-auto p-0" asChild>
+                    <Link href={`/${locale}/categories-management/${cat.id}`}>{dict.editCategory}</Link>
                   </Button>
                 </TableCell>
               </TableRow>
