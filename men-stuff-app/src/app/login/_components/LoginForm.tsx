@@ -1,5 +1,6 @@
 'use client'
 
+import { useLogin } from '@/app/_hooks/useLogin'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -10,57 +11,49 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-type LoginFormProps = {
-  basePath: string
-  open: boolean // Bắt buộc truyền từ cha để quản lý popup
-  onOpenChange: (open: boolean) => void // Bắt buộc truyền để đóng popup
-}
-
-export function LoginForm({ basePath, open, onOpenChange }: LoginFormProps) {
+export function LoginForm() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const loginMutation = useLogin()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    setErrorMessage('')
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      const data = await res.json().catch(() => ({}))
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          if (data.error) {
+            setErrorMessage(data.error)
+            return
+          }
 
-      if (res.ok) {
-        const role = data.role as 'admin' | 'user' | undefined
-        const redirectParam = new URLSearchParams(window.location.search).get('redirect')
+          const role = data.role as 'admin' | 'user' | undefined
+          const searchParams = new URLSearchParams(window.location.search)
+          const redirectParam = searchParams.get('redirect')
 
-        if (role === 'admin') {
-          router.push(redirectParam || `${basePath}/dashboard`)
-        } else {
-          const isAdminPath =
-            redirectParam && /^\/(admin|dashboard|products-management|categories-management)/.test(redirectParam)
-          router.push(!isAdminPath && redirectParam ? redirectParam : (basePath || '/'))
-        }
-        router.refresh()
-        onOpenChange(false) // Đăng nhập xong thì đóng luôn modal
-      } else {
-        setError(data.error || 'Invalid credentials')
+          if (role === 'admin') {
+            router.push(redirectParam || `/dashboard`)
+          } else {
+            const isAdminPath =
+              redirectParam && /^\/(admin|dashboard|products-management|categories-management)/.test(redirectParam)
+            router.push(!isAdminPath && redirectParam ? redirectParam : '/')
+          }
+          router.refresh()
+        },
+        onError: () => {
+          setErrorMessage('Invalid credentials')
+        },
       }
-    } catch {
-      setError('Invalid credentials')
-    } finally {
-      setIsLoading(false)
-    }
+    )
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={true}>
       <DialogContent
         className="max-w-md overflow-hidden border-none bg-transparent p-0 shadow-none"
         showCloseButton={false}
@@ -99,14 +92,12 @@ export function LoginForm({ basePath, open, onOpenChange }: LoginFormProps) {
                     placeholder="Nhập email"
                     required
                     className="bg-background border-border/50 focus:border-primary/50 h-11 pl-10 transition-all"
-                    // autoComplete="email"
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
-                  intrinsic-label="pass"
                   className="text-muted-foreground text-xs font-semibold tracking-widest uppercase"
                 >
                   Mật khẩu
@@ -121,14 +112,13 @@ export function LoginForm({ basePath, open, onOpenChange }: LoginFormProps) {
                     placeholder="Nhập mật khẩu"
                     required
                     className="bg-background border-border/50 focus:border-primary/50 h-11 pl-10 transition-all"
-                    // autoComplete="current-password"
                   />
                 </div>
               </div>
-              {error && (
+              {(errorMessage || loginMutation.isError) && (
                 <div className="bg-destructive/10 border-destructive/20 animate-in fade-in zoom-in-95 rounded-lg border p-3">
                   <p className="text-destructive text-center text-xs font-medium" role="alert">
-                    {error}
+                    {errorMessage || 'Đã xảy ra lỗi vui lòng thử lại'}
                   </p>
                 </div>
               )}
@@ -136,16 +126,15 @@ export function LoginForm({ basePath, open, onOpenChange }: LoginFormProps) {
             <CardFooter className="mt-10 flex flex-col gap-4 pb-8">
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={loginMutation.isPending}
                 className="bg-primary text-primary-foreground h-11 w-full text-sm font-bold tracking-widest uppercase transition-all hover:opacity-90"
               >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Đăng nhập'}
+                {loginMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Đăng nhập'}
               </Button>
 
               <div className="flex flex-col items-center gap-2">
                 <Link
-                  href={basePath}
-                  onClick={() => onOpenChange(false)}
+                  href={'/'}
                   className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 transition-colors hover:underline"
                 >
                   Tiếp tục với tư cách khách
