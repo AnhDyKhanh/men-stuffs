@@ -75,4 +75,5 @@ export const labels = {
 } as const
 
 export const LOCALE = 'vi' as const
-export const BASE_PATH = `/${LOCALE}`
+/** Base path for routes (empty = no locale prefix) */
+export const BASE_PATH = ''
