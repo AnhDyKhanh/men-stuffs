@@ -2,7 +2,6 @@ import Link from 'next/link'
 import type { NavLink } from '@/app/_constants/placeholderData'
 
 interface HeaderProps {
-  lang: string
   logoLabel: string
   navLinks: NavLink[]
   accountHref: string
@@ -10,14 +9,11 @@ interface HeaderProps {
   cartHref: string
   cartLabel: string
   searchLabel: string
-  /** Optional: đổi ngôn ngữ (đã bỏ i18n, có thể bỏ qua) */
-  languageSwitcher?: React.ReactNode
   /** When set, shows an Admin link (e.g. for admin users) */
   adminHref?: string
 }
 
 export default function Header({
-  lang,
   logoLabel,
   navLinks,
   accountHref,
@@ -25,7 +21,6 @@ export default function Header({
   cartHref,
   cartLabel,
   searchLabel,
-  languageSwitcher,
   adminHref,
 }: HeaderProps) {
   return (
@@ -53,12 +48,11 @@ export default function Header({
             </nav>
           </div>
 
-          <Link href={`/${lang}`} className="absolute left-1/2 -translate-x-1/2 text-xl font-bold text-neutral-900">
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-xl font-bold text-neutral-900">
             {logoLabel}
           </Link>
 
           <div className="flex items-center gap-4 md:gap-6">
-            {languageSwitcher ?? null}
             {adminHref && (
               <Link href={adminHref} className="hidden text-sm text-blue-600 hover:text-blue-700 sm:inline">
                 Admin
