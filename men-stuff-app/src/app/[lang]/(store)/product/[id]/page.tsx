@@ -15,58 +15,55 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound()
 
   return (
-    <div className="bg-black min-h-screen text-white">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-
+    <div className="min-h-screen bg-black text-white">
+      <div className="mx-auto max-w-7xl px-6 py-12">
         {/* Breadcrumb nhỏ */}
-        <nav className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-8">
-          Home  /  Products  /  {product.name}
+        <nav className="mb-8 text-[10px] tracking-[0.2em] text-gray-500 uppercase">
+          Home / Products / {product.name}
         </nav>
 
-        <div className="grid md:grid-cols-12 gap-12">
-
+        <div className="grid gap-12 md:grid-cols-12">
           {/* Cột trái: Ảnh sản phẩm (Chiếm 7/12 cột) */}
-          <div className="md:col-span-7 flex gap-4">
+          <div className="flex gap-4 md:col-span-7">
             {/* Danh sách ảnh nhỏ bên cạnh (Thumbnails) */}
-            <div className="hidden md:flex flex-col gap-2 w-20">
+            <div className="hidden w-20 flex-col gap-2 md:flex">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square bg-zinc-900 border border-zinc-800 cursor-pointer">
-                  <Image src={product.thumbnail} alt="thumb" width={80} height={80} className="opacity-50 hover:opacity-100 object-cover h-full" />
+                <div key={i} className="aspect-square cursor-pointer border border-zinc-800 bg-zinc-900">
+                  <Image
+                    src={product.thumbnail}
+                    alt="thumb"
+                    width={80}
+                    height={80}
+                    className="h-full object-cover opacity-50 hover:opacity-100"
+                  />
                 </div>
               ))}
             </div>
 
             {/* Ảnh chính */}
-            <div className="flex-1 bg-zinc-900 flex items-center justify-center overflow-hidden cursor-zoom-in group">
+            <div className="group flex flex-1 cursor-zoom-in items-center justify-center overflow-hidden bg-zinc-900">
               <Image
                 src={product.thumbnail}
                 alt={product.name}
                 width={800}
                 height={800}
-                className="object-cover w-full h-auto transition-transform duration-700 ease-in-out group-hover:scale-125"
+                className="h-auto w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-125"
               />
             </div>
           </div>
 
           {/* Cột phải: Thông tin */}
-          <div className="md:col-span-5 flex flex-col pt-4 sticky top-24 h-fit">
-            <p className="text-gray-500 text-[10px] tracking-widest uppercase mb-2">Men Stuff</p>
-            <h1 className="text-3xl font-medium mb-2 tracking-tight">
-              {product.name}
-            </h1>
+          <div className="sticky top-24 flex h-fit flex-col pt-4 md:col-span-5">
+            <p className="mb-2 text-[10px] tracking-widest text-gray-500 uppercase">Men Stuff</p>
+            <h1 className="mb-2 text-3xl font-medium tracking-tight">{product.name}</h1>
             {/* Thêm phần đánh giá ở đây */}
             <Rating score={5} reviews={36} />
 
-            <p className="text-xl font-light mb-8">
-              {product.price.toLocaleString("vi-VN")} VND
-            </p>
-
-
-
+            <p className="mb-8 text-xl font-light">{product.price.toLocaleString('vi-VN')} VND</p>
 
             <ProductForm product={product} />
 
-            <div className="mt-10 pt-10 border-t border-zinc-800">
+            <div className="mt-10 border-t border-zinc-800 pt-10">
               <p className="text-sm leading-relaxed text-zinc-400 italic">
                 Different isn&apos;t abnormal — it&apos;s powerful. Men Stuff stands with you. Own it.
               </p>
@@ -77,11 +74,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
         {/* Phần mô tả chi tiết dưới cùng */}
         <div className="mt-20 border-t border-zinc-800 pt-16">
           <div className="max-w-3xl">
-            <h2 className="text-xl uppercase tracking-widest mb-8 border-b border-white w-fit pb-2">Description</h2>
-            <div className="space-y-6 text-zinc-400 leading-loose">
+            <h2 className="mb-8 w-fit border-b border-white pb-2 text-xl tracking-widest uppercase">Description</h2>
+            <div className="space-y-6 leading-loose text-zinc-400">
               <p>{product.description}</p>
-              <p><strong>Material:</strong> 925 Sterling Silver, Black Onyx Gemstone.</p>
-              <p><strong>Craftsmanship:</strong> Hand-finished by master artisans with intricate floral carvings.</p>
+              <p>
+                <strong>Material:</strong> 925 Sterling Silver, Black Onyx Gemstone.
+              </p>
+              <p>
+                <strong>Craftsmanship:</strong> Hand-finished by master artisans with intricate floral carvings.
+              </p>
             </div>
           </div>
         </div>

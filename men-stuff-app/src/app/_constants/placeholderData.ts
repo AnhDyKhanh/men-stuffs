@@ -58,10 +58,7 @@ function formatPrice(value: number): string {
   }).format(value)
 }
 
-export function getPlaceholderProducts(
-  locale: string,
-  basePath: string,
-): PlaceholderProduct[] {
+export function getPlaceholderProducts(locale: string, basePath: string): PlaceholderProduct[] {
   const products: Omit<PlaceholderProduct, 'priceFormatted' | 'href'>[] = [
     {
       id: '1',
@@ -139,17 +136,12 @@ export function getPlaceholderProducts(
     ...p,
     priceFormatted: formatPrice(p.price),
     href: `${basePath}/product/${p.id}`,
-    imageUrl:
-      p.imageUrl || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
+    imageUrl: p.imageUrl || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
   }))
 }
 
 /** New arrivals (products with label "new" or first N products). */
-export function getNewProducts(
-  locale: string,
-  basePath: string,
-  limit = 8,
-): PlaceholderProduct[] {
+export function getNewProducts(locale: string, basePath: string, limit = 8): PlaceholderProduct[] {
   const all = getPlaceholderProducts(locale, basePath)
   const withNew = all.filter((p) => p.label === 'new')
   return (withNew.length >= limit ? withNew : all).slice(0, limit)
@@ -269,11 +261,7 @@ export function getTwoBannerRows(
 }
 
 export function getAnnouncementMessages(): string[] {
-  return [
-    'Free shipping nationwide',
-    '1-for-1 exchange within 3 days',
-    'Lifetime warranty on selected items',
-  ]
+  return ['Free shipping nationwide', '1-for-1 exchange within 3 days', 'Lifetime warranty on selected items']
 }
 
 export function getFooterColumns(basePath: string): FooterColumn[] {

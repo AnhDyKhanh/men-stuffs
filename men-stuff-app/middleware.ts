@@ -36,12 +36,7 @@ function removeLocaleFromPath(pathname: string): string {
   return pathname
 }
 
-const adminRoutePrefixes = [
-  '/admin',
-  '/dashboard',
-  '/products-management',
-  '/categories-management',
-]
+const adminRoutePrefixes = ['/admin', '/dashboard', '/products-management', '/categories-management']
 
 function isAdminRoute(pathWithoutLocale: string): boolean {
   return adminRoutePrefixes.some((prefix) => pathWithoutLocale.startsWith(prefix))
@@ -93,7 +88,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

@@ -8,16 +8,12 @@ import { Button } from '@/components/ui/button'
  */
 export function LayoutExample() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       <Navbar />
       <main className="container px-4 py-10">
         <section className="mb-10">
-          <h1 className="mb-2 text-2xl font-semibold text-foreground">
-            Luxury Men Style
-          </h1>
-          <p className="mb-6 text-muted-foreground">
-            Dark theme · Silver accent · Subtle shadow
-          </p>
+          <h1 className="text-foreground mb-2 text-2xl font-semibold">Luxury Men Style</h1>
+          <p className="text-muted-foreground mb-6">Dark theme · Silver accent · Subtle shadow</p>
           <div className="flex flex-wrap gap-3">
             <Button>Primary</Button>
             <Button variant="secondary">Secondary</Button>
@@ -26,9 +22,7 @@ export function LayoutExample() {
           </div>
         </section>
         <section>
-          <h2 className="mb-4 text-lg font-medium text-foreground">
-            Product card sample
-          </h2>
+          <h2 className="text-foreground mb-4 text-lg font-medium">Product card sample</h2>
           <div className="grid max-w-sm gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <ProductCardSample />
             <ProductCardSample title="Leather Belt" price="890,000₫" />

@@ -7,10 +7,7 @@ export async function POST(request: Request) {
     const { rating, comment, product_id, order_id } = body
 
     if (typeof rating !== 'number' && typeof rating !== 'string') {
-      return NextResponse.json(
-        { error: 'Rating là bắt buộc (1–5)' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Rating là bắt buộc (1–5)' }, { status: 400 })
     }
 
     const result = await submitFeedback({
@@ -21,10 +18,7 @@ export async function POST(request: Request) {
     })
 
     if (result.error) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: result.status ?? 500 }
-      )
+      return NextResponse.json({ error: result.error }, { status: result.status ?? 500 })
     }
 
     return NextResponse.json({
@@ -33,9 +27,6 @@ export async function POST(request: Request) {
     })
   } catch (err) {
     console.error('[POST /api/guest/feedback]', err)
-    return NextResponse.json(
-      { error: 'Gửi feedback thất bại' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Gửi feedback thất bại' }, { status: 500 })
   }
 }

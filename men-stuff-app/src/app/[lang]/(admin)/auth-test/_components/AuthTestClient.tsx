@@ -75,11 +75,10 @@ export default function AuthTestClient() {
 
   return (
     <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900">
-        Kiểm tra Middleware (header x-user-role)
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900">Kiểm tra Middleware (header x-user-role)</h3>
       <p className="text-sm text-gray-600">
-        Header <code className="rounded bg-gray-100 px-1">x-user-role</code> do middleware set trên response khi load trang.
+        Header <code className="rounded bg-gray-100 px-1">x-user-role</code> do middleware set trên response khi load
+        trang.
       </p>
       {xUserRole !== null ? (
         <p className="font-mono text-sm">
@@ -89,35 +88,43 @@ export default function AuthTestClient() {
         <p className="text-gray-500">Đang đọc...</p>
       )}
 
-      <h3 className="text-lg font-semibold text-gray-900">
-        Kiểm tra API & Upload (cookie + staff)
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900">Kiểm tra API & Upload (cookie + staff)</h3>
       <button
         type="button"
         onClick={handleTestUpload}
         disabled={uploading}
-        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
       >
         {uploading ? 'Đang gửi...' : 'Test Upload & RLS'}
       </button>
       {uploadResult && (
-        <div className={`rounded-md p-3 text-sm ${uploadResult.ok ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+        <div
+          className={`rounded-md p-3 text-sm ${uploadResult.ok ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+        >
           {uploadResult.ok ? (
-            <p>Thành công. URL ảnh: <a href={uploadResult.url} target="_blank" rel="noreferrer" className="underline">{uploadResult.url}</a></p>
+            <p>
+              Thành công. URL ảnh:{' '}
+              <a href={uploadResult.url} target="_blank" rel="noreferrer" className="underline">
+                {uploadResult.url}
+              </a>
+            </p>
           ) : (
             <p>Lỗi: {uploadResult.error}</p>
           )}
         </div>
       )}
 
-      <h3 className="text-lg font-semibold text-gray-900">
-        API /api/auth/me (cookie gửi kèm request)
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900">API /api/auth/me (cookie gửi kèm request)</h3>
       {apiRole ? (
         <div className="text-sm">
-          <p><span className="font-medium text-black">Role:</span> <span className="text-black">{apiRole.role}</span></p>
+          <p>
+            <span className="font-medium text-black">Role:</span> <span className="text-black">{apiRole.role}</span>
+          </p>
           {apiRole.user && (
-            <p><span className="font-medium text-black">account_id:</span> <span className="text-black">{apiRole.user.id}</span>  </p>
+            <p>
+              <span className="font-medium text-black">account_id:</span>{' '}
+              <span className="text-black">{apiRole.user.id}</span>{' '}
+            </p>
           )}
         </div>
       ) : (

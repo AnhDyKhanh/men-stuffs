@@ -66,20 +66,8 @@ export default function UploadButton({ onUploadSuccess, accept = 'image/*' }: Up
       >
         {loading ? (
           <span className="flex items-center gap-2">
-            <svg
-              className="animate-spin h-5 w-5"
-              viewBox="0 0 24 24"
-              aria-hidden
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-              />
+            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" aria-hidden>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path
                 className="opacity-75"
                 fill="currentColor"

@@ -8,9 +8,7 @@ export type UserRole = 'guest' | 'user' | 'admin'
 /**
  * Get user role from cookies (set by API login after verifying staff).
  */
-export function getUserRole(
-  cookies: { get: (name: string) => { value?: string } | undefined },
-): UserRole {
+export function getUserRole(cookies: { get: (name: string) => { value?: string } | undefined }): UserRole {
   const role = cookies.get('role')?.value
   if (role === 'user' || role === 'admin') return role
   return 'guest'
@@ -19,9 +17,9 @@ export function getUserRole(
 /**
  * Get account_id from cookie (set by API login). Server/middleware use.
  */
-export function getAccountIdFromCookie(
-  cookies: { get: (name: string) => { value?: string } | undefined },
-): string | undefined {
+export function getAccountIdFromCookie(cookies: {
+  get: (name: string) => { value?: string } | undefined
+}): string | undefined {
   return cookies.get('account_id')?.value
 }
 
@@ -35,9 +33,7 @@ export function hasRole(userRole: UserRole, requiredRole: UserRole): boolean {
 /**
  * Check if current user is admin (server-side, from cookie only).
  */
-export function isAdmin(
-  cookies: { get: (name: string) => { value?: string } | undefined },
-): boolean {
+export function isAdmin(cookies: { get: (name: string) => { value?: string } | undefined }): boolean {
   return getUserRole(cookies) === 'admin'
 }
 

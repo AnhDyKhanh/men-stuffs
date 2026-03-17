@@ -20,7 +20,6 @@ interface ProductFormProps {
   }
 }
 
-
 // export type Product = {
 //   id: string
 //   category_id: string
@@ -37,11 +36,7 @@ interface ProductFormProps {
 /**
  * Product form component for create/edit
  */
-export default function ProductForm({
-  product,
-  lang,
-  translations,
-}: ProductFormProps) {
+export default function ProductForm({ product, lang, translations }: ProductFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -57,9 +52,7 @@ export default function ProductForm({
     setIsSubmitting(true)
 
     try {
-      const url = product
-        ? `/api/admin/products/${product.id}`
-        : '/api/admin/products'
+      const url = product ? `/api/admin/products/${product.id}` : '/api/admin/products'
       const method = product ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
@@ -87,57 +80,43 @@ export default function ProductForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {translations.productNameVi}
-        </label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">{translations.productNameVi}</label>
         <input
           type="text"
           value={formData.name_vi}
-          onChange={(e) =>
-            setFormData({ ...formData, name_vi: e.target.value })
-          }
-          className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => setFormData({ ...formData, name_vi: e.target.value })}
+          className="w-full rounded border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {translations.productNameEn}
-        </label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">{translations.productNameEn}</label>
         <input
           type="text"
           value={formData.name_en}
-          onChange={(e) =>
-            setFormData({ ...formData, name_en: e.target.value })
-          }
-          className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
+          className="w-full rounded border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {translations.productPrice}
-        </label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">{translations.productPrice}</label>
         <input
           type="number"
           step="1000"
           min="0"
           value={formData.price}
-          onChange={(e) =>
-            setFormData({ ...formData, price: Number(e.target.value) })
-          }
-          className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+          className="w-full rounded border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           required
         />
         <p className="mt-1 text-sm text-gray-500">Price in VND</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {translations.productStatus}
-        </label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">{translations.productStatus}</label>
         <select
           value={formData.status}
           onChange={(e) =>
@@ -146,7 +125,7 @@ export default function ProductForm({
               status: e.target.value as ProductStatus,
             })
           }
-          className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full rounded border px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
         >
           <option value="active">{translations.active}</option>
           <option value="inactive">{translations.inactive}</option>
@@ -157,14 +136,14 @@ export default function ProductForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+          className="rounded-lg bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
         >
           {isSubmitting ? 'Saving...' : translations.save}
         </button>
         <button
           type="button"
           onClick={() => router.push(`/${lang}/products-management`)}
-          className="bg-gray-200 text-black px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+          className="rounded-lg bg-gray-200 px-6 py-2 text-black transition hover:bg-gray-300"
         >
           {translations.cancel}
         </button>

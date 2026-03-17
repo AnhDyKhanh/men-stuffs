@@ -33,9 +33,7 @@ export async function POST(request: Request) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`
     const filePath = `${fileName}`
 
-    const { error: uploadError } = await supabase.storage
-      .from('image')
-      .upload(filePath, file)
+    const { error: uploadError } = await supabase.storage.from('image').upload(filePath, file)
 
     if (uploadError) {
       return NextResponse.json({ error: uploadError.message }, { status: 500 })
@@ -47,9 +45,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: publicUrl }, { status: 200 })
   } catch {
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

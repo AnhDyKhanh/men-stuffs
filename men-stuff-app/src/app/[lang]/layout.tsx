@@ -14,9 +14,5 @@ export default async function LocaleLayout({
 }) {
   await params
 
-  return (
-    <Providers>
-      {children}
-    </Providers>
-  )
+  return <Providers>{children}</Providers>
 }

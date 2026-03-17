@@ -29,10 +29,7 @@ function formatPrice(value: number): string {
   }).format(value)
 }
 
-function mapProductsToPlaceholder(
-  products: Product[] | null | undefined,
-  basePath: string,
-): PlaceholderProduct[] {
+function mapProductsToPlaceholder(products: Product[] | null | undefined, basePath: string): PlaceholderProduct[] {
   if (!products) return []
 
   return products.map((p) => {
@@ -43,9 +40,7 @@ function mapProductsToPlaceholder(
       name: p.name ?? 'Sản phẩm',
       price,
       priceFormatted: formatPrice(price),
-      imageUrl:
-        p.origin_image ||
-        'https://placehold.co/400x400/f5f5f5/999?text=Product',
+      imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
       href: `${basePath}/product/${p.id}`,
       rating: 0,
       reviewCount: 0,
@@ -62,14 +57,14 @@ function mapCategoriesToFeatured(
   if (!categories || categories.length === 0) {
     return getPlaceholderFeaturedCategories(basePath, 'vi')
   }
-  return categories
-    .slice(0, limit)
-    .map((cat, index): FeaturedCategory => ({
+  return categories.slice(0, limit).map(
+    (cat, index): FeaturedCategory => ({
       id: cat.id,
       title: cat.name || `Danh mục ${index + 1}`,
       imageUrl: '/categories/default.png',
       href: `${basePath}/products?categoryId=${encodeURIComponent(cat.slug || cat.id)}`,
-    }))
+    }),
+  )
 }
 
 export default function StoreHomeClient() {
@@ -89,26 +84,20 @@ export default function StoreHomeClient() {
   const apiProducts = (productsResponse?.data ?? null) as Product[] | null
   const newProductsFromApi = mapProductsToPlaceholder(apiProducts, BASE_PATH)
   const newProducts: PlaceholderProduct[] =
-    newProductsFromApi.length > 0
-      ? newProductsFromApi
-      : getPlaceholderNewProducts('vi', BASE_PATH)
+    newProductsFromApi.length > 0 ? newProductsFromApi : getPlaceholderNewProducts('vi', BASE_PATH)
 
   const latestProductForBanner =
     newProductsFromApi.length > 0
       ? {
-        title: newProductsFromApi[0].name,
-        href: newProductsFromApi[0].href,
-        imageUrl: newProductsFromApi[0].imageUrl,
-      }
+          title: newProductsFromApi[0].name,
+          href: newProductsFromApi[0].href,
+          imageUrl: newProductsFromApi[0].imageUrl,
+        }
       : undefined
 
   const bannerRows = getTwoBannerRows(BASE_PATH, latestProductForBanner)
 
-  const {
-    data: categoriesData,
-    isLoading: isLoadingCategories,
-    isError: isCategoriesError,
-  } = useGetAllCategories()
+  const { data: categoriesData, isLoading: isLoadingCategories, isError: isCategoriesError } = useGetAllCategories()
 
   const featuredCategories = mapCategoriesToFeatured(
     categoriesData as { id: string; name?: string; slug?: string }[] | null,
@@ -120,56 +109,39 @@ export default function StoreHomeClient() {
     <>
       <HeroSlideshow slides={heroSlides} />
 
-      <div className="bg-black max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-16">
+      <div className="mx-auto max-w-7xl space-y-16 bg-black px-4 py-12 md:py-16">
         <section aria-labelledby="new-products-heading">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <h2
-              id="new-products-heading"
-              className="text-2xl font-semibold text-white md:text-3xl"
-            >
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 id="new-products-heading" className="text-2xl font-semibold text-white md:text-3xl">
               {labels.home.newProducts}
             </h2>
             <Link
               href={`${BASE_PATH}/products`}
-              className="text-sm font-medium text-neutral-300 hover:text-white underline underline-offset-2"
+              className="text-sm font-medium text-neutral-300 underline underline-offset-2 hover:text-white"
             >
               {labels.home.viewAll}
             </Link>
           </div>
 
           {isProductsError && (
-            <p className="mb-4 text-sm text-red-400">
-              Không thể tải sản phẩm. Đang hiển thị dữ liệu mẫu.
-            </p>
+            <p className="mb-4 text-sm text-red-400">Không thể tải sản phẩm. Đang hiển thị dữ liệu mẫu.</p>
           )}
 
           {isLoadingProducts && newProductsFromApi.length === 0 ? (
             <p className="text-sm text-neutral-400">Đang tải sản phẩm...</p>
           ) : (
-            <ProductGrid
-              products={newProducts}
-              buyNowLabel={labels.products.addToCart}
-              columns={4}
-              variant="dark"
-            />
+            <ProductGrid products={newProducts} buyNowLabel={labels.products.addToCart} columns={4} variant="dark" />
           )}
         </section>
 
         <section aria-labelledby="featured-categories-heading">
           {isCategoriesError && (
-            <p className="mb-4 text-sm text-red-500">
-              Không thể tải danh mục. Đang hiển thị dữ liệu mẫu.
-            </p>
+            <p className="mb-4 text-sm text-red-500">Không thể tải danh mục. Đang hiển thị dữ liệu mẫu.</p>
           )}
           {isLoadingCategories && !categoriesData && (
-            <p className="text-sm text-neutral-600">
-              Đang tải danh mục sản phẩm...
-            </p>
+            <p className="text-sm text-neutral-600">Đang tải danh mục sản phẩm...</p>
           )}
-          <FeaturedCategoriesSection
-            title="Danh mục nổi bật"
-            categories={featuredCategories}
-          />
+          <FeaturedCategoriesSection title="Danh mục nổi bật" categories={featuredCategories} />
         </section>
       </div>
 
@@ -179,4 +151,3 @@ export default function StoreHomeClient() {
     </>
   )
 }
-

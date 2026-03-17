@@ -11,10 +11,6 @@ const STAFF_TABLE = 'staff'
  */
 export async function isStaffByAccountId(accountId: string): Promise<boolean> {
   if (!accountId) return false
-  const { data, error } = await getSupabase()
-    .from(STAFF_TABLE)
-    .select('id')
-    .eq('account_id', accountId)
-    .maybeSingle()
+  const { data, error } = await getSupabase().from(STAFF_TABLE).select('id').eq('account_id', accountId).maybeSingle()
   return !error && data != null
 }

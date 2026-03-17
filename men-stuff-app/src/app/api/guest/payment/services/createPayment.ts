@@ -69,9 +69,7 @@ export async function createOrder(body: CreateOrderDTO) {
     }))
 
     // Bước 3: Chèn items vào bảng order_item
-    const { error: itemsError } = await supabase
-      .from('order_item')
-      .insert(orderItems)
+    const { error: itemsError } = await supabase.from('order_item').insert(orderItems)
 
     // Bước 4: Xử lý "Bẫy lỗi" (Manual Rollback)
     // Nếu chèn items lỗi, phải xóa cái Order vừa tạo để tránh đơn hàng rác
@@ -85,7 +83,6 @@ export async function createOrder(body: CreateOrderDTO) {
       error: null,
       status: 200,
     }
-
   } catch (err: unknown) {
     console.error('[createOrder Error]:', err)
     return {

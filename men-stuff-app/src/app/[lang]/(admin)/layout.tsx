@@ -18,14 +18,9 @@ export default async function AdminLayout({
   if (userRole !== 'admin') {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
-        <h1 className="text-2xl font-bold mb-4">Truy cập bị từ chối</h1>
-        <p className="text-gray-600 mb-4">
-          Bạn cần đăng nhập với tài khoản admin.
-        </p>
-        <Link
-          href={`${BASE_PATH}/login`}
-          className="text-blue-600 hover:underline"
-        >
+        <h1 className="mb-4 text-2xl font-bold">Truy cập bị từ chối</h1>
+        <p className="mb-4 text-gray-600">Bạn cần đăng nhập với tài khoản admin.</p>
+        <Link href={`${BASE_PATH}/login`} className="text-blue-600 hover:underline">
           Đăng nhập Admin
         </Link>
       </div>
@@ -33,58 +28,48 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <aside className="w-64 bg-white border-r min-h-screen">
+    <div className="flex min-h-screen bg-gray-50">
+      <aside className="min-h-screen w-64 border-r bg-white">
         <div className="p-6">
-          <Link
-            href={`${BASE_PATH}/dashboard`}
-            className="text-2xl font-bold text-blue-600"
-          >
+          <Link href={`${BASE_PATH}/dashboard`} className="text-2xl font-bold text-blue-600">
             Khu vực Admin
           </Link>
         </div>
-        <nav className="px-4 space-y-2">
+        <nav className="space-y-2 px-4">
           <Link
             href={`${BASE_PATH}/dashboard`}
-            className="block px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition"
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
           >
             {labels.admin.dashboard}
           </Link>
           <Link
             href={`${BASE_PATH}/products-management`}
-            className="block px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition"
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
           >
             {labels.admin.products}
           </Link>
           <Link
             href={`${BASE_PATH}/categories-management`}
-            className="block px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition"
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
           >
             {labels.admin.categories}
           </Link>
-          <div className="pt-4 border-t">
+          <div className="border-t pt-4">
             <LogoutButton lang="vi" />
           </div>
         </nav>
       </aside>
 
-      <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b px-6 py-4">
+      <div className="flex flex-1 flex-col">
+        <header className="border-b bg-white px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold text-gray-800">
-              Bảng điều khiển Admin
-            </h1>
+            <h1 className="text-xl font-semibold text-gray-800">Bảng điều khiển Admin</h1>
             <div className="flex items-center gap-4">
-              <Link
-                href={BASE_PATH}
-                className="text-sm text-gray-600 hover:text-gray-900"
-              >
+              <Link href={BASE_PATH} className="text-sm text-gray-600 hover:text-gray-900">
                 {labels.admin.viewStore}
               </Link>
               <span className="text-sm text-gray-400">|</span>
-              <span className="text-sm text-gray-600">
-                admin@menstuff.local
-              </span>
+              <span className="text-sm text-gray-600">admin@menstuff.local</span>
             </div>
           </div>
         </header>

@@ -7,7 +7,7 @@ import { createProduct } from './services/createProducts'
  * Get all products
  */
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url)
   const options = {
     page: parseInt(searchParams.get('page') || '1', 10),
     size: parseInt(searchParams.get('size') || '10', 10),
@@ -17,10 +17,10 @@ export async function GET(request: Request) {
     categoryId: searchParams.get('categoryId') ?? undefined,
     dateFrom: searchParams.get('dateFrom') ?? undefined,
     dateTo: searchParams.get('dateTo') ?? undefined,
-  };
+  }
 
-  const result = await getAllProducts(options);
-  return Response.json(result);
+  const result = await getAllProducts(options)
+  return Response.json(result)
 }
 
 /**
