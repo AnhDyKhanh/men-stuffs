@@ -30,7 +30,7 @@ function mapProductsToPlaceholder(products: Product[] | null | undefined, basePa
     price: p.price ?? 0,
     priceFormatted: formatPrice(p.price ?? 0),
     imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
-    href: `${basePath}/products/${p.slug || p.id}`,
+    href: `${basePath}/product/${p.slug || p.id}`,
     rating: 0,
     reviewCount: 0,
     label: 'new' as const,
@@ -179,31 +179,33 @@ export default function ProductsPageClient({
   const subtitle = view === 'new-in' ? 'Sản phẩm mới nhất vừa về' : 'Khám phá toàn bộ sản phẩm của chúng tôi'
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h1>
-          <p className="mt-2 text-base text-neutral-300">{subtitle}</p>
+          <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            {title} <span className="text-gradient-gold">{view === 'new-in' ? 'Drop' : ''}</span>
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/60">{subtitle}</p>
           {total > 0 && (
-            <p className="mt-1 text-sm text-neutral-400">
-              {total} {total === 1 ? 'sản phẩm' : 'sản phẩm'}
-            </p>
+            <p className="mt-3 font-mono text-xs tracking-widest text-white/45 uppercase">{total} sản phẩm</p>
           )}
         </header>
 
         {/* Filter & Search */}
-        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-10 flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/25 p-5 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium text-neutral-400">Danh mục:</span>
+            <span className="font-mono text-[11px] font-medium tracking-widest text-white/55 uppercase">
+              Danh mục
+            </span>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => handleCategoryChange(undefined)}
-                className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   !categoryId
-                    ? 'border-white bg-white text-black'
-                    : 'border-neutral-600 text-white hover:bg-neutral-800'
+                    ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
+                    : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
                 }`}
               >
                 Tất cả
@@ -213,10 +215,10 @@ export default function ProductsPageClient({
                   key={cat.id}
                   type="button"
                   onClick={() => handleCategoryChange(cat.id)}
-                  className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
+                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                     categoryId === cat.id
-                      ? 'border-white bg-white text-black'
-                      : 'border-neutral-600 text-white hover:bg-neutral-800'
+                      ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
+                      : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
                   }`}
                 >
                   {cat.name ?? cat.id}
@@ -231,13 +233,13 @@ export default function ProductsPageClient({
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applySearch()}
               placeholder="Tìm sản phẩm..."
-              className="w-full min-w-0 flex-1 rounded-lg border border-neutral-600 bg-neutral-900 px-3 py-2 text-white placeholder-neutral-500 focus:border-white focus:ring-1 focus:ring-white focus:outline-none sm:w-48"
+              className="h-12 w-full min-w-0 flex-1 rounded-xl border border-white/10 bg-black/35 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931A] sm:w-48"
               aria-label="Tìm sản phẩm"
             />
             <button
               type="button"
               onClick={applySearch}
-              className="rounded-lg border border-neutral-600 bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] px-5 text-sm font-semibold tracking-wider text-white shadow-[0_0_20px_-10px_rgba(234,88,12,0.55)] transition hover:shadow-[0_0_30px_-10px_rgba(247,147,26,0.65)]"
             >
               Tìm
             </button>
@@ -245,7 +247,7 @@ export default function ProductsPageClient({
               <button
                 type="button"
                 onClick={clearFilters}
-                className="rounded-lg border border-neutral-600 px-3 py-2 text-sm text-neutral-400 hover:bg-neutral-800 hover:text-white"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 bg-white/5 px-4 text-sm font-semibold text-white/70 transition hover:bg-white/8 hover:text-white"
               >
                 Xóa bộ lọc
               </button>
@@ -285,14 +287,14 @@ export default function ProductsPageClient({
                   type="button"
                   onClick={() => goToPage(page - 1)}
                   disabled={page <= 0}
-                  className="inline-flex h-10 items-center rounded-lg border border-neutral-600 bg-transparent px-4 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:pointer-events-none disabled:opacity-50"
+                  className="inline-flex h-11 items-center rounded-full border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white/80 transition hover:bg-white/8 hover:text-white disabled:pointer-events-none disabled:opacity-40"
                 >
                   Trước
                 </button>
                 <div className="flex items-center gap-1">
                   {getPageNumbers(page, totalPages).map((n, i) =>
                     n === 'ellipsis' ? (
-                      <span key={`ellipsis-${i}`} className="px-2 text-neutral-500">
+                      <span key={`ellipsis-${i}`} className="px-2 font-mono text-xs tracking-widest text-white/35">
                         …
                       </span>
                     ) : (
@@ -300,10 +302,10 @@ export default function ProductsPageClient({
                         key={n}
                         type="button"
                         onClick={() => goToPage(n)}
-                        className={`inline-flex h-10 min-w-[2.5rem] items-center justify-center rounded-lg border text-sm font-medium transition ${
+                        className={`inline-flex h-11 min-w-10 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${
                           n === page
-                            ? 'border-white bg-white text-black'
-                            : 'border-neutral-600 bg-transparent text-white hover:bg-neutral-800'
+                            ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
+                            : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
                         }`}
                       >
                         {n + 1}
@@ -315,7 +317,7 @@ export default function ProductsPageClient({
                   type="button"
                   onClick={() => goToPage(page + 1)}
                   disabled={page >= totalPages - 1}
-                  className="inline-flex h-10 items-center rounded-lg border border-neutral-600 bg-transparent px-4 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:pointer-events-none disabled:opacity-50"
+                  className="inline-flex h-11 items-center rounded-full border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white/80 transition hover:bg-white/8 hover:text-white disabled:pointer-events-none disabled:opacity-40"
                 >
                   Sau
                 </button>
@@ -327,7 +329,7 @@ export default function ProductsPageClient({
         {/* Empty */}
         {!isLoading && !isError && placeholderProducts.length === 0 && (
           <div className="py-20 text-center">
-            <p className="text-neutral-400">Chưa có sản phẩm nào.</p>
+            <p className="text-white/60">Chưa có sản phẩm nào.</p>
           </div>
         )}
       </div>

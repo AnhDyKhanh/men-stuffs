@@ -13,7 +13,7 @@ export function Navbar() {
             <Link href="/vi">Store</Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/vi/login">Login</Link>
+            <Link href="/login">Login</Link>
           </Button>
         </div>
       </nav>

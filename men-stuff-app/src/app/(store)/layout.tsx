@@ -21,7 +21,10 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const accountLabel = userRole === 'guest' ? labels.common.login : labels.common.account
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="bg-void-texture relative flex min-h-screen flex-col">
+      <div className="pointer-events-none absolute inset-0 opacity-60">
+        <div className="bg-grid-pattern absolute inset-0" />
+      </div>
       <AnnouncementBar storeLink={`${BASE_PATH}/pages/contact`} storeLabel="Hệ thống cửa hàng" />
       <Header
         logoLabel={SITE_NAME}
@@ -34,7 +37,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         adminHref={userRole === 'admin' ? `${BASE_PATH}/dashboard` : undefined}
       />
 
-      <main id="page-content" className="flex-1">
+      <main id="page-content" className="relative z-10 flex-1">
         {children}
       </main>
 

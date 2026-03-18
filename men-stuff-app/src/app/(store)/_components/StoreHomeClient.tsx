@@ -109,7 +109,7 @@ export default function StoreHomeClient() {
     <>
       <HeroSlideshow slides={heroSlides} />
 
-      <div className="mx-auto max-w-7xl space-y-16 bg-black px-4 py-12 md:py-16">
+      <div className="mx-auto max-w-7xl space-y-16 px-4 py-12 md:py-16">
         <section aria-labelledby="new-products-heading">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h2 id="new-products-heading" className="text-2xl font-semibold text-white md:text-3xl">
@@ -117,7 +117,7 @@ export default function StoreHomeClient() {
             </h2>
             <Link
               href={`${BASE_PATH}/products`}
-              className="text-sm font-medium text-neutral-300 underline underline-offset-2 hover:text-white"
+              className="font-mono text-xs tracking-widest text-white/70 uppercase transition hover:text-white"
             >
               {labels.home.viewAll}
             </Link>

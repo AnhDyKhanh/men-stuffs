@@ -34,15 +34,18 @@ export default function ProductForm({ product }: ProductFormProps) {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
           {/* Bộ tăng giảm số lượng */}
-          <div className="flex h-12 items-center border border-gray-700">
+          <div className="flex h-12 items-center rounded-full border border-white/10 bg-black/25 shadow-[0_0_24px_-16px_rgba(247,147,26,0.25)]">
             <button
               onClick={() => quantity > 1 && setQuantity(quantity - 1)}
-              className="px-4 text-xl hover:bg-gray-800"
+              className="rounded-full px-4 text-xl text-white/75 transition hover:bg-white/5 hover:text-[#F7931A]"
             >
               -
             </button>
-            <span className="w-12 text-center">{quantity}</span>
-            <button onClick={() => setQuantity(quantity + 1)} className="px-4 text-xl hover:bg-gray-800">
+            <span className="w-12 text-center font-mono text-sm tracking-widest text-white/90">{quantity}</span>
+            <button
+              onClick={() => setQuantity(quantity + 1)}
+              className="rounded-full px-4 text-xl text-white/75 transition hover:bg-white/5 hover:text-[#F7931A]"
+            >
               +
             </button>
           </div>
@@ -51,15 +54,15 @@ export default function ProductForm({ product }: ProductFormProps) {
           <button
             onClick={handleAddToCart}
             disabled={isPending}
-            className="h-12 flex-1 bg-white font-bold tracking-tighter text-black uppercase transition hover:bg-gray-200 disabled:bg-gray-400"
+            className="shadow-glow-orange h-12 flex-1 rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] px-6 font-semibold tracking-wider text-white uppercase transition hover:shadow-[0_0_30px_-5px_rgba(247,147,26,0.6)] disabled:opacity-60 disabled:shadow-none"
           >
             {isPending ? 'Adding...' : 'Add to Cart'}
           </button>
         </div>
 
         {/* Nút Buy Now */}
-        <button className="h-12 w-full rounded-md bg-[#5a31f4] font-bold text-white transition hover:opacity-90">
-          Buy with shop
+        <button className="h-12 w-full rounded-full border border-white/15 bg-white/5 font-semibold text-white transition hover:bg-white/8">
+          Buy now
         </button>
       </div>
     </div>
