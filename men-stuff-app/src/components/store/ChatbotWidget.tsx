@@ -47,7 +47,7 @@ export default function ChatbotWidget() {
       <button
         type="button"
         onClick={() => setIsOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-800 border border-neutral-600 text-white shadow-lg hover:bg-neutral-700 transition focus:outline-none focus:ring-2 focus:ring-neutral-500"
+        className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-neutral-600 bg-neutral-800 text-white shadow-lg transition hover:bg-neutral-700 focus:ring-2 focus:ring-neutral-500 focus:outline-none"
         aria-label={isOpen ? 'Đóng chatbot' : 'Mở chatbot'}
       >
         {isOpen ? (
@@ -56,7 +56,12 @@ export default function ChatbotWidget() {
           </svg>
         ) : (
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
           </svg>
         )}
       </button>
@@ -64,7 +69,7 @@ export default function ChatbotWidget() {
       {/* Chat panel */}
       {isOpen && (
         <div
-          className="fixed bottom-24 right-6 z-50 flex w-[360px] max-w-[calc(100vw-3rem)] flex-col rounded-xl border border-neutral-700 bg-neutral-900 shadow-xl"
+          className="fixed right-6 bottom-24 z-50 flex w-[360px] max-w-[calc(100vw-3rem)] flex-col rounded-xl border border-neutral-700 bg-neutral-900 shadow-xl"
           role="dialog"
           aria-label="Chatbot (đang phát triển)"
         >
@@ -73,25 +78,19 @@ export default function ChatbotWidget() {
             <span className="text-xs text-neutral-500">Upcoming</span>
           </div>
 
-          <div
-            ref={listRef}
-            className="flex min-h-[240px] max-h-[320px] flex-1 flex-col gap-3 overflow-y-auto p-4"
-          >
+          <div ref={listRef} className="flex max-h-[320px] min-h-[240px] flex-1 flex-col gap-3 overflow-y-auto p-4">
             {messages.length === 0 && (
-              <p className="text-center text-sm text-neutral-500 py-4">
+              <p className="py-4 text-center text-sm text-neutral-500">
                 Chào bạn! Tính năng đang được phát triển. Thử gửi tin nhắn để xem phản hồi mẫu.
               </p>
             )}
             {messages.map((m) => (
-              <div
-                key={m.id}
-                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+              <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <span
                   className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
                     m.role === 'user'
                       ? 'bg-neutral-700 text-white'
-                      : 'bg-neutral-800 text-neutral-200 border border-neutral-700'
+                      : 'border border-neutral-700 bg-neutral-800 text-neutral-200'
                   }`}
                 >
                   {m.text}
@@ -113,7 +112,7 @@ export default function ChatbotWidget() {
               <button
                 type="button"
                 onClick={handleSend}
-                className="rounded-lg bg-neutral-700 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-600 transition"
+                className="rounded-lg bg-neutral-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-600"
               >
                 Gửi
               </button>

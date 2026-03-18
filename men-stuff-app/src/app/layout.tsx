@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Providers from '@/components/provider/providers'
 
 export const metadata: Metadata = {
   title: 'Men Stuffs - Cửa hàng thời trang nam',
@@ -9,15 +10,11 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className="dark" suppressHydrationWarning>
       <body className="antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

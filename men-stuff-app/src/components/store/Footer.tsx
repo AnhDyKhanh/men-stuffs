@@ -7,27 +7,18 @@ interface FooterProps {
   bottomLinks?: FooterLink[]
 }
 
-export default function Footer({
-  columns,
-  copyrightText,
-  bottomLinks = [],
-}: FooterProps) {
+export default function Footer({ columns, copyrightText, bottomLinks = [] }: FooterProps) {
   return (
-    <footer className="bg-neutral-900 text-neutral-300 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+    <footer className="mt-auto bg-neutral-900 text-neutral-300">
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           {columns.map((col) => (
             <div key={col.title}>
-              <h3 className="text-white font-semibold uppercase tracking-wider text-sm mb-4">
-                {col.title}
-              </h3>
+              <h3 className="mb-4 text-sm font-semibold tracking-wider text-white uppercase">{col.title}</h3>
               <ul className="space-y-3">
                 {col.links.map((link) => (
                   <li key={link.key}>
-                    <Link
-                      href={link.href}
-                      className="text-sm hover:text-white transition"
-                    >
+                    <Link href={link.href} className="text-sm transition hover:text-white">
                       {link.label}
                     </Link>
                   </li>
@@ -37,16 +28,13 @@ export default function Footer({
           ))}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-neutral-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <nav
-            className="flex flex-wrap items-center justify-center gap-6"
-            aria-label="Footer"
-          >
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-neutral-700 pt-8 sm:flex-row">
+          <nav className="flex flex-wrap items-center justify-center gap-6" aria-label="Footer">
             {bottomLinks.map((link) => (
               <Link
                 key={link.key}
                 href={link.href}
-                className="text-sm uppercase tracking-wide hover:text-white transition"
+                className="text-sm tracking-wide uppercase transition hover:text-white"
               >
                 {link.label}
               </Link>

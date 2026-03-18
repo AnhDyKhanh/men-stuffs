@@ -16,13 +16,9 @@ let _adminClient: SupabaseClient | null = null
 export function getSupabase(): SupabaseClient {
   if (_client) return _client
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (!url || !key) {
-    throw new Error(
-      'Missing Supabase env. Add NEXT_PUBLIC_SUPABASE_URL and anon key to .env.local',
-    )
+    throw new Error('Missing Supabase env. Add NEXT_PUBLIC_SUPABASE_URL and anon key to .env.local')
   }
   _client = createClient(url, key, { db: { schema: 'public' } })
   return _client
@@ -37,9 +33,7 @@ export function getSupabaseAdmin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) {
-    throw new Error(
-      'Missing SUPABASE_SERVICE_ROLE_KEY. Add to .env.local (server-only).',
-    )
+    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY. Add to .env.local (server-only).')
   }
   _adminClient = createClient(url, key, { db: { schema: 'public' } })
   return _adminClient

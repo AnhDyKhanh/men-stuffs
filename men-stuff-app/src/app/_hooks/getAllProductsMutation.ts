@@ -20,9 +20,7 @@ function buildProductsQueryString(options: ProductQueryOptions): string {
   return params.toString()
 }
 
-async function fetchAllProducts(
-  options: ProductQueryOptions
-): Promise<PaginatedData<Product[]>> {
+async function fetchAllProducts(options: ProductQueryOptions): Promise<PaginatedData<Product[]>> {
   const query = buildProductsQueryString(options)
   const url = `${API_ROUTES.PRODUCTS.GET_ALL}?${query}`
 
