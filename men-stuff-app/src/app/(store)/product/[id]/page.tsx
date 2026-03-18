@@ -2,10 +2,9 @@
 
 import { useGetProductById } from '@/app/_hooks/getProductById'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
-import ProductForm from './_component/ProductForm' // Import component vừa tạo
-import Rating from './_component/Rating'
 import { useParams } from 'next/navigation'
+import ProductForm from './_component/ProductForm'; // Import component vừa tạo
+import Rating from './_component/Rating'
 
 export default function ProductDetailPage() {
   const { id } = useParams()
@@ -13,7 +12,6 @@ export default function ProductDetailPage() {
   console.log('product', product)
 
   if (isLoading) return <div>Loading...</div>
-  if (!product) notFound()
 
   return (
     <div className="min-h-screen text-white">
