@@ -66,22 +66,16 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-[100] flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg transition hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+        className="fixed right-6 bottom-6 z-[100] flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg transition hover:bg-neutral-800 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black focus:outline-none"
         aria-label="Mở form gửi phản hồi"
       >
         <FeedbackIcon />
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-[99] bg-black/50"
-          aria-hidden
-          onClick={close}
-        />
-      )}
+      {open && <div className="fixed inset-0 z-[99] bg-black/50" aria-hidden onClick={close} />}
 
       <div
-        className={`fixed bottom-0 right-0 left-0 z-[100] max-h-[85vh] overflow-y-auto rounded-t-2xl border-t border-neutral-700 bg-neutral-900 text-white shadow-2xl transition-transform duration-300 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md sm:rounded-2xl sm:border ${
+        className={`fixed right-0 bottom-0 left-0 z-[100] max-h-[85vh] overflow-y-auto rounded-t-2xl border-t border-neutral-700 bg-neutral-900 text-white shadow-2xl transition-transform duration-300 sm:right-6 sm:bottom-6 sm:left-auto sm:max-w-md sm:rounded-2xl sm:border ${
           open ? 'translate-y-0' : 'translate-y-full sm:translate-y-[calc(100%+1.5rem)]'
         }`}
         role="dialog"
@@ -105,9 +99,7 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
           {sent ? (
             <div className="py-8 text-center">
               <p className="text-lg font-medium text-white">Cảm ơn bạn đã gửi phản hồi!</p>
-              <p className="mt-1 text-sm text-neutral-400">
-                Ý kiến của bạn giúp chúng tôi cải thiện trải nghiệm.
-              </p>
+              <p className="mt-1 text-sm text-neutral-400">Ý kiến của bạn giúp chúng tôi cải thiện trải nghiệm.</p>
               <button
                 type="button"
                 onClick={close}
@@ -119,14 +111,8 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
           ) : (
             <>
               <div>
-                <p className="mb-2 text-sm font-medium text-neutral-300">
-                  Đánh giá của bạn (1–5 sao)
-                </p>
-                <div
-                  className="flex gap-1"
-                  role="group"
-                  aria-label="Chọn số sao"
-                >
+                <p className="mb-2 text-sm font-medium text-neutral-300">Đánh giá của bạn (1–5 sao)</p>
+                <div className="flex gap-1" role="group" aria-label="Chọn số sao">
                   {Array.from({ length: STAR_COUNT }, (_, i) => (
                     <button
                       key={i}
@@ -134,7 +120,7 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
                       onClick={() => setRating(i + 1)}
                       onMouseEnter={() => setHoverRating(i + 1)}
                       onMouseLeave={() => setHoverRating(0)}
-                      className="text-2xl text-amber-400 transition hover:scale-110 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-neutral-900"
+                      className="text-2xl text-amber-400 transition hover:scale-110 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:outline-none"
                       aria-pressed={rating === i + 1}
                       aria-label={`${i + 1} sao`}
                     >
@@ -154,7 +140,7 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Chia sẻ thêm với chúng tôi..."
                   rows={3}
-                  className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white placeholder-neutral-500 focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
+                  className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white placeholder-neutral-500 focus:border-white focus:ring-1 focus:ring-white focus:outline-none"
                 />
               </div>
 
@@ -191,12 +177,7 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
 
 function FeedbackIcon() {
   return (
-    <svg
-      className="h-6 w-6"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
+    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -210,12 +191,7 @@ function FeedbackIcon() {
 function CloseIcon() {
   return (
     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M6 18L18 6M6 6l12 12"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
     </svg>
   )
 }

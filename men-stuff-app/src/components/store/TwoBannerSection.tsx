@@ -9,10 +9,7 @@ interface TwoBannerSectionProps {
 export default function TwoBannerSection({ items }: TwoBannerSectionProps) {
   const pair = Array.isArray(items) ? items.slice(0, 2) : []
   return (
-    <section
-      className="grid grid-cols-1 md:grid-cols-2 gap-0"
-      aria-label="Promotional banners"
-    >
+    <section className="grid grid-cols-1 gap-0 md:grid-cols-2" aria-label="Promotional banners">
       {pair.map((item) => (
         <Link
           key={item.id}
@@ -28,7 +25,7 @@ export default function TwoBannerSection({ items }: TwoBannerSectionProps) {
             unoptimized
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-hover:bg-black/30">
-            <h3 className="px-4 text-center text-xl font-semibold uppercase tracking-wider text-white drop-shadow-md md:text-2xl">
+            <h3 className="px-4 text-center text-xl font-semibold tracking-wider text-white uppercase drop-shadow-md md:text-2xl">
               {item.title}
             </h3>
           </div>

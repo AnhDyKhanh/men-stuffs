@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button'
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 shadow-sm backdrop-blur">
+    <header className="border-border bg-background/95 sticky top-0 z-50 w-full border-b shadow-sm backdrop-blur">
       <nav className="container flex h-14 items-center justify-between px-4">
-        <Link href="/" className="font-semibold text-foreground">
+        <Link href="/" className="text-foreground font-semibold">
           Men Stuffs
         </Link>
         <div className="flex items-center gap-2">
@@ -13,7 +13,7 @@ export function Navbar() {
             <Link href="/vi">Store</Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/vi/login">Login</Link>
+            <Link href="/login">Login</Link>
           </Button>
         </div>
       </nav>

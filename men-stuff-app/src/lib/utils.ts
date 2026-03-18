@@ -1,10 +1,9 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
 
 export function getBaseUrl() {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
@@ -15,9 +14,9 @@ export function getFetchUrl(apiRoute: string) {
   return `${getBaseUrl()}${apiRoute}`
 }
 
-// hàm này để compile path với params //check sau 
+// hàm này để compile path với params //check sau
 export function compilePath(path: string, params: Record<string, string | number>) {
   return Object.entries(params).reduce((acc: string, [key, value]) => {
-    return acc.replace(`:${key}`, String(value));
-  }, path);
+    return acc.replace(`:${key}`, String(value))
+  }, path)
 }

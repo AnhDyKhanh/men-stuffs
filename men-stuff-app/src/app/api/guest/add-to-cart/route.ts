@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server"
-import { addProductToCart } from "../services/addProductToCart"
+import { NextResponse } from 'next/server'
+import { addProductToCart } from '../services/addProductToCart'
 
 // api/guest/add-to-cart
 export async function POST(request: Request) {

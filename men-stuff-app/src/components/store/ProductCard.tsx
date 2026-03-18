@@ -21,53 +21,45 @@ function StarRating({
 }) {
   const value = Math.min(STAR_COUNT, Math.max(0, rating))
   return (
-    <div
-      className="flex items-center gap-1 mt-1"
-      role="img"
-      aria-label={`${value} out of ${STAR_COUNT} stars`}
-    >
+    <div className="mt-1 flex items-center gap-1" role="img" aria-label={`${value} out of ${STAR_COUNT} stars`}>
       {Array.from({ length: STAR_COUNT }, (_, i) => (
-        <span
-          key={i}
-          className={`text-amber-500 ${i < value ? 'opacity-100' : 'opacity-30'}`}
-          aria-hidden
-        >
+        <span key={i} className={`text-amber-500 ${i < value ? 'opacity-100' : 'opacity-30'}`} aria-hidden>
           ★
         </span>
       ))}
-      <span className={`text-xs ml-1 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`} aria-hidden>
+      <span className={`ml-1 text-xs ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`} aria-hidden>
         {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
       </span>
     </div>
   )
 }
 
-export default function ProductCard({
-  product,
-  buyNowLabel = 'Buy now',
-  variant = 'default',
-}: ProductCardProps) {
+export default function ProductCard({ product, buyNowLabel = 'Buy now', variant = 'default' }: ProductCardProps) {
   const isDark = variant === 'dark'
   return (
     <article className="group">
-      <div className={`relative aspect-square overflow-hidden rounded-lg ${isDark ? 'bg-neutral-800' : 'bg-neutral-100'}`}>
-        <Link
-          href={product.href}
-          className="block aspect-square"
-          aria-label={product.name}
-        >
+      <div
+        className={`relative aspect-square overflow-hidden rounded-2xl border transition-all duration-300 ${
+          isDark
+            ? 'border-white/10 bg-[#0F1115]/70 hover:-translate-y-1 hover:border-[#F7931A]/50 hover:shadow-[0_0_30px_-10px_rgba(247,147,26,0.2)]'
+            : 'border-black/10 bg-white hover:-translate-y-1 hover:shadow-lg'
+        }`}
+      >
+        <Link href={product.href} className="block aspect-square" aria-label={product.name}>
           <Image
             src={product.imageUrl}
             alt=""
             width={400}
             height={400}
-            className="h-full w-full object-cover transition group-hover:scale-105"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-110 group-hover:contrast-125"
             unoptimized
           />
         </Link>
         {product.label && (
           <span
-            className={`absolute top-2 left-2 rounded px-2 py-1 text-xs font-medium uppercase ${isDark ? 'bg-white text-black' : 'bg-neutral-900 text-white'}`}
+            className={`absolute top-3 left-3 rounded-full border px-3 py-1 font-mono text-[10px] font-medium tracking-widest uppercase ${
+              isDark ? 'border-white/15 bg-black/40 text-white' : 'border-black/10 bg-white text-black'
+            }`}
             aria-hidden
           >
             {product.label}
@@ -77,20 +69,22 @@ export default function ProductCard({
       <div className="mt-3">
         <Link
           href={product.href}
-          className={`font-medium line-clamp-2 ${isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-800 hover:text-neutral-600'}`}
+          className={`line-clamp-2 font-medium ${
+            isDark ? 'text-white/95 transition hover:text-white' : 'text-neutral-800 hover:text-neutral-600'
+          }`}
         >
           {product.name}
         </Link>
-        <p className={`mt-1 text-lg font-semibold ${isDark ? 'text-neutral-200' : 'text-neutral-800'}`}>
+        <p className={`mt-1 font-mono text-lg font-semibold ${isDark ? 'text-gradient-gold' : 'text-neutral-800'}`}>
           {product.priceFormatted}
         </p>
         <StarRating rating={product.rating} reviewCount={product.reviewCount} isDark={isDark} />
         <Link
           href={product.href}
-          className={`mt-3 inline-block w-full rounded-lg py-2.5 text-center text-sm font-medium transition ${
+          className={`mt-3 inline-flex h-11 w-full items-center justify-center rounded-full text-center text-sm font-semibold tracking-wider transition ${
             isDark
-              ? 'border border-white text-white hover:bg-white hover:text-black'
-              : 'border border-neutral-900 text-neutral-200 hover:bg-neutral-900 hover:text-white'
+              ? 'bg-linear-to-r from-[#EA580C] to-[#F7931A] text-white shadow-[0_0_20px_-10px_rgba(234,88,12,0.55)] hover:shadow-[0_0_30px_-10px_rgba(247,147,26,0.65)]'
+              : 'border border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white'
           }`}
         >
           {buyNowLabel}

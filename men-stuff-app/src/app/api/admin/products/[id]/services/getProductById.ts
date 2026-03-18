@@ -1,4 +1,4 @@
-import { getSupabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase'
 
 type GetProductByIdParams = {
   id: string
@@ -10,11 +10,7 @@ export async function getProductById(params: GetProductByIdParams) {
     const supabase = getSupabase()
 
     //làm sao để định nghĩa type cho data?
-    const { data } = await supabase
-      .from('product')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle()
+    const { data } = await supabase.from('product').select('*').eq('id', id).maybeSingle()
 
     if (!data) return undefined
 
@@ -26,7 +22,6 @@ export async function getProductById(params: GetProductByIdParams) {
     //   .eq('is_primary', true)
     //   .maybeSingle()
 
-
     const product = {
       id: data.id,
       name: data.name ?? '',
@@ -35,8 +30,7 @@ export async function getProductById(params: GetProductByIdParams) {
       price: Number(data.price),
       thumbnail: data.origin_image ?? '',
       status: data.status ?? 'active',
-      createdAt:
-        data.created_at ?? data.createdAt ?? new Date().toISOString(),
+      createdAt: data.created_at ?? data.createdAt ?? new Date().toISOString(),
     }
     return product
   } catch (err) {
@@ -46,11 +40,8 @@ export async function getProductById(params: GetProductByIdParams) {
 }
 
 export async function deleteProductById(params: GetProductByIdParams) {
-  const { id } = params;
-  const { statusText } = await getSupabase()
-    .from('product')
-    .delete()
-    .eq('id', id)
+  const { id } = params
+  const { statusText } = await getSupabase().from('product').delete().eq('id', id)
 
   return { statusText }
 }

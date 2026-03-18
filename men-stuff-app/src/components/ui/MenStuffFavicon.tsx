@@ -21,5 +21,5 @@ export const MenStuffFavicon = () => {
       <line x1="50" y1="15" x2="50" y2="22" stroke="#ebf1f1" stroke-width="2" />
       <circle cx="50" cy="50" r="38" stroke="#ebf1f1" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.3" />
     </svg>
-  );
-};
+  )
+}

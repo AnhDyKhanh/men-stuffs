@@ -1,5 +1,5 @@
-import { getUserCartItems } from "./services/getUserCartItems"
-import { NextResponse } from "next/server"
+import { getUserCartItems } from './services/getUserCartItems'
+import { NextResponse } from 'next/server'
 
 // api/guest/cart
 export async function GET() {

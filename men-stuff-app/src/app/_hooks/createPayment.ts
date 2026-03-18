@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query"
-import { CreateOrderDTO } from "../api/guest/payment/services/createPayment"
+import { useMutation } from '@tanstack/react-query'
+import { CreateOrderDTO } from '../api/guest/payment/services/createPayment'
 
 async function fetchCreatePayment(body: CreateOrderDTO) {
   const res = await fetch('/api/guest/payment', {

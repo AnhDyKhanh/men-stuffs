@@ -1,14 +1,14 @@
 export interface ProductQueryOptions {
-  page?: number;
-  size?: number;
-  orderBy?: string;
-  ascending?: boolean;
+  page?: number
+  size?: number
+  orderBy?: string
+  ascending?: boolean
   /** Tìm theo tên sản phẩm */
-  search?: string;
+  search?: string
   /** Lọc theo category_id */
-  categoryId?: string;
+  categoryId?: string
   /** Lọc theo ngày tạo từ (ISO string) */
-  dateFrom?: string;
+  dateFrom?: string
   /** Lọc theo ngày tạo đến (ISO string) */
-  dateTo?: string;
+  dateTo?: string
 }

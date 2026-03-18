@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query"
-import { AddProductToCartDTO } from "../api/guest/services/addProductToCart"
+import { useMutation } from '@tanstack/react-query'
+import { AddProductToCartDTO } from '../api/guest/services/addProductToCart'
 
 async function fetchAddProductToCart(body: AddProductToCartDTO) {
   const res = await fetch('/api/guest/add-to-cart', {
