@@ -1,17 +1,18 @@
-import { getProductById } from '@/app/_hooks/getProductById'
+'use client'
+
+import { useGetProductById } from '@/app/_hooks/getProductById'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import ProductForm from './_component/ProductForm' // Import component vừa tạo
 import Rating from './_component/Rating'
+import { useParams } from 'next/navigation'
 
-type PageProps = {
-  params: Promise<{ id: string }>
-}
+export default function ProductDetailPage() {
+  const { id } = useParams()
+  const { data: product, isLoading } = useGetProductById(id as string)
+  console.log('product', product)
 
-export default async function ProductDetailPage({ params }: PageProps) {
-  const { id } = await params
-  const product = await getProductById(id)
-
+  if (isLoading) return <div>Loading...</div>
   if (!product) notFound()
 
   return (
