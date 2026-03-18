@@ -9,8 +9,8 @@ import { logout } from '@/lib/auth'
 export default function LogoutButton() {
   const router = useRouter()
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     router.push('/login')
     router.refresh()
   }

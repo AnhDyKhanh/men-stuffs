@@ -10,6 +10,7 @@ import { Loader2, Lock, Mail, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 export function LoginForm() {
   const router = useRouter()
@@ -43,6 +44,9 @@ export function LoginForm() {
               redirectParam && /^\/(admin|dashboard|products-management|categories-management)/.test(redirectParam)
             router.push(!isAdminPath && redirectParam ? redirectParam : '/')
           }
+          toast.success("Đăng nhập thành công!", {
+            description: "Chào mừng bạn trở lại Men Stuffs",
+          })
           router.refresh()
         },
         onError: () => {
@@ -130,6 +134,14 @@ export function LoginForm() {
                 className="bg-primary text-primary-foreground h-11 w-full text-sm font-bold tracking-widest uppercase transition-all hover:opacity-90"
               >
                 {loginMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Đăng nhập'}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => router.push('/register')}
+                disabled={loginMutation.isPending}
+                className="bg-primary text-primary-foreground h-11 w-full text-sm font-bold tracking-widest uppercase transition-all hover:opacity-90"
+              >
+                Đăng ký
               </Button>
 
               <div className="flex flex-col items-center gap-2">

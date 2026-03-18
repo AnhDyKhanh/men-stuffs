@@ -24,13 +24,13 @@ export default function Header({
   adminHref,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-lg">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between md:h-20">
           <div className="flex items-center gap-6">
             <button
               type="button"
-              className="-ml-2 p-2 text-neutral-700 hover:text-neutral-900 md:hidden"
+              className="-ml-2 rounded-lg p-2 text-white/70 hover:bg-white/5 hover:text-white md:hidden"
               aria-label="Menu"
             >
               <MenuIcon />
@@ -40,7 +40,7 @@ export default function Header({
                 <Link
                   key={link.key}
                   href={link.href}
-                  className="text-sm font-medium tracking-wide text-neutral-700 uppercase hover:text-neutral-900"
+                  className="font-mono text-xs tracking-widest text-white/70 uppercase transition hover:text-white"
                 >
                   {link.label}
                 </Link>
@@ -48,23 +48,39 @@ export default function Header({
             </nav>
           </div>
 
-          <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-xl font-bold text-neutral-900">
-            {logoLabel}
+          <Link
+            href="/"
+            className="absolute left-1/2 -translate-x-1/2 text-lg font-semibold tracking-tight text-white md:text-xl"
+          >
+            <span className="text-gradient-gold">{logoLabel}</span>
           </Link>
 
           <div className="flex items-center gap-4 md:gap-6">
             {adminHref && (
-              <Link href={adminHref} className="hidden text-sm text-blue-600 hover:text-blue-700 sm:inline">
-                Admin
+              <Link
+                href={adminHref}
+                className="hidden rounded-full border border-[#F7931A]/40 bg-[#F7931A]/10 px-3 py-1 text-xs font-medium tracking-wider text-white shadow-[0_0_18px_-10px_rgba(247,147,26,0.6)] transition hover:border-[#F7931A]/70 hover:bg-[#F7931A]/15 sm:inline"
+              >
+                ADMIN
               </Link>
             )}
-            <Link href={accountHref} className="hidden text-sm text-neutral-700 hover:text-neutral-900 sm:inline">
+            <Link
+              href={accountHref}
+              className="hidden text-sm font-medium text-white/75 transition hover:text-white sm:inline"
+            >
               {accountLabel}
             </Link>
-            <button type="button" className="p-2 text-neutral-700 hover:text-neutral-900" aria-label={searchLabel}>
+            <button
+              type="button"
+              className="rounded-lg p-2 text-white/70 transition hover:bg-white/5 hover:text-white"
+              aria-label={searchLabel}
+            >
               <SearchIcon />
             </button>
-            <Link href={cartHref} className="flex items-center gap-2 text-neutral-700 hover:text-neutral-900">
+            <Link
+              href={cartHref}
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-white/80 shadow-[0_0_20px_-14px_rgba(247,147,26,0.35)] transition hover:border-[#F7931A]/50 hover:bg-white/8 hover:text-white hover:shadow-[0_0_30px_-12px_rgba(247,147,26,0.55)]"
+            >
               <CartIcon />
               <span className="hidden text-sm sm:inline">{cartLabel}</span>
             </Link>
