@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { API_ROUTES } from '../_constants/apiRouter'
-import { getFetchUrl } from '@/lib/utils'
+import { GetProductByIdResponse } from '../api/admin/products/[id]/services/getProductById'
 
 /** GET /api/admin/products/[id] — id phải nằm trong path, không dùng query. */
 // export const getProductById = async (id: string) => {
@@ -17,7 +17,7 @@ import { getFetchUrl } from '@/lib/utils'
 async function fetchProductById(id: string) {
   const path = API_ROUTES.PRODUCTS.GET_BY_ID.replace(':id', id)
   // Luôn dùng getFetchUrl để tránh lỗi đường dẫn trên Production
-  const res = await fetch(getFetchUrl(path))
+  const res = await fetch(path)
 
   if (!res.ok) throw new Error('Không tìm thấy sản phẩm')
   return res.json()
@@ -27,18 +27,7 @@ export function useGetProductById(id: string) {
   return useQuery({
     queryKey: ['@get-product-by-id', id],
     queryFn: () => fetchProductById(id),
+    select: (data: GetProductByIdResponse) => data.data,
     enabled: !!id,
   })
 }
-
-//response là dạng sau
-// {
-//   "id": "06339e54-c5b0-4227-a4c8-e9c9ad62ca5d",
-//     "name": "Vòng tay bạc",
-//       "slug": "vong-tay-bac",
-//         "description": "Sản phẩm nam thiết kế tối giản, phù hợp phong cách lịch lãm.",
-//           "price": 1802025,
-//             "thumbnail": "https://xhclatfxcwxjhxbwxkch.supabase.co/storage/v1/object/public/image/1772371289953-jic1n6ngh1d.webp",
-//               "status": "active",
-//                 "createdAt": "2026-02-21T07:43:41.641825"
-// }

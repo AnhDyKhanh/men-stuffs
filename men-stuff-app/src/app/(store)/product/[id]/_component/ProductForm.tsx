@@ -1,7 +1,7 @@
 'use client'
 
+import { useAddToCart } from '@/app/_hooks/useAddToCart'
 import { useState } from 'react'
-import { useAddToCart } from './useAddToCart' // Import hook vừa tạo
 
 interface ProductFormProps {
   product: {
