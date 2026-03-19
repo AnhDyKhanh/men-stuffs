@@ -53,11 +53,9 @@ export default function NewInClient() {
   )
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+    <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white md:text-4xl mb-2">
-          New In
-        </h1>
+        <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">New In</h1>
         <p className="text-neutral-400">
           Top {NEW_IN_SIZE} sản phẩm mới nhất — cập nhật liên tục.
         </p>
@@ -70,24 +68,23 @@ export default function NewInClient() {
       )}
 
       {isLoading && products.length === 0 ? (
-        <p className="text-neutral-400 py-12">Đang tải...</p>
+        <p className="py-12 text-neutral-400">Đang tải...</p>
       ) : products.length === 0 ? (
-        <p className="text-neutral-400 py-12">Chưa có sản phẩm nào.</p>
+        <p className="py-12 text-neutral-400">Chưa có sản phẩm nào.</p>
       ) : (
         <>
-          <p className="text-sm text-neutral-500 mb-4">
+          <p className="mb-4 text-sm text-neutral-500">
             {products.length} sản phẩm mới
           </p>
           <ProductGrid
             products={products}
             buyNowLabel="Thêm vào giỏ"
             columns={4}
-            variant="dark"
           />
           <div className="mt-8 text-center">
             <Link
               href={`${BASE_PATH}/products`}
-              className="inline-block px-6 py-3 rounded-lg bg-white text-black font-medium hover:bg-neutral-200 transition"
+              className="inline-block rounded-lg bg-white px-6 py-3 font-medium text-black transition hover:bg-neutral-200"
             >
               Xem tất cả sản phẩm
             </Link>
