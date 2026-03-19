@@ -51,8 +51,10 @@ export default function NewInClient() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">New In</h1>
-        <p className="text-neutral-400">Top {NEW_IN_SIZE} sản phẩm mới nhất — cập nhật liên tục.</p>
+        <h1 className="mb-2 text-3xl font-bold md:text-4xl">
+          <span className="text-gradient-gold">New In</span>
+        </h1>
+        <p className="text-white/60">Top {NEW_IN_SIZE} sản phẩm mới nhất — cập nhật liên tục.</p>
       </div>
 
       {isError && <p className="mb-4 text-sm text-red-400">Không thể tải sản phẩm. Vui lòng thử lại.</p>}
@@ -63,8 +65,8 @@ export default function NewInClient() {
         <p className="py-12 text-neutral-400">Chưa có sản phẩm nào.</p>
       ) : (
         <>
-          <p className="mb-4 text-sm text-neutral-500">{products.length} sản phẩm mới</p>
-          <ProductGrid products={products} buyNowLabel="Thêm vào giỏ" columns={4} />
+          <p className="mb-4 text-sm text-white/45">{products.length} sản phẩm mới</p>
+          <ProductGrid products={products} buyNowLabel="Thêm vào giỏ" columns={4} variant="dark" />
           <div className="mt-8 text-center">
             <Link
               href={`${BASE_PATH}/products`}
