@@ -21,11 +21,7 @@ function StatCard({ title, value, subtitle }: { title: string; value: string | n
   )
 }
 
-export default function DashboardDashboardClient({
-  labels: adminLabels,
-}: {
-  labels: typeof import('@/lib/labels').labels.admin
-}) {
+export default function DashboardDashboardClient() {
   const { data: products } = useGetAllProducts({
     page: 1,
     size: 10,
@@ -41,20 +37,20 @@ export default function DashboardDashboardClient({
 
   return (
     <div>
-      <h1 className="mb-8 text-3xl font-bold text-gray-900">{adminLabels.dashboard}</h1>
+      <h1 className="mb-8 text-3xl font-bold text-gray-900">Bảng điều khiển</h1>
 
       <section className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4" aria-label="Thống kê">
-        <StatCard title={adminLabels.totalProducts} value={stats.totalProducts} />
-        <StatCard title={adminLabels.totalOrders} value={stats.totalOrders} />
-        <StatCard title={adminLabels.totalRevenue} value={formatRevenue(stats.totalRevenue)} />
-        <StatCard title={adminLabels.pendingOrders} value={stats.pendingOrders} />
+        <StatCard title="Tổng sản phẩm" value={stats.totalProducts} />
+        <StatCard title="Tổng đơn hàng" value={stats.totalOrders} />
+        <StatCard title="Tổng doanh thu" value={formatRevenue(stats.totalRevenue)} />
+        <StatCard title="Đơn hàng chờ xử lý" value={stats.pendingOrders} />
       </section>
 
       <DashboardQuickActions
         locale="vi"
-        createProductLabel={adminLabels.createProduct}
-        productsLabel={adminLabels.products}
-        quickActionsLabel={adminLabels.quickActions}
+        createProductLabel="Tạo sản phẩm mới"
+        productsLabel="Quản lý sản phẩm"
+        quickActionsLabel="Thao tác nhanh"
       />
     </div>
   )

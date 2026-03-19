@@ -1,14 +1,20 @@
-// ./_components/useAddToCart.ts
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+'use client'
 
-export const useAddToCart = () => {
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { API_ROUTES } from '../_constants/apiRouter'
+import { apiFetch } from '@/lib/apiFetch'
+import { AddProductToCartDTO } from '../api/guest/services/addProductToCart'
+
+async function fetchAddToCart(payload: AddProductToCartDTO) {
+  const url = API_ROUTES.GUEST.ADD_TO_CART
+  return apiFetch(url, { method: 'POST', body: payload })
+}
+
+export function useAddToCart() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (payload: any) => {
-      // API thêm vào giỏ
-      return fetch('/api/cart', { method: 'POST', body: JSON.stringify(payload) })
-    },
+    mutationFn: fetchAddToCart,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer-current-cart'] })
     },

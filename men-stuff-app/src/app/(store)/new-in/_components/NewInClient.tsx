@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { BASE_PATH } from '@/lib/labels'
-import ProductGrid from '@/components/store/ProductGrid'
+import ProductGrid from '@/app/(store)/_components/ProductGrid'
 import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
 import type { Product } from '@/app/_models/product'
 import type { PlaceholderProduct } from '@/app/_constants/placeholderData'

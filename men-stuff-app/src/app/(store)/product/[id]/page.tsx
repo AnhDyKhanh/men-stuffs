@@ -67,7 +67,7 @@ export default function ProductDetailPage() {
                 priority
                 className="h-auto w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
             </div>
           </div>
 

@@ -10,10 +10,10 @@ import {
   type PlaceholderProduct,
 } from '@/app/_constants/placeholderData'
 import type { FeaturedCategory } from '@/app/_constants/placeholderData'
-import HeroSlideshow from '@/components/store/HeroSlideshow'
-import ProductGrid from '@/components/store/ProductGrid'
-import TwoBannerSection from '@/components/store/TwoBannerSection'
-import FeaturedCategoriesSection from '@/components/store/FeaturedCategoriesSection'
+import HeroSlideshow from '@/app/(store)/_components/HeroSlideshow'
+import ProductGrid from '@/app/(store)/_components/ProductGrid'
+import TwoBannerSection from '@/app/(store)/_components/TwoBannerSection'
+import FeaturedCategoriesSection from '@/app/(store)/_components/FeaturedCategoriesSection'
 import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
 import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
 import type { Product } from '@/app/_models/product'
@@ -89,10 +89,10 @@ export default function StoreHomeClient() {
   const latestProductForBanner =
     newProductsFromApi.length > 0
       ? {
-          title: newProductsFromApi[0].name,
-          href: newProductsFromApi[0].href,
-          imageUrl: newProductsFromApi[0].imageUrl,
-        }
+        title: newProductsFromApi[0].name,
+        href: newProductsFromApi[0].href,
+        imageUrl: newProductsFromApi[0].imageUrl,
+      }
       : undefined
 
   const bannerRows = getTwoBannerRows(BASE_PATH, latestProductForBanner)
