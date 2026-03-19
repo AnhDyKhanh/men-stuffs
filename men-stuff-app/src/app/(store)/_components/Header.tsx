@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { NavLink } from '@/app/_constants/placeholderData'
+import type { NavLink } from '@/constants/placeholderData'
 
 interface HeaderProps {
   logoLabel: string

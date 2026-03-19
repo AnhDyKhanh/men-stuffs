@@ -1,8 +1,8 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { API_ROUTES } from '../_constants/apiRouter'
-import { GetProductByIdResponse } from '../api/admin/products/[id]/services/getProductById'
+import { API_ROUTES } from '../constants/apiRouter'
+import { GetProductByIdResponse } from '../app/api/admin/products/[id]/services/getProductById'
 import { apiFetch } from '@/lib/apiFetch'
 
 async function fetchProductById(id: string) {

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isStaffByAccountId } from '@/lib/auth-server'
-import { adminRoutePrefixes } from '@/app/_constants/webRoute'
-import { protectedUserRoutes } from '@/app/_constants/webRoute'
+import { adminRoutePrefixes } from '@/constants/webRoute'
+import { protectedUserRoutes } from '@/constants/webRoute'
 
 const COOKIE_ACCOUNT_ID = 'account_id'
 

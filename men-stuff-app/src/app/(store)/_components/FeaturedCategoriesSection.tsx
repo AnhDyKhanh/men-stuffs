@@ -1,4 +1,4 @@
-import type { FeaturedCategory } from '@/app/_constants/placeholderData'
+import type { FeaturedCategory } from '@/constants/placeholderData'
 
 interface FeaturedCategoriesSectionProps {
   title: string

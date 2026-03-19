@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { labels, BASE_PATH } from '@/lib/labels'
 import { getUserRole } from '@/lib/auth'
-import LogoutButton from '@/app/_components/admin/LogoutButton'
+import LogoutButton from '@/components/shared/LogoutButton'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()

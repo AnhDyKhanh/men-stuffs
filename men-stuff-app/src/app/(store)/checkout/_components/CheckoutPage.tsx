@@ -1,8 +1,8 @@
 'use client'
 
-import { useCreatePayment } from '@/app/_hooks/createPayment'
-import { useGetCustomerCurrentCart } from '@/app/_hooks/getCustomerCurrentCart'
-import { CartItem } from '@/app/_types/cart'
+import { useCreatePayment } from '@/hooks/createPayment'
+import { useGetCustomerCurrentCart } from '@/hooks/getCustomerCurrentCart'
+import { CartItem } from '@/types/cart'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { labels, BASE_PATH } from '@/lib/labels'
 import { getUserRole } from '@/lib/auth'
-import { getMainNavLinks, getFooterColumns } from '@/app/_constants/placeholderData'
+import { getMainNavLinks, getFooterColumns } from '@/constants/placeholderData'
 import AnnouncementBar from '@/app/(store)/_components/AnnouncementBar'
 import Header from '@/app/(store)/_components/Header'
 import Footer from '@/app/(store)/_components/Footer'

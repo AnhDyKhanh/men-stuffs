@@ -1,7 +1,7 @@
 'use client'
 
-import LogoutButton from '@/app/_components/admin/LogoutButton'
-import { useGetCustomerAccountInfor } from '@/app/_hooks/getCustomerAccountInfor'
+import LogoutButton from '@/components/shared/LogoutButton'
+import { useGetCustomerAccountInfor } from '@/hooks/getCustomerAccountInfor'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

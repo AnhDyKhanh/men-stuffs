@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
-import { API_ROUTES } from '../_constants/apiRouter'
-import { GetUserCartItemsApiResponse } from '../_types/cart'
+import { API_ROUTES } from '../constants/apiRouter'
+import { GetUserCartItemsApiResponse } from '../types/cart'
 
 //phải call url api, chứu ko gọi thăngt hàm vì sẽ xung đột với server component
 async function fetchCustomerCurrentCart() {

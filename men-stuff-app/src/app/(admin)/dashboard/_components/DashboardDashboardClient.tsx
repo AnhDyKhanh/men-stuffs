@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import DashboardQuickActions from './DashboardQuickActions'
 
 function formatRevenue(value: number) {

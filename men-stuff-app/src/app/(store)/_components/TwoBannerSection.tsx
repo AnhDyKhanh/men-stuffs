@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { BannerItem } from '@/app/_constants/placeholderData'
+import type { BannerItem } from '@/constants/placeholderData'
 import Image from 'next/image'
 
 interface TwoBannerSectionProps {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetProductById } from '@/app/_hooks/getProductById'
+import { useGetProductById } from '@/hooks/getProductById'
 import {
   Breadcrumb,
   BreadcrumbItem,

@@ -1,5 +1,5 @@
-import { Product } from '@/app/_models/product'
-import { Data } from '@/app/_types/response.type'
+import { Product } from '@/models/product'
+import { Data } from '@/types/response.type'
 import { getSupabase } from '@/lib/supabase'
 
 export type CreateProductDTO = {
