@@ -1,5 +1,6 @@
 import { getSupabase } from '@/lib/supabase'
 import { getCurrentCustomerId } from './getCustomerAccount'
+import { CartStatus } from '@/enum/cart.enum'
 
 export type AddProductToCartDTO = {
   productId: string
@@ -20,7 +21,7 @@ export async function addProductToCart(body: AddProductToCartDTO) {
       .from('cart')
       .select('id')
       .eq('customer_id', customerId)
-      .eq('status', 'active')
+      .eq('status', CartStatus.ACTIVE)
       .maybeSingle()
 
     if (fetchError) throw fetchError

@@ -20,7 +20,7 @@ export function useCreatePayment() {
   return useMutation({
     mutationFn: fetchCreatePayment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['@customer-current-cart'] })
+      queryClient.invalidateQueries({ queryKey: ['customer-current-cart'] })
     },
   })
 }

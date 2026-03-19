@@ -12,10 +12,14 @@ import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import AddressSelector from './AddressSelector'
 import { OrderSummary } from './OrderSummary'
+import { PAYMENT_METHOD_LABELS } from '../_constants/payment'
+import { PaymentMethod } from '@/enum/payment.enum'
+import { useRouter } from 'next/navigation'
 
 export default function CheckoutPage() {
   const { data: cartResponse, isLoading } = useGetCustomerCurrentCart()
   const { mutate: createPayment, isPending: isSubmitting } = useCreatePayment()
+  const router = useRouter()
 
   // State
   const [formData, setFormData] = useState({
@@ -39,7 +43,7 @@ export default function CheckoutPage() {
   }, [cartItems])
 
   const handleSubmit = () => {
-    if (!formData.phone || !address.province || !formData.street) {
+    if (!formData.phone || !address.province || !formData.street || !paymentMethod) {
       return toast.error('Vui lòng điền đầy đủ thông tin giao hàng')
     }
 
@@ -57,7 +61,15 @@ export default function CheckoutPage() {
       })),
     }
 
-    createPayment(payload)
+    createPayment(payload, {
+      onSuccess: () => {
+        toast.success('Thanh toán thành công')
+        router.push('/')
+      },
+      onError: () => {
+        toast.error('Thanh toán thất bại')
+      },
+    })
   }
 
   const handleAddressChange = useCallback((p: string | null, d: string | null) => {
@@ -122,10 +134,12 @@ export default function CheckoutPage() {
               <SelectTrigger className="h-14 border-zinc-800 bg-zinc-900">
                 <SelectValue placeholder="Payment method" />
               </SelectTrigger>
-              <SelectContent className="border-zinc-800 bg-zinc-900 text-white">
-                <SelectItem value="cod">COD (Thanh toán khi nhận hàng)</SelectItem>
-                <SelectItem value="bank_transfer">Chuyển khoản ngân hàng</SelectItem>
-                <SelectItem value="momo">Ví MoMo</SelectItem>
+              <SelectContent className="border-zinc-800 bg-zinc-900 text-white w-full" defaultValue={PaymentMethod.COD}>
+                {Object.values(PaymentMethod).map((method: PaymentMethod) => (
+                  <SelectItem key={method} value={method}>
+                    {PAYMENT_METHOD_LABELS[method]}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -141,7 +155,7 @@ export default function CheckoutPage() {
               disabled={isSubmitting || cartItems.length === 0}
             >
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Complete Order
+              Thanh toán
             </Button>
           </div>
         </div>
