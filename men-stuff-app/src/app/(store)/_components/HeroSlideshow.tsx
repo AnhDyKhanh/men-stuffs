@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import type { HeroSlide } from '@/app/_constants/placeholderData'
+import type { HeroSlide } from '@/constants/placeholderData'
 
 const AUTOPLAY_INTERVAL_MS = 7000
 
@@ -30,9 +30,8 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
           <Link
             key={slide.id}
             href={slide.href}
-            className={`absolute inset-0 block transition-opacity duration-500 ${
-              index === current ? 'z-10 opacity-100' : 'z-0 opacity-0'
-            }`}
+            className={`absolute inset-0 block transition-opacity duration-500 ${index === current ? 'z-10 opacity-100' : 'z-0 opacity-0'
+              }`}
             aria-hidden={index !== current}
           >
             <img src={slide.imageUrl} alt="" className="h-full w-full object-cover" width={1920} height={900} />
@@ -57,9 +56,8 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
                 role="tab"
                 aria-selected={index === current}
                 aria-label={`Slide ${index + 1}`}
-                className={`h-2 rounded-full transition-all ${
-                  index === current ? 'w-8 bg-white' : 'w-2 bg-white/60 hover:bg-white/80'
-                }`}
+                className={`h-2 rounded-full transition-all ${index === current ? 'w-8 bg-white' : 'w-2 bg-white/60 hover:bg-white/80'
+                  }`}
                 onClick={() => setCurrent(index)}
               />
             </li>

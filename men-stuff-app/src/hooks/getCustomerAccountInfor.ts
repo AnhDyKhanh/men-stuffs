@@ -1,5 +1,5 @@
 'use client'
-import { API_ROUTES } from '../_constants/apiRouter'
+import { API_ROUTES } from '../constants/apiRouter'
 import { useQuery } from '@tanstack/react-query'
 
 async function fetchCustomerAccountInfor() {

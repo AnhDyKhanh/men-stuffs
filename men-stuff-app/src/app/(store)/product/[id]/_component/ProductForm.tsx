@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import RequireLoginDialog from '@/app/_components/web/RequireLoginDialog'
-import { useAddToCart } from '@/app/_hooks/useAddToCart'
-import { useAuth } from '@/app/_hooks/useAuth'
+import RequireLoginDialog from '@/components/shared/RequireLoginDialog'
+import { useAddToCart } from '@/hooks/useAddToCart'
+import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Minus, Plus, ShoppingCart, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'

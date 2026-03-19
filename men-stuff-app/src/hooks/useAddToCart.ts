@@ -1,9 +1,9 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { API_ROUTES } from '../_constants/apiRouter'
+import { API_ROUTES } from '../constants/apiRouter'
 import { apiFetch } from '@/lib/apiFetch'
-import { AddProductToCartDTO } from '../api/guest/services/addProductToCart'
+import { AddProductToCartDTO } from '../app/api/guest/services/addProductToCart'
 
 async function fetchAddToCart(payload: AddProductToCartDTO) {
   const url = API_ROUTES.GUEST.ADD_TO_CART

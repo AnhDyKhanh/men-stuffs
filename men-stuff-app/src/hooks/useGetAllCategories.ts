@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { Category } from '../_types/category'
+import type { Category } from '../types/category'
 import { getAllCategoryMutation } from './getAllCategoryMutation'
 
 async function fetchAllCategories(): Promise<Category[]> {

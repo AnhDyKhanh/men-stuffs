@@ -1,4 +1,4 @@
-import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import type { PlaceholderProduct } from '@/constants/placeholderData'
 import ProductCard from './ProductCard'
 
 interface ProductGridProps {

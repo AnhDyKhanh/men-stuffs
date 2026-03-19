@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { FooterColumn, FooterLink } from '@/app/_constants/placeholderData'
+import type { FooterColumn, FooterLink } from '@/constants/placeholderData'
 
 interface FooterProps {
   columns: FooterColumn[]

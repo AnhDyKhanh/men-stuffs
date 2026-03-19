@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BASE_PATH, labels } from '@/lib/labels'
 import ProductGrid from '@/app/(store)/_components/ProductGrid'
-import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
-import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
-import type { Product } from '@/app/_models/product'
-import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { useGetAllCategories } from '@/hooks/useGetAllCategories'
+import type { Product } from '@/models/product'
+import type { PlaceholderProduct } from '@/constants/placeholderData'
 
 type CategoryItem = { id: string; name?: string | null }
 
@@ -203,8 +203,8 @@ export default function ProductsPageClient({
                 type="button"
                 onClick={() => handleCategoryChange(undefined)}
                 className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${!categoryId
-                    ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
-                    : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
+                  ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
+                  : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
                   }`}
               >
                 Tất cả
@@ -215,8 +215,8 @@ export default function ProductsPageClient({
                   type="button"
                   onClick={() => handleCategoryChange(cat.id)}
                   className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${categoryId === cat.id
-                      ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
-                      : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
+                    ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
+                    : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
                     }`}
                 >
                   {cat.name ?? cat.id}
@@ -301,8 +301,8 @@ export default function ProductsPageClient({
                         type="button"
                         onClick={() => goToPage(n)}
                         className={`inline-flex h-11 min-w-10 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${n === page
-                            ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
-                            : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
+                          ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white shadow-[0_0_18px_-12px_rgba(247,147,26,0.6)]'
+                          : 'border-white/15 bg-white/5 text-white/80 hover:bg-white/8 hover:text-white'
                           }`}
                       >
                         {n + 1}

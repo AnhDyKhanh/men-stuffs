@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useLogout } from '@/app/_hooks/useLogout'
+import { useLogout } from '@/hooks/useLogout'
 
 export default function LogoutButton() {
   const router = useRouter()

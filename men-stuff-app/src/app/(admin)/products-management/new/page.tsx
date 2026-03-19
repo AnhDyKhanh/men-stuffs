@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import ProductForm from '@/app/_components/admin/ProductForm'
+import ProductForm from '@/app/(admin)/dashboard/_components/ProductForm'
 import { labels, BASE_PATH } from '@/lib/labels'
 
 export default async function NewProductPage() {

@@ -1,4 +1,4 @@
-import { Data } from '@/app/_types/response.type'
+import { Data } from '@/types/response.type'
 import { getSupabase } from '@/lib/supabase'
 
 type GetProductByIdParams = {

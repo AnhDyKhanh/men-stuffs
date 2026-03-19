@@ -1,6 +1,6 @@
-import { ProductQueryOptions } from '@/app/_dtos/get-product-list-option.dto'
-import { Product } from '@/app/_models/product'
-import { PaginatedData } from '@/app/_types/response.type'
+import { ProductQueryOptions } from '@/dtos/get-product-list-option.dto'
+import { Product } from '@/models/product'
+import { PaginatedData } from '@/types/response.type'
 import { getSupabase } from '@/lib/supabase'
 
 export async function getAllProducts(options: ProductQueryOptions = {}): Promise<PaginatedData<Product[]>> {

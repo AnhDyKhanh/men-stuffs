@@ -1,6 +1,6 @@
 import { getSupabase } from '@/lib/supabase'
 import { getCurrentCustomerId } from '../../services/getCustomerAccount'
-import type { PaymentMethod, PaymentStatus } from '@/app/_models/order'
+import type { PaymentMethod, PaymentStatus } from '@/models/order'
 
 export type CreateOrderItemDTO = {
   product_id: string

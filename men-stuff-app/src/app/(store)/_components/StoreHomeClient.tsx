@@ -8,15 +8,15 @@ import {
   getFeaturedCategories as getPlaceholderFeaturedCategories,
   getTwoBannerRows,
   type PlaceholderProduct,
-} from '@/app/_constants/placeholderData'
-import type { FeaturedCategory } from '@/app/_constants/placeholderData'
+} from '@/constants/placeholderData'
+import type { FeaturedCategory } from '@/constants/placeholderData'
 import HeroSlideshow from '@/app/(store)/_components/HeroSlideshow'
 import ProductGrid from '@/app/(store)/_components/ProductGrid'
 import TwoBannerSection from '@/app/(store)/_components/TwoBannerSection'
 import FeaturedCategoriesSection from '@/app/(store)/_components/FeaturedCategoriesSection'
-import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
-import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
-import type { Product } from '@/app/_models/product'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { useGetAllCategories } from '@/hooks/useGetAllCategories'
+import type { Product } from '@/models/product'
 
 const CURRENCY = 'VND'
 const LOCALE_VI = 'vi-VN'

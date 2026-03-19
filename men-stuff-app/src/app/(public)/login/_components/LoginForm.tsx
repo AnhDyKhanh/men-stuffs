@@ -1,6 +1,6 @@
 'use client'
 
-import { useLogin } from '@/app/_hooks/useLogin'
+import { useLogin } from '@/hooks/useLogin'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'

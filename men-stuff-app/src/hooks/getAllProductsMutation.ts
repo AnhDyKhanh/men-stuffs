@@ -1,10 +1,10 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { API_ROUTES } from '../_constants/apiRouter'
-import type { ProductQueryOptions } from '../_dtos/get-product-list-option.dto'
-import type { Product } from '../_models/product'
-import type { PaginatedData } from '../_types/response.type'
+import { API_ROUTES } from '../constants/apiRouter'
+import type { ProductQueryOptions } from '../dtos/get-product-list-option.dto'
+import type { Product } from '../models/product'
+import type { PaginatedData } from '../types/response.type'
 
 function buildProductsQueryString(options: ProductQueryOptions): string {
   const params = new URLSearchParams({

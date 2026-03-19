@@ -1,6 +1,6 @@
 'use client'
 
-import { useRegister } from '@/app/_hooks/useRegister'
+import { useRegister } from '@/hooks/useRegister'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'

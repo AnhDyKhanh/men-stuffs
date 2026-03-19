@@ -1,7 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreateOrderDTO } from '../api/guest/payment/services/createPayment'
-import { API_ROUTES } from '../_constants/apiRouter'
+import { CreateOrderDTO } from '../app/api/guest/payment/services/createPayment'
+import { API_ROUTES } from '../constants/apiRouter'
 
 async function fetchCreatePayment(body: CreateOrderDTO) {
   const url = API_ROUTES.GUEST.PAYMENT
