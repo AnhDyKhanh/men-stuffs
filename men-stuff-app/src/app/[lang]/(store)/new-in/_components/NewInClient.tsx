@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { BASE_PATH } from '@/lib/labels'
-import ProductGrid from '@/components/store/ProductGrid'
-import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
-import type { Product } from '@/app/_models/product'
-import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import ProductGrid from '@/app/(store)/_components/ProductGrid'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import type { Product } from '@/models/product'
+import type { PlaceholderProduct } from '@/constants/placeholderData'
 
 const NEW_IN_SIZE = 30
 const CURRENCY = 'VND'

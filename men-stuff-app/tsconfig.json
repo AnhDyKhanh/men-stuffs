@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/hooks/*": ["./src/app/_hooks/*"],
+      "@/models/*": ["./src/app/_models/*"],
+      "@/constants/*": ["./src/app/_constants/*"]
     }
   },
   "include": [
