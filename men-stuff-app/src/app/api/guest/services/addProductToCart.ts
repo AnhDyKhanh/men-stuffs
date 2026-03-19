@@ -49,26 +49,35 @@ export async function addProductToCart(body: AddProductToCartDTO) {
 
     if (itemError) throw itemError
 
-    // 3. Upsert sản phẩm
-    const { data: finalItem, error: upsertError } = await supabase
-      .from('cart_items')
-      .upsert({
-        id: existingItem?.id, // Có id là update, không có là insert
-        cart_id: cartId,
-        product_id: productId,
-        quantity: (existingItem?.quantity || 0) + quantity,
-        price_at_time: priceAtTime,
-      })
-      .select()
-      .single()
+    if (existingItem) {
+      // Update số lượng
+      const { data: finalItem, error: upsertError } = await supabase
+        .from('cart_items')
+        .update({
+          quantity: existingItem.quantity + quantity,
+          price_at_time: priceAtTime,
+        })
+        .eq('id', existingItem.id)
+        .select()
+        .single()
 
-    if (upsertError) throw upsertError
+      if (upsertError) throw upsertError
+      return { data: finalItem, error: null, message: 'Sản phẩm đã nằm gọn trong giỏ!', status: 200 }
+    } else {
+      // Insert mới
+      const { data: finalItem, error: insertError } = await supabase
+        .from('cart_items')
+        .insert({
+          cart_id: cartId,
+          product_id: productId,
+          quantity,
+          price_at_time: priceAtTime,
+        })
+        .select()
+        .single()
 
-    return {
-      data: finalItem,
-      error: null,
-      message: 'Sản phẩm đã nằm gọn trong giỏ!',
-      status: 200,
+      if (insertError) throw insertError
+      return { data: finalItem, error: null, message: 'Sản phẩm đã nằm gọn trong giỏ!', status: 200 }
     }
   } catch (error: any) {
     console.error('[ADD_TO_CART_ERROR]:', error.message)

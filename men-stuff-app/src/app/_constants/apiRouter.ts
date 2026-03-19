@@ -6,6 +6,8 @@ export const API_ROUTES = {
     CART: {
       GET_CUSTOMER_CURRENT_CART: '/api/guest/cart',
     },
+    ADD_TO_CART: '/api/guest/add-to-cart',
+    PAYMENT: '/api/guest/payment',
   },
   PRODUCTS: {
     GET_ALL: '/api/admin/products',

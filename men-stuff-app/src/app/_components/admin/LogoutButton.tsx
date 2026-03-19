@@ -1,16 +1,14 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { logout } from '@/lib/auth'
+import { useLogout } from '@/app/_hooks/useLogout'
 
-/**
- * Logout button component for admin
- */
 export default function LogoutButton() {
   const router = useRouter()
+  const { mutate: logout } = useLogout()
 
   const handleLogout = async () => {
-    await logout()
+    logout()
     router.push('/login')
     router.refresh()
   }

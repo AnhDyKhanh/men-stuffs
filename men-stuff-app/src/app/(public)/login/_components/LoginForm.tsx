@@ -12,7 +12,12 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-export function LoginForm() {
+interface LoginFormProps {
+  redirect?: string | null
+}
+
+export function LoginForm(props: LoginFormProps) {
+  const { redirect } = props
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,21 +33,19 @@ export function LoginForm() {
       { email, password },
       {
         onSuccess: (data) => {
+
           if (data.error) {
             setErrorMessage(data.error)
             return
           }
 
           const role = data.role as 'admin' | 'user' | undefined
-          const searchParams = new URLSearchParams(window.location.search)
-          const redirectParam = searchParams.get('redirect')
 
           if (role === 'admin') {
-            router.push(redirectParam || `/dashboard`)
+            router.push(redirect || `/dashboard`)
           } else {
-            const isAdminPath =
-              redirectParam && /^\/(admin|dashboard|products-management|categories-management)/.test(redirectParam)
-            router.push(!isAdminPath && redirectParam ? redirectParam : '/')
+            const isAdminPath = redirect && /^\/(admin|dashboard|products-management|categories-management)/.test(redirect)
+            router.push(!isAdminPath && redirect ? redirect : '/')
           }
           toast.success("Đăng nhập thành công!", {
             description: "Chào mừng bạn trở lại Men Stuffs",

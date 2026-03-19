@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 type LoginDTO = {
   email: string
@@ -16,7 +16,11 @@ async function fetchLogin(body: LoginDTO) {
 }
 
 export function useLogin() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: fetchLogin,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['@auth-me'] })
+    },
   })
 }
