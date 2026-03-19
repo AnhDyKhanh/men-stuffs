@@ -10,12 +10,7 @@ export const useAddToCart = () => {
       return fetch('/api/cart', { method: 'POST', body: JSON.stringify(payload) })
     },
     onSuccess: () => {
-      // ĐÂY LÀ PHẦN QUAN TRỌNG:
-      // 'cart' là cái Key mà bạn dùng trong useQuery để lấy danh sách giỏ hàng
-      queryClient.invalidateQueries({ queryKey: ['cart'] })
-
-      // Nếu bạn muốn mở luôn Side Cart sau khi thêm thành công:
-      // openSideCart();
+      queryClient.invalidateQueries({ queryKey: ['customer-current-cart'] })
     },
   })
 }
