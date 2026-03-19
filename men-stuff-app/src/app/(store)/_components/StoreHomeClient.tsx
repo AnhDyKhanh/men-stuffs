@@ -57,11 +57,18 @@ function mapCategoriesToFeatured(
   if (!categories || categories.length === 0) {
     return getPlaceholderFeaturedCategories(basePath, 'vi')
   }
+
+  const placeholderCats = getPlaceholderFeaturedCategories(basePath, 'vi')
+
   return categories.slice(0, limit).map(
     (cat, index): FeaturedCategory => ({
       id: cat.id,
       title: cat.name || `Danh mục ${index + 1}`,
-      imageUrl: '/categories/default.png',
+      imageUrl: (() => {
+        const key = cat.slug || cat.id
+        const matched = placeholderCats.find((p) => p.id === key || p.id === cat.id)
+        return matched?.imageUrl ?? placeholderCats[0]?.imageUrl ?? '/categories/rings.png'
+      })(),
       href: `${basePath}/products?categoryId=${encodeURIComponent(cat.slug || cat.id)}`,
     }),
   )
