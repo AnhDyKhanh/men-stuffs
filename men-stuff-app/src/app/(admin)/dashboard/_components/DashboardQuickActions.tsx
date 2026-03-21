@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { labels } from '@/lib/labels'
-import { Button } from '@/components/ui/button'
 import UploadButton from './UploadButton'
 
 type DashboardQuickActionsProps = {
@@ -22,27 +20,30 @@ export default function DashboardQuickActions({
   const [imageUrl, setImageUrl] = useState<string>('')
 
   return (
-    <section className="rounded-xl border border-border bg-card/80 p-6 shadow-[0_0_40px_-18px_rgba(247,147,26,0.12)] backdrop-blur">
-      <h2 className="mb-4 text-xl font-semibold text-foreground">{quickActionsLabel}</h2>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button asChild className="rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] font-semibold text-primary-foreground shadow-glow-orange">
-          <Link href="/products-management/new">{createProductLabel}</Link>
-        </Button>
-        <Button asChild variant="outline" className="rounded-full border-border">
-          <Link href="/products-management">{productsLabel}</Link>
-        </Button>
-        <Button asChild variant="secondary" className="rounded-full">
-          <Link href="/order">{labels.admin.orders}</Link>
-        </Button>
+    <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900">{quickActionsLabel}</h2>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link
+          href="/products-management/new"
+          className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          {createProductLabel}
+        </Link>
+        <Link
+          href="/products-management"
+          className="inline-flex items-center justify-center rounded-lg bg-gray-200 px-6 py-2.5 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-300"
+        >
+          {productsLabel}
+        </Link>
         <UploadButton onUploadSuccess={setImageUrl} />
         {imageUrl && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
             <span>URL:</span>
             <a
               href={imageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="max-w-[200px] truncate text-primary hover:underline"
+              className="max-w-[200px] truncate text-blue-600 hover:underline"
             >
               {imageUrl}
             </a>

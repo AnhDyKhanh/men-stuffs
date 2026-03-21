@@ -19,4 +19,8 @@ export const API_ROUTES = {
   CATEGORIES: {
     GET_ALL: '/api/admin/category',
   },
+  ORDERS: {
+    GET_ALL: '/api/admin/orders',
+    PATCH_STATUS: (id: string) => `/api/admin/orders/${id}`,
+  },
 }

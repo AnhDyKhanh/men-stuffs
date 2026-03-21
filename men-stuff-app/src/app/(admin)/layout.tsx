@@ -10,63 +10,65 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (userRole !== 'admin') {
     return (
-      <div className="relative min-h-screen bg-background">
-        <div className="pointer-events-none fixed inset-0 bg-void-texture opacity-90" aria-hidden />
-        <div className="relative z-10 container mx-auto px-4 py-12 text-center">
-          <h1 className="mb-4 text-2xl font-bold text-foreground">Truy cập bị từ chối</h1>
-          <p className="mb-4 text-muted-foreground">Bạn cần đăng nhập với tài khoản admin.</p>
-          <Link href={`${BASE_PATH}/login`} className="text-primary underline-offset-4 hover:underline">
-            Đăng nhập Admin
-          </Link>
-        </div>
+      <div className="container mx-auto px-4 py-12 text-center">
+        <h1 className="mb-4 text-2xl font-bold">Truy cập bị từ chối</h1>
+        <p className="mb-4 text-gray-600">Bạn cần đăng nhập với tài khoản admin.</p>
+        <Link href={`${BASE_PATH}/login`} className="text-blue-600 hover:underline">
+          Đăng nhập Admin
+        </Link>
       </div>
     )
   }
 
-  const navLink =
-    'block rounded-xl border border-transparent px-4 py-3 text-sm text-muted-foreground transition hover:border-border hover:bg-muted/50 hover:text-foreground'
-
   return (
-    <div className="relative flex min-h-screen bg-background text-foreground">
-      <div className="pointer-events-none fixed inset-0 bg-void-texture opacity-90" aria-hidden />
-      <div className="pointer-events-none fixed inset-0 bg-grid-pattern opacity-40" aria-hidden />
-
-      <aside className="relative z-10 min-h-screen w-64 border-r border-border bg-card/90 backdrop-blur">
+    <div className="flex min-h-screen bg-gray-50">
+      <aside className="min-h-screen w-64 border-r bg-white">
         <div className="p-6">
-          <Link href={`${BASE_PATH}/dashboard`} className="text-xl font-semibold tracking-tight">
-            <span className="text-gradient-gold">Men Stuffs</span>
-            <span className="ml-2 text-sm font-normal text-muted-foreground">Admin</span>
+          <Link href={`${BASE_PATH}/dashboard`} className="text-2xl font-bold text-blue-600">
+            Khu vực Admin
           </Link>
         </div>
-        <nav className="space-y-1 px-3">
-          <Link href={`${BASE_PATH}/dashboard`} className={navLink}>
+        <nav className="space-y-2 px-4">
+          <Link
+            href={`${BASE_PATH}/dashboard`}
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+          >
             {labels.admin.dashboard}
           </Link>
-          <Link href={`${BASE_PATH}/order`} className={navLink}>
-            {labels.admin.orders}
-          </Link>
-          <Link href={`${BASE_PATH}/products-management`} className={navLink}>
+          <Link
+            href={`${BASE_PATH}/products-management`}
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+          >
             {labels.admin.products}
           </Link>
-          <Link href={`${BASE_PATH}/categories-management`} className={navLink}>
+          <Link
+            href={`${BASE_PATH}/categories-management`}
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+          >
             {labels.admin.categories}
           </Link>
-          <div className="border-t border-border/80 pt-4">
+          <Link
+            href={`${BASE_PATH}/order`}
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+          >
+            {labels.admin.orders}
+          </Link>
+          <div className="border-t pt-4">
             <LogoutButton />
           </div>
         </nav>
       </aside>
 
-      <div className="relative z-10 flex flex-1 flex-col">
-        <header className="border-b border-border bg-card/70 px-6 py-4 backdrop-blur">
+      <div className="flex flex-1 flex-col">
+        <header className="border-b bg-white px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold text-foreground">Bảng điều khiển Admin</h1>
+            <h1 className="text-xl font-semibold text-gray-800">Bảng điều khiển Admin</h1>
             <div className="flex items-center gap-4">
-              <Link href="/" className="text-sm text-muted-foreground transition hover:text-foreground">
+              <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
                 {labels.admin.viewStore}
               </Link>
-              <span className="text-sm text-border">|</span>
-              <span className="font-mono text-xs text-muted-foreground">staff</span>
+              <span className="text-sm text-gray-400">|</span>
+              <span className="text-sm text-gray-600">admin@menstuff.local</span>
             </div>
           </div>
         </header>

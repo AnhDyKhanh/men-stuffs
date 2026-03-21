@@ -1,36 +1,58 @@
 import { getSupabaseAdmin } from '@/lib/supabase'
 import type { Order } from '@/models/order'
+import type { PaginatedData } from '@/types/response.type'
 
-export type GetAllOrdersOptions = {
-  page: number
-  size: number
+export type GetOrdersOptions = {
+  page?: number
+  size?: number
   status?: string | null
+  search?: string | null
 }
 
-export async function getAllOrders({ page, size, status }: GetAllOrdersOptions) {
-  const supabase = getSupabaseAdmin()
-  const from = page * size
-  const to = from + size - 1
+export async function getAllOrders(options: GetOrdersOptions = {}): Promise<PaginatedData<Order[]>> {
+  const { page = 1, size = 20, status, search } = options
 
-  let q = supabase
-    .from('orders')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
+  const safePage = Math.max(1, Number(page))
+  const safeSize = Math.max(1, Math.min(100, Number(size)))
+  const from = (safePage - 1) * safeSize
+  const to = from + safeSize - 1
 
-  if (status?.trim()) {
-    q = q.eq('status', status.trim())
-  }
+  try {
+    const supabase = getSupabaseAdmin()
 
-  const { data, error, count } = await q.range(from, to)
+    let query = supabase.from('orders').select('*', { count: 'exact' })
 
-  if (error) {
-    console.error('[getAllOrders]', error)
-    return { data: [] as Order[], total: 0, error: error.message }
-  }
+    if (status?.trim()) {
+      query = query.eq('status', status.trim())
+    }
 
-  return {
-    data: (data ?? []) as Order[],
-    total: count ?? 0,
-    error: null as string | null,
+    if (search?.trim()) {
+      const raw = search.trim().replace(/[,%]/g, '').replace(/%/g, '')
+      const pattern = `%${raw}%`
+      query = query.or(
+        `order_code.ilike.${pattern},receiver_name.ilike.${pattern},receiver_phone.ilike.${pattern}`,
+      )
+    }
+
+    const { data, error, count } = await query.order('created_at', { ascending: false }).range(from, to)
+
+    if (error) throw error
+
+    return {
+      data: (data ?? []) as Order[],
+      total: count ?? 0,
+      error: null,
+      message: null,
+      status: 200,
+    }
+  } catch (error: unknown) {
+    console.error('[API GET /api/admin/orders] exception:', error)
+    return {
+      data: null,
+      total: 0,
+      error: error instanceof Error ? error.message : 'Failed to fetch orders',
+      message: null,
+      status: 500,
+    }
   }
 }
