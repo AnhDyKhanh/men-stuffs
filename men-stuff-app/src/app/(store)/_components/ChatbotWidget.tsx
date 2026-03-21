@@ -1,25 +1,57 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-
-const PLACEHOLDER_REPLY =
-  'Tính năng chatbot đang được phát triển. Bạn vui lòng quay lại sau hoặc liên hệ qua trang Liên hệ. Cảm ơn bạn!'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  buildBotReply,
+  getSuggestionChips,
+  loadHabits,
+  recordChipClick,
+  recordPathVisit,
+  type SuggestionChip,
+} from '@/lib/chatbot-habits'
 
 type Message = {
   id: string
   role: 'user' | 'bot'
   text: string
+  chips?: SuggestionChip[]
 }
 
 export default function ChatbotWidget() {
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const [habits, setHabits] = useState(() => loadHabits())
   const listRef = useRef<HTMLDivElement>(null)
+
+  const starterChips = useMemo(() => getSuggestionChips(pathname ?? '/', habits), [pathname, habits])
 
   useEffect(() => {
     listRef.current?.scrollTo(0, listRef.current.scrollHeight)
   }, [messages])
+
+  useEffect(() => {
+    if (!pathname) return
+    recordPathVisit(pathname)
+    setHabits(loadHabits())
+  }, [pathname])
+
+  const pushBot = (text: string, chips?: SuggestionChip[]) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `b-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        role: 'bot',
+        text,
+        chips,
+      },
+    ])
+  }
 
   const handleSend = () => {
     const text = input.trim()
@@ -33,21 +65,23 @@ export default function ChatbotWidget() {
     setMessages((prev) => [...prev, userMsg])
     setInput('')
 
-    const botMsg: Message = {
-      id: `b-${Date.now()}`,
-      role: 'bot',
-      text: PLACEHOLDER_REPLY,
-    }
-    setMessages((prev) => [...prev, botMsg])
+    const reply = buildBotReply(text, pathname ?? '/')
+    const chips =
+      reply.followUp && reply.followUp.length > 0 ? reply.followUp.slice(0, 4) : starterChips.slice(0, 4)
+    pushBot(reply.text, chips)
+  }
+
+  const onChip = (chip: SuggestionChip) => {
+    recordChipClick(chip.id)
+    setHabits(loadHabits())
   }
 
   return (
     <>
-      {/* Floating button */}
       <button
         type="button"
         onClick={() => setIsOpen((o) => !o)}
-        className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-neutral-600 bg-neutral-800 text-white shadow-lg transition hover:bg-neutral-700 focus:ring-2 focus:ring-neutral-500 focus:outline-none"
+        className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-glow-orange transition hover:border-primary/50 hover:shadow-glow-gold focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         aria-label={isOpen ? 'Đóng chatbot' : 'Mở chatbot'}
       >
         {isOpen ? (
@@ -66,56 +100,84 @@ export default function ChatbotWidget() {
         )}
       </button>
 
-      {/* Chat panel */}
       {isOpen && (
         <div
-          className="fixed right-6 bottom-24 z-50 flex w-[360px] max-w-[calc(100vw-3rem)] flex-col rounded-xl border border-neutral-700 bg-neutral-900 shadow-xl"
+          className="fixed right-6 bottom-24 z-50 flex w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_0_50px_-14px_rgba(247,147,26,0.25)]"
           role="dialog"
-          aria-label="Chatbot (đang phát triển)"
+          aria-label="Trợ lý Men Stuffs"
         >
-          <div className="flex items-center justify-between border-b border-neutral-700 px-4 py-3">
-            <span className="font-semibold text-white">Chatbot</span>
-            <span className="text-xs text-neutral-500">Upcoming</span>
+          <div className="flex items-center justify-between border-b border-border bg-background/60 px-4 py-3 backdrop-blur">
+            <div>
+              <div className="text-sm font-semibold">
+                <span className="text-gradient-gold">Men Stuffs</span> Assistant
+              </div>
+              <p className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">Gợi ý theo thói quen</p>
+            </div>
+            <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">Beta</span>
           </div>
 
-          <div ref={listRef} className="flex max-h-[320px] min-h-[240px] flex-1 flex-col gap-3 overflow-y-auto p-4">
+          <div ref={listRef} className="flex max-h-[340px] min-h-[220px] flex-1 flex-col gap-3 overflow-y-auto p-4">
             {messages.length === 0 && (
-              <p className="py-4 text-center text-sm text-neutral-500">
-                Chào bạn! Tính năng đang được phát triển. Thử gửi tin nhắn để xem phản hồi mẫu.
-              </p>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Chào bạn! Mình gợi ý nhanh dựa trên trang bạn đang xem và vài lần tương tác trước (lưu trên máy bạn).
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {starterChips.map((chip) => (
+                    <Button key={chip.id} asChild size="sm" variant="secondary" className="h-8 rounded-full border border-border bg-card/80 text-xs">
+                      <Link href={chip.href} onClick={() => onChip(chip)}>
+                        {chip.label}
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </div>
             )}
             {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div key={m.id} className={`flex flex-col gap-2 ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <span
-                  className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
+                  className={`max-w-[92%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
                     m.role === 'user'
-                      ? 'bg-neutral-700 text-white'
-                      : 'border border-neutral-700 bg-neutral-800 text-neutral-200'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'border border-border bg-background/80 text-foreground'
                   }`}
                 >
                   {m.text}
                 </span>
+                {m.role === 'bot' && m.chips && m.chips.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {m.chips.map((chip) => (
+                      <Button
+                        key={`${m.id}-${chip.id}`}
+                        asChild
+                        size="sm"
+                        variant="outline"
+                        className="h-8 rounded-full border-border text-xs"
+                      >
+                        <Link href={chip.href} onClick={() => onChip(chip)}>
+                          {chip.label}
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
 
-          <div className="border-t border-neutral-700 p-3">
+          <div className="border-t border-border bg-background/60 p-3 backdrop-blur">
             <div className="flex gap-2">
-              <input
+              <Input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Nhập tin nhắn..."
-                className="flex-1 rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-sm text-white placeholder-neutral-500 focus:border-neutral-500 focus:outline-none"
+                placeholder="Hỏi về New In, giá, giỏ hàng..."
+                className="min-h-10 border-border bg-card/80"
               />
-              <button
-                type="button"
-                onClick={handleSend}
-                className="rounded-lg bg-neutral-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-600"
-              >
+              <Button type="button" onClick={handleSend} className="shrink-0 rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] font-semibold text-primary-foreground shadow-glow-orange">
                 Gửi
-              </button>
+              </Button>
             </div>
           </div>
         </div>
