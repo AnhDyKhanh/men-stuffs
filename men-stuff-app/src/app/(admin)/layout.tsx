@@ -47,6 +47,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           >
             {labels.admin.categories}
           </Link>
+          <Link
+            href={`${BASE_PATH}/order`}
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+          >
+            {labels.admin.orders}
+          </Link>
           <div className="border-t pt-4">
             <LogoutButton />
           </div>
