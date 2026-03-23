@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
 import { updateOrderStatus } from '../services/updateOrderStatus'
 import type { OrderStatus } from '@/models/order'
+import { getOrderDetail } from '../services/getOrderDetail'
 
 type RouteContext = { params: Promise<{ id: string }> }
+
+/**
+ * GET /api/admin/orders/:id
+ */
+export async function GET(_request: Request, context: RouteContext) {
+  const { id } = await context.params
+  const result = await getOrderDetail(id)
+  return NextResponse.json(result, { status: result.status ?? 500 })
+}
 
 /**
  * PATCH /api/admin/orders/:id
