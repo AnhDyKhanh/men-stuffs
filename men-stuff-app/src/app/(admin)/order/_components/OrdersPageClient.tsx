@@ -62,18 +62,14 @@ export function OrdersPageClient() {
 
   return (
     <div className="space-y-6">
-      {/* Hero strip — đồng bộ storefront: void + grid */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-background/90 bg-void-texture p-6 shadow-[0_0_50px_-14px_rgba(247,147,26,0.12)]">
-        <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" aria-hidden />
-        <div className="relative flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">{dict.kicker}</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight">
-              <span className="text-gradient-gold">{dict.title}</span>
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{dict.subtitle}</p>
+            <p className="font-mono text-[11px] tracking-widest text-slate-500 uppercase">{dict.kicker}</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">{dict.title}</h1>
+            <p className="mt-2 max-w-2xl text-sm text-slate-600">{dict.subtitle}</p>
           </div>
-          <Button asChild variant="outline" className="border-white/15 bg-white/5 hover:bg-white/10">
+          <Button asChild variant="outline" className="border-slate-300 bg-white text-slate-700 hover:bg-slate-50">
             <Link href={`${BASE_PATH}/dashboard`}>
               <ChevronLeft className="mr-1 size-4" />
               {dict.backDashboard}
@@ -122,8 +118,8 @@ export function OrdersPageClient() {
       />
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-card/50 px-4 py-3">
-          <p className="font-mono text-xs text-muted-foreground">
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p className="font-mono text-xs text-slate-600">
             {dict.pageInfo
               .replace(
                 '{from}',
@@ -137,20 +133,20 @@ export function OrdersPageClient() {
               type="button"
               variant="outline"
               size="sm"
-              className="border-white/10"
+              className="border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
               <ChevronLeft className="size-4" />
             </Button>
-            <span className="flex items-center px-2 font-mono text-xs text-muted-foreground">
+            <span className="flex items-center px-2 font-mono text-xs text-slate-600">
               {page} / {totalPages}
             </span>
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="border-white/10"
+              className="border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             >

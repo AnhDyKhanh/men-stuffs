@@ -24,7 +24,7 @@ function StatCard({ title, value, subtitle }: { title: string; value: string | n
 export default function DashboardDashboardClient() {
   const { data: products } = useGetAllProducts({
     page: 1,
-    size: 10,
+    size: 100,
     orderBy: 'created_at',
   })
 

@@ -21,6 +21,7 @@ export const API_ROUTES = {
   },
   ORDERS: {
     GET_ALL: '/api/admin/orders',
+    GET_DETAIL: (id: string) => `/api/admin/orders/${id}`,
     PATCH_STATUS: (id: string) => `/api/admin/orders/${id}`,
   },
 }
