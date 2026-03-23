@@ -1,6 +1,6 @@
 import ProductsTable from '@/app/(admin)/dashboard/_components/ProductsTable'
 import { getAllProducts } from '@/app/api/admin/products/services/getAllProducts'
-import type { Product } from '@/app/_types/product'
+import type { Product } from '@/types/product'
 import { labels, BASE_PATH } from '@/lib/labels'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -9,7 +9,7 @@ import Link from 'next/link'
 export default async function AdminProductsPage() {
   const res = await getAllProducts({ page: 0, size: 100, orderBy: 'created_at', ascending: false })
   const raw = res?.data ?? []
-  const products: Product[] = raw.map((p: { id: string; is_active?: string | null; [key: string]: unknown }) => ({
+  const products: Product[] = raw.map((p: { id: string; is_active?: string | null;[key: string]: unknown }) => ({
     ...p,
     status: (p.is_active === 'inactive' ? 'inactive' : 'active') as Product['status'],
   })) as Product[]

@@ -8,15 +8,15 @@ import {
   getFeaturedCategories as getPlaceholderFeaturedCategories,
   getTwoBannerRows,
   type PlaceholderProduct,
-} from '@/app/_constants/placeholderData'
-import type { FeaturedCategory } from '@/app/_constants/placeholderData'
-import HeroSlideshow from '@/components/store/HeroSlideshow'
-import ProductGrid from '@/components/store/ProductGrid'
-import TwoBannerSection from '@/components/store/TwoBannerSection'
-import FeaturedCategoriesSection from '@/components/store/FeaturedCategoriesSection'
-import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
-import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
-import type { Product } from '@/app/_models/product'
+} from '@/constants/placeholderData'
+import type { FeaturedCategory } from '@/constants/placeholderData'
+import HeroSlideshow from '@/app/(store)/_components/HeroSlideshow'
+import ProductGrid from '@/app/(store)/_components/ProductGrid'
+import TwoBannerSection from '@/app/(store)/_components/TwoBannerSection'
+import FeaturedCategoriesSection from '@/app/(store)/_components/FeaturedCategoriesSection'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { useGetAllCategories } from '@/hooks/useGetAllCategories'
+import type { Product } from '@/models/product'
 
 const CURRENCY = 'VND'
 const LOCALE_VI = 'vi-VN'
@@ -57,11 +57,18 @@ function mapCategoriesToFeatured(
   if (!categories || categories.length === 0) {
     return getPlaceholderFeaturedCategories(basePath, 'vi')
   }
+
+  const placeholderCats = getPlaceholderFeaturedCategories(basePath, 'vi')
+
   return categories.slice(0, limit).map(
     (cat, index): FeaturedCategory => ({
       id: cat.id,
       title: cat.name || `Danh mục ${index + 1}`,
-      imageUrl: '/categories/default.png',
+      imageUrl: (() => {
+        const key = cat.slug || cat.id
+        const matched = placeholderCats.find((p) => p.id === key || p.id === cat.id)
+        return matched?.imageUrl ?? placeholderCats[0]?.imageUrl ?? '/categories/rings.png'
+      })(),
       href: `${basePath}/products?categoryId=${encodeURIComponent(cat.slug || cat.id)}`,
     }),
   )
@@ -89,10 +96,10 @@ export default function StoreHomeClient() {
   const latestProductForBanner =
     newProductsFromApi.length > 0
       ? {
-          title: newProductsFromApi[0].name,
-          href: newProductsFromApi[0].href,
-          imageUrl: newProductsFromApi[0].imageUrl,
-        }
+        title: newProductsFromApi[0].name,
+        href: newProductsFromApi[0].href,
+        imageUrl: newProductsFromApi[0].imageUrl,
+      }
       : undefined
 
   const bannerRows = getTwoBannerRows(BASE_PATH, latestProductForBanner)

@@ -1,0 +1,317 @@
+'use client'
+
+import { useState } from 'react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import type { Order, OrderStatus } from '@/models/order'
+import { ORDER_STATUS_OPTIONS } from './orderConstants'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { API_ROUTES } from '@/constants/apiRouter'
+import { toast } from 'sonner'
+
+function formatVnd(n: number | null | undefined) {
+  if (n == null) return '—'
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(n)
+}
+
+function formatDate(iso: string | Date | null | undefined) {
+  if (!iso) return '—'
+  const d = typeof iso === 'string' ? new Date(iso) : iso
+  if (Number.isNaN(d.getTime())) return '—'
+  return new Intl.DateTimeFormat('vi-VN', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(d)
+}
+
+type Dict = {
+  tableTitle: string
+  colCode: string
+  colCustomer: string
+  colPhone: string
+  colTotal: string
+  colStatus: string
+  colPayment: string
+  colCreated: string
+  colAction: string
+  empty: string
+  paymentCod: string
+  paymentBank: string
+  paymentMomo: string
+}
+
+const paymentLabel = (m: string | null | undefined, dict: Dict) => {
+  if (m === 'cod') return dict.paymentCod
+  if (m === 'bank_transfer') return dict.paymentBank
+  if (m === 'momo') return dict.paymentMomo
+  return m ?? '—'
+}
+
+type Props = {
+  orders: Order[] | null | undefined
+  isLoading: boolean
+  dict: Dict
+  onStatusChange: (orderId: string, status: OrderStatus) => void
+  updatingId?: string | null
+}
+
+type OrderDetailItem = {
+  id: string
+  quantity: number
+  price_at_time: number
+  product: {
+    id: string
+    name: string
+    origin_image: string | null
+  } | null
+}
+
+type OrderDetailData = {
+  id: string
+  order_code: string | null
+  receiver_name: string | null
+  receiver_phone: string | null
+  shipping_address: string | null
+  total_amount: number | null
+  status: string | null
+  created_at: string | null
+  items: OrderDetailItem[]
+}
+
+const MOCK_SHIPPERS = [
+  { id: 'shipper-1', name: 'Phạm Ngọc Duy Khánh', phone: '0901234567' },
+  { id: 'shipper-2', name: 'Phạm Ngọc Duy Minh', phone: '0912345678' },
+]
+
+export function OrdersTable({ orders, isLoading, dict, onStatusChange, updatingId }: Props) {
+  const rows = orders ?? []
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [isDetailLoading, setIsDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState<string | null>(null)
+  const [detail, setDetail] = useState<OrderDetailData | null>(null)
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [selectedShipperId, setSelectedShipperId] = useState<string>('')
+
+  const handleOpenDetail = async (orderId: string) => {
+    setSelectedOrderId(orderId)
+    setIsDetailOpen(true)
+    setIsDetailLoading(true)
+    setDetailError(null)
+    setDetail(null)
+    setSelectedShipperId('')
+
+    try {
+      const res = await fetch(API_ROUTES.ORDERS.GET_DETAIL(orderId), { cache: 'no-store' })
+      const payload = (await res.json().catch(() => null)) as { data?: OrderDetailData; error?: string } | null
+      if (!res.ok || !payload?.data) {
+        throw new Error(payload?.error || 'Không tải được chi tiết đơn hàng')
+      }
+      if (payload.data.id === orderId) {
+        setDetail(payload.data)
+      } else {
+        throw new Error('Dữ liệu chi tiết không khớp đơn hàng đang chọn')
+      }
+    } catch (error: unknown) {
+      setDetailError(error instanceof Error ? error.message : 'Không tải được chi tiết đơn hàng')
+    } finally {
+      setIsDetailLoading(false)
+    }
+  }
+
+  const handleAssignShipper = () => {
+    if (!detail || selectedOrderId !== detail.id) return
+    if (!selectedShipperId) {
+      toast.error('Vui long chon nguoi giao hang')
+      return
+    }
+
+    const shipper = MOCK_SHIPPERS.find((s) => s.id === selectedShipperId)
+    if (!shipper) {
+      toast.error('Khong tim thay shipper da chon')
+      return
+    }
+
+    toast.success(`Da them ${shipper.name} (${shipper.phone}) cho don ${detail.order_code ?? detail.id.slice(0, 8)}`)
+    setIsDetailOpen(false)
+  }
+
+  return (
+    <>
+      <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
+        <CardHeader className="border-b border-slate-200 pb-4">
+          <CardTitle className="text-lg font-semibold tracking-tight text-slate-900">
+            {dict.tableTitle}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="relative">
+            {isLoading && (
+              <div className="space-y-2 p-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full rounded-md" />
+                ))}
+              </div>
+            )}
+            {!isLoading && rows.length === 0 && (
+              <p className="p-8 text-center text-sm text-slate-500">{dict.empty}</p>
+            )}
+            {!isLoading && rows.length > 0 && (
+              <div className="w-full overflow-x-auto">
+                <Table className="min-w-[1100px]">
+                  <TableHeader>
+                    <TableRow className="border-slate-200 hover:bg-slate-50">
+                      <TableHead className="text-slate-600">{dict.colCode}</TableHead>
+                      <TableHead className="text-slate-600">{dict.colCustomer}</TableHead>
+                      <TableHead className="text-slate-600">{dict.colPhone}</TableHead>
+                      <TableHead className="text-slate-600">{dict.colTotal}</TableHead>
+                      <TableHead className="text-slate-600">{dict.colPayment}</TableHead>
+                      <TableHead className="text-slate-600">Địa chỉ nhận</TableHead>
+                      <TableHead className="text-slate-600">{dict.colCreated}</TableHead>
+                      <TableHead className="text-slate-600">{dict.colStatus}</TableHead>
+                      <TableHead className="text-slate-600">{dict.colAction}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {rows.map((o) => (
+                      <TableRow key={o.id} className="border-slate-200 hover:bg-slate-50/80">
+                        <TableCell className="font-mono text-xs">{o.order_code ?? o.id.slice(0, 8)}</TableCell>
+                        <TableCell className="max-w-[140px] truncate">{o.receiver_name ?? '—'}</TableCell>
+                        <TableCell className="font-mono text-xs">{o.receiver_phone ?? '—'}</TableCell>
+                        <TableCell className="font-mono text-sm">{formatVnd(o.total_amount)}</TableCell>
+                        <TableCell className="text-xs">{paymentLabel(o.payment_method, dict)}</TableCell>
+                        <TableCell className="text-xs">{o.shipping_address ?? '—'}</TableCell>
+                        <TableCell className="text-xs text-slate-500">{formatDate(o.created_at as unknown as string)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Select
+                              value={(o.status ?? 'pending') as string}
+                              disabled={updatingId === o.id}
+                              onValueChange={(v) => onStatusChange(o.id, v as OrderStatus)}
+                            >
+                              <SelectTrigger className="h-9 border-slate-300 bg-white text-xs text-slate-900">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ORDER_STATUS_OPTIONS.map((opt) => (
+                                  <SelectItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="outline" size="sm" onClick={() => void handleOpenDetail(o.id)}>
+                            Xem chi tiết
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+        <DialogContent className="max-h-[200vh] border-slate-200 bg-white text-slate-900 sm:max-w-2xl p-4">
+          <DialogHeader>
+            <DialogTitle>Chi tiết đơn hàng</DialogTitle>
+          </DialogHeader>
+
+          {isDetailLoading && <p className="text-sm text-slate-600">Đang tải chi tiết...</p>}
+          {!isDetailLoading && detailError && <p className="text-sm text-red-600">{detailError}</p>}
+
+          {!isDetailLoading && !detailError && detail && selectedOrderId === detail.id && (
+            <div className="space-y-4">
+              <div className="grid gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm sm:grid-cols-2">
+                <p>
+                  <span className="font-medium text-slate-700">Mã đơn:</span> {detail.order_code ?? detail.id.slice(0, 8)}
+                </p>
+                <p>
+                  <span className="font-medium text-slate-700">Khách hàng:</span> {detail.receiver_name ?? '—'}
+                </p>
+                <p>
+                  <span className="font-medium text-slate-700">SĐT:</span> {detail.receiver_phone ?? '—'}
+                </p>
+                <p>
+                  <span className="font-medium text-slate-700">Tổng tiền:</span> {formatVnd(detail.total_amount)}
+                </p>
+                <p className="sm:col-span-2">
+                  <span className="font-medium text-slate-700">Địa chỉ nhận:</span> {detail.shipping_address ?? '—'}
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-slate-800">Danh sách sản phẩm</p>
+                <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+                  <Table className="min-w-[640px]">
+                    <TableHeader>
+                      <TableRow className="border-slate-200 bg-slate-50 hover:bg-slate-50">
+                        <TableHead className="text-slate-600">Sản phẩm</TableHead>
+                        <TableHead className="text-slate-600">Số lượng</TableHead>
+                        <TableHead className="text-slate-600">Đơn giá</TableHead>
+                        <TableHead className="text-slate-600">Thành tiền</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {detail.items.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center text-sm text-slate-500">
+                            Không có sản phẩm trong đơn
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      {detail.items.map((item) => (
+                        <TableRow key={item.id} className="border-slate-200">
+                          <TableCell className="text-sm">{item.product?.name ?? 'Sản phẩm đã xóa'}</TableCell>
+                          <TableCell className="text-sm">{item.quantity}</TableCell>
+                          <TableCell className="text-sm">{formatVnd(item.price_at_time)}</TableCell>
+                          <TableCell className="text-sm">{formatVnd(item.price_at_time * item.quantity)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-slate-800">Chọn người giao hàng</p>
+                <Select value={selectedShipperId} onValueChange={setSelectedShipperId}>
+                  <SelectTrigger className="border-slate-300 bg-white text-slate-900">
+                    <SelectValue placeholder="Chon shipper..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MOCK_SHIPPERS.map((shipper) => (
+                      <SelectItem key={shipper.id} value={shipper.id}>
+                        {shipper.name} - {shipper.phone}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button type="button" className="bg-slate-900 text-white hover:bg-slate-800" onClick={handleAssignShipper}>
+              Thêm người giao hàng
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}

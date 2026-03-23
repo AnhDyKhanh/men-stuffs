@@ -3,11 +3,11 @@
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { BASE_PATH } from '@/lib/labels'
-import ProductGrid from '@/components/store/ProductGrid'
-import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
-import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
-import type { Product } from '@/app/_models/product'
-import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import ProductGrid from '@/app/(store)/_components/ProductGrid'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { useGetAllCategories } from '@/hooks/useGetAllCategories'
+import type { Product } from '@/models/product'
+import type { PlaceholderProduct } from '@/constants/placeholderData'
 
 type CategoryItem = { id: string; name?: string }
 

@@ -1,4 +1,4 @@
-import ProductForm from '@/app/_components/admin/ProductForm'
+import ProductForm from '@/app/(admin)/dashboard/_components/ProductForm'
 import { labels, BASE_PATH } from '@/lib/labels'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'

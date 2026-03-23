@@ -1,8 +1,13 @@
-'use client'
-
+// app/login/page.tsx
 import { LoginForm } from './_components/LoginForm'
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>
+}) {
+  const { redirect } = await searchParams
+
   return (
     <div
       className="bg-background flex min-h-screen w-full items-center justify-center"
@@ -13,7 +18,7 @@ export default function LoginPage() {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <LoginForm />
+      <LoginForm redirect={redirect ?? null} />
     </div>
   )
 }

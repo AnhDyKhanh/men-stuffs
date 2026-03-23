@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetCustomerCurrentCart } from '@/app/_hooks/getCustomerCurrentCart'
+import { useGetCustomerCurrentCart } from '@/hooks/getCustomerCurrentCart'
 import { BASE_PATH } from '@/lib/labels'
 import Link from 'next/link'
 import CartPageClient from './_components/CartPageClient'

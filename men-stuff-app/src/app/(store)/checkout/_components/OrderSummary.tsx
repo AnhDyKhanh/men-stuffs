@@ -1,4 +1,4 @@
-import { CartItem } from '@/app/_types/cart'
+import { CartItem } from '@/types/cart'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
 
