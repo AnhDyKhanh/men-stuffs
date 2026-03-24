@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { BASE_PATH } from '@/lib/labels'
 import ProductGrid from '@/app/(store)/_components/ProductGrid'
@@ -8,6 +8,7 @@ import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import { useGetAllCategories } from '@/hooks/useGetAllCategories'
 import type { Product } from '@/models/product'
 import type { PlaceholderProduct } from '@/constants/placeholderData'
+import { getHotProductIdsToday, trackProductClick } from '@/lib/productHot'
 
 type CategoryItem = { id: string; name?: string }
 
@@ -45,6 +46,7 @@ export default function ShopAllClient() {
   const [categoryId, setCategoryId] = useState('')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [showHotOnly, setShowHotOnly] = useState(false)
 
   const { data: categoriesData } = useGetAllCategories()
   const categories: CategoryItem[] = Array.isArray(categoriesData)
@@ -69,6 +71,16 @@ export default function ShopAllClient() {
   const products = mapProductsToPlaceholder((response as { data?: Product[] })?.data ?? null, BASE_PATH)
   const total = (response as { total?: number })?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const hotProductIdsToday = useMemo(() => new Set(getHotProductIdsToday(8)), [])
+  const productsWithHotLabel = useMemo(
+    () =>
+      products.map((product) => ({
+        ...product,
+        label: hotProductIdsToday.has(product.id) ? ('hot' as const) : product.label,
+      })),
+    [products, hotProductIdsToday],
+  )
+  const visibleProducts = showHotOnly ? productsWithHotLabel.filter((p) => p.label === 'hot') : productsWithHotLabel
 
   const applyFilters = useCallback(() => {
     setSearch(searchInput.trim())
@@ -82,6 +94,7 @@ export default function ShopAllClient() {
     setCategoryId('')
     setDateFrom('')
     setDateTo('')
+    setShowHotOnly(false)
     setPage(1)
   }, [])
 
@@ -177,20 +190,41 @@ export default function ShopAllClient() {
             </button>
           </div>
         </div>
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowHotOnly((prev) => !prev)}
+            className={`inline-flex h-10 items-center justify-center rounded-full border px-4 text-xs font-semibold tracking-wider uppercase transition ${showHotOnly
+              ? 'border-rose-400/60 bg-rose-500/20 text-rose-100'
+              : 'border-white/15 bg-white/5 text-white/70 hover:bg-white/8 hover:text-white'
+              }`}
+          >
+            HOT hôm nay
+          </button>
+          <span className="font-mono text-[11px] tracking-widest text-white/45 uppercase">
+            {hotProductIdsToday.size} sản phẩm đang hot
+          </span>
+        </div>
       </div>
 
       {isError && <p className="mb-4 text-sm text-red-400">Không thể tải sản phẩm. Vui lòng thử lại.</p>}
 
-      {isLoading && products.length === 0 ? (
+      {isLoading && visibleProducts.length === 0 ? (
         <p className="py-12 text-neutral-400">Đang tải...</p>
-      ) : products.length === 0 ? (
+      ) : visibleProducts.length === 0 ? (
         <p className="py-12 text-neutral-400">Không có sản phẩm nào phù hợp.</p>
       ) : (
         <>
           <p className="mb-6 font-mono text-xs tracking-widest text-white/45 uppercase">
             Hiển thị {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} / {total} sản phẩm
           </p>
-          <ProductGrid products={products} buyNowLabel="Thêm vào giỏ" columns={4} variant="dark" />
+          <ProductGrid
+            products={visibleProducts}
+            buyNowLabel="Thêm vào giỏ"
+            columns={4}
+            variant="dark"
+            onProductClick={trackProductClick}
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (
