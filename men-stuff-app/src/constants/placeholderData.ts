@@ -12,7 +12,7 @@ export interface PlaceholderProduct {
   href: string
   rating?: number
   reviewCount?: number
-  label?: 'new' | 'sale'
+  label?: 'new' | 'sale' | 'hot'
 }
 
 export interface HeroSlide {
