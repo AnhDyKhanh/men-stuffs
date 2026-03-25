@@ -14,7 +14,7 @@ function buildProductsQueryString(options: ProductQueryOptions): string {
     ascending: String(options.ascending ?? false),
   })
   if (options.search?.trim()) params.set('search', options.search.trim())
-  if (options.categoryId?.trim()) params.set('categoryId', options.categoryId.trim())
+  if (options.categoryId?.length) params.set('categoryId', options.categoryId.join(','))
   if (options.dateFrom) params.set('dateFrom', options.dateFrom)
   if (options.dateTo) params.set('dateTo', options.dateTo)
   return params.toString()

@@ -1,27 +1,28 @@
+'use client'
+
 import ProductsTable from '@/app/(admin)/dashboard/_components/ProductsTable'
-import { getAllProducts } from '@/app/api/admin/products/services/getAllProducts'
-import type { Product } from '@/types/product'
-import { labels, BASE_PATH } from '@/lib/labels'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { BASE_PATH } from '@/lib/labels'
 import Link from 'next/link'
 
-export default async function AdminProductsPage() {
-  const res = await getAllProducts({ page: 0, size: 100, orderBy: 'created_at', ascending: false })
-  const raw = res?.data ?? []
-  const products: Product[] = raw.map((p: { id: string; is_active?: string | null;[key: string]: unknown }) => ({
-    ...p,
-    status: (p.is_active === 'inactive' ? 'inactive' : 'active') as Product['status'],
-  })) as Product[]
-  const error = res?.error ? String(res.error) : null
-  const dict = labels.admin
+export default function AdminProductsPage() {
+  const { data: productsData } = useGetAllProducts({
+    page: 0,
+    size: 100,
+    orderBy: 'created_at',
+    ascending: false
+  })
+  const products = productsData?.data ?? []
+  const error = productsData?.error ? String(productsData.error) : null
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight text-black">{dict.products}</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-black">Quản lý sản phẩm</h1>
         <Button asChild>
-          <Link href={`${BASE_PATH}/products-management/new`}>{dict.createProduct}</Link>
+          <Link href={`${BASE_PATH}/products-management/new`}>Tạo sản phẩm mới</Link>
         </Button>
       </div>
 
@@ -35,22 +36,6 @@ export default async function AdminProductsPage() {
         variant="white"
         products={products}
         locale="vi"
-        dict={{
-          productName: dict.productName,
-          productPrice: dict.productPrice,
-          status: dict.status,
-          createdAt: dict.createdAt,
-          actions: dict.actions,
-          active: dict.active,
-          inactive: dict.inactive,
-          editProduct: dict.editProduct,
-          noProducts: dict.noProducts,
-          createProduct: dict.createProduct,
-          prev: dict.prev,
-          next: dict.next,
-          pageOf: dict.pageOf,
-          rowsPerPage: dict.rowsPerPage,
-        }}
         createProductHref={`${BASE_PATH}/products-management/new`}
       />
     </div>

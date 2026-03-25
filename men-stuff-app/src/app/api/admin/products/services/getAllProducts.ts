@@ -28,8 +28,8 @@ export async function getAllProducts(options: ProductQueryOptions = {}): Promise
     if (search?.trim()) {
       query = query.ilike('name', `%${search.trim()}%`)
     }
-    if (categoryId?.trim()) {
-      query = query.eq('category_id', categoryId.trim())
+    if (categoryId?.length) {
+      query = query.in('category_id', categoryId)
     }
     if (dateFrom) {
       query = query.gte('created_at', dateFrom)
@@ -43,7 +43,20 @@ export async function getAllProducts(options: ProductQueryOptions = {}): Promise
     if (error) throw error
 
     return {
-      data: data || [],
+      data: data?.map((p: Product) => ({
+        id: p.id,
+        category_id: p.category_id,
+        name: p.name,
+        slug: p.slug,
+        description: p.description,
+        price: p.price,
+        discount_price: p.discount_price,
+        material: p.material,
+        is_active: p.is_active,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+        origin_image: p.origin_image,
+      })) || [],
       total: count ?? 0,
       error: null,
       message: null,
