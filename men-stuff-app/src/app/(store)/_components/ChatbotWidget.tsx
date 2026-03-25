@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { BASE_PATH } from '@/lib/labels'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import { getHotProductIdsToday, trackProductClick } from '@/lib/productHot'
+import type { Product } from '@/models/product'
 import { Sparkles, Send, X } from 'lucide-react'
 
 const STORAGE_PREFS = 'men_stuffs_chatbot_prefs_v1'
@@ -107,6 +108,37 @@ function formatPrice(value: number): string {
   }).format(value)
 }
 
+function linePrice(p: Product): number {
+  const base = p.price ?? 0
+  const d = p.discount_price
+  if (d != null && d > 0 && d < base) return d
+  return base
+}
+
+function ts(created: Product['created_at']): number {
+  if (!created) return 0
+  const t = new Date(created as unknown as string).getTime()
+  return Number.isFinite(t) ? t : 0
+}
+
+/** Rẻ nhất / đắt nhất / mới nhất — theo batch sản phẩm đang tải. */
+function buildCatalogSummary(products: Product[]): string | null {
+  if (!products.length) return null
+  const priced = products.map((p) => ({ p, v: linePrice(p) })).filter((x) => x.v > 0)
+  if (!priced.length) return null
+  const byMoney = [...priced].sort((a, b) => a.v - b.v)
+  const cheapest = byMoney[0]
+  const expensive = byMoney[byMoney.length - 1]
+  const newestP = [...products].sort((a, b) => ts(b.created_at) - ts(a.created_at))[0]
+  const nv = linePrice(newestP)
+  return [
+    `Trong danh mục đang xem được:`,
+    `• Rẻ nhất: "${cheapest.p.name ?? '—'}" — ${formatPrice(cheapest.v)}`,
+    `• Đắt nhất: "${expensive.p.name ?? '—'}" — ${formatPrice(expensive.v)}`,
+    `• Mới nhất: "${newestP.name ?? '—'}" — ${formatPrice(nv)}`,
+  ].join('\n')
+}
+
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
@@ -115,7 +147,7 @@ export default function ChatbotWidget() {
   const listRef = useRef<HTMLDivElement>(null)
   const { data: productsResponse } = useGetAllProducts({
     page: 1,
-    size: 40,
+    size: 120,
     orderBy: 'created_at',
     ascending: false,
   })
@@ -123,22 +155,22 @@ export default function ChatbotWidget() {
   const prefs = useMemo(() => loadPrefs(), [messages, isOpen])
 
   const suggestions = useMemo(() => rankedSuggestions(prefs).slice(0, 4), [prefs])
+  const rawProducts = useMemo(
+    () => ((productsResponse as { data?: Product[] })?.data ?? []) as Product[],
+    [productsResponse],
+  )
+
+  const catalogSummary = useMemo(() => buildCatalogSummary(rawProducts), [rawProducts])
+
   const allProducts = useMemo((): ChatProduct[] => {
-    const products = ((productsResponse as { data?: Array<{
-      id: string
-      name?: string | null
-      price?: number | null
-      origin_image?: string | null
-      slug?: string | null
-    }> })?.data ?? [])
-    return products.map((p) => ({
+    return rawProducts.map((p) => ({
       id: p.id,
       name: p.name ?? 'Sản phẩm',
-      priceFormatted: formatPrice(p.price ?? 0),
+      priceFormatted: formatPrice(linePrice(p)),
       imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
       href: `${BASE_PATH}/product/${p.slug || p.id}`,
     }))
-  }, [productsResponse])
+  }, [rawProducts])
 
   const hotProducts = useMemo(() => {
     const hotIds = new Set(getHotProductIdsToday(6))
@@ -176,7 +208,7 @@ export default function ChatbotWidget() {
     }
   }, [messages])
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     const text = input.trim()
     if (!text) return
 
@@ -185,8 +217,85 @@ export default function ChatbotWidget() {
     setInput('')
 
     const lower = text.toLowerCase()
+
+    const asksCart = /giỏ|cart|trong giỏ|xem giỏ|giỏ hàng/i.test(lower)
+    if (asksCart) {
+      bumpTopic('cart')
+      try {
+        const res = await fetch(`${BASE_PATH}/api/guest/cart`, { cache: 'no-store', credentials: 'include' })
+        const json = (await res.json()) as {
+          data?: { cartItems?: Array<{ quantity: number; price: number; product: { name?: string } }> }
+        }
+        const items = json?.data?.cartItems ?? []
+        if (!res.ok || json?.data === undefined) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `b-${Date.now()}`,
+              role: 'bot',
+              text:
+                'Mình không đọc được giỏ lúc này — thường là bạn chưa đăng nhập (giỏ gắn với tài khoản). Đăng nhập rồi mở Giỏ hàng trên menu. Dưới đây là vài gợi ý để bạn xem trước:',
+              products: newProducts.slice(0, 3),
+            },
+          ])
+          return
+        }
+        if (items.length === 0) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `b-${Date.now()}`,
+              role: 'bot',
+              text:
+                'Giỏ của bạn đang trống — thêm vài món đi cho vui. Dưới đây là gợi ý nhanh (bấm để xem chi tiết):',
+              products: newProducts.slice(0, 4),
+            },
+          ])
+          return
+        }
+        const lines = items.map((it) => {
+          const lineTotal = it.price * it.quantity
+          return `• ${it.product?.name ?? 'Sản phẩm'} × ${it.quantity} — ${formatPrice(lineTotal)}`
+        })
+        const subtotal = items.reduce((s, it) => s + it.price * it.quantity, 0)
+        const cartText = `Trong giỏ của bạn:\n${lines.join('\n')}\nTạm tính: ${formatPrice(subtotal)}`
+        setMessages((prev) => [...prev, { id: `b-${Date.now()}`, role: 'bot', text: cartText }])
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            role: 'bot',
+            text: 'Không tải được giỏ. Mở trang Giỏ hàng trên menu hoặc thử lại sau.',
+          },
+        ])
+      }
+      return
+    }
+
+    const asksPriceFacts =
+      /đắt nhất|rẻ nhất|giá cao|giá thấp|expensive|cheap|mới nhất|mới ra|hàng mới|giá|bao nhiêu|khoảng giá/i.test(
+        lower,
+      )
+    if (asksPriceFacts) {
+      bumpTopic('products')
+      if (catalogSummary) {
+        setMessages((prev) => [...prev, { id: `b-${Date.now()}`, role: 'bot', text: catalogSummary }])
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            role: 'bot',
+            text: `Chưa có dữ liệu sản phẩm để so sánh giá lúc này. Xem danh sách tại ${BASE_PATH}/products hoặc New In ${BASE_PATH}/new-in.`,
+          },
+        ])
+      }
+      return
+    }
+
     const asksConsulting =
-      /tư vấn|tu van|goi y|gợi ý|nên mua|mua gì|phối|mix|match|hot|best/.test(lower)
+      /tư vấn|tu van|goi y|gợi ý|nên mua|mua gì|phối|mix|match|hot|best/.test(lower) && !asksPriceFacts
 
     const reply = botReply(text)
     const botMsg: Message = asksConsulting
@@ -201,7 +310,7 @@ export default function ChatbotWidget() {
         }
       : { id: `b-${Date.now()}`, role: 'bot', text: reply }
     setMessages((prev) => [...prev, botMsg])
-  }, [input, hotProducts, newProducts])
+  }, [catalogSummary, hotProducts, newProducts])
 
   const onChip = useCallback((topic: string, href: string) => {
     bumpTopic(topic)
