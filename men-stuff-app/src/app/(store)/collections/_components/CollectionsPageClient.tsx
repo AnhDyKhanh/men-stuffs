@@ -3,7 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { BASE_PATH } from '@/lib/labels'
+import { API_ROUTES } from '@/constants/apiRouter'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +13,14 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import type { Product } from '@/models/product'
+
+type CollectionFromApi = {
+  id: string
+  name: string
+  description: string | null
+  created_at: string
+  products: Product[]
+}
 
 function formatVnd(value: number): string {
   return new Intl.NumberFormat('vi-VN', {
@@ -31,12 +41,10 @@ function productHref(p: Product): string {
   return `${BASE_PATH}/product/${p.slug || p.id}`
 }
 
-/** 4 sản phẩm mới nhất — cùng sort API (created_at desc). */
 function comboNewInStack(products: Product[]): Product[] {
   return products.slice(0, 4)
 }
 
-/** Từ rẻ → cao: lấy 4 mức giá (min + quartiles + max) để combo “tổng hợp”. */
 function comboPriceSpectrum(products: Product[]): Product[] {
   const valid = products.filter((p) => effectivePrice(p) > 0)
   if (valid.length === 0) return []
@@ -56,8 +64,19 @@ function comboPriceSpectrum(products: Product[]): Product[] {
   return out
 }
 
+async function fetchPublicCollections(): Promise<CollectionFromApi[]> {
+  const res = await fetch(API_ROUTES.COLLECTIONS.PUBLIC, { cache: 'no-store' })
+  const json = (await res.json()) as { data?: CollectionFromApi[] }
+  return json.data ?? []
+}
+
 export default function CollectionsPageClient() {
-  const { data, isLoading, isError } = useGetAllProducts({
+  const { data: curated = [], isLoading: loadingCurated } = useQuery({
+    queryKey: ['@public-collections'],
+    queryFn: fetchPublicCollections,
+  })
+
+  const { data, isLoading: loadingProducts, isError } = useGetAllProducts({
     page: 1,
     size: 80,
     orderBy: 'created_at',
@@ -72,27 +91,120 @@ export default function CollectionsPageClient() {
   const totalA = useMemo(() => comboA.reduce((s, p) => s + effectivePrice(p), 0), [comboA])
   const totalB = useMemo(() => comboB.reduce((s, p) => s + effectivePrice(p), 0), [comboB])
 
+  const showFallback = curated.length === 0
+  const loading = loadingCurated || (showFallback && loadingProducts)
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
       <header className="mb-10 text-center sm:mb-14">
         <p className="mb-3 font-mono text-[11px] tracking-[0.25em] text-muted-foreground uppercase">Men Stuffs</p>
         <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
-          Our <span className="text-gradient-gold">Collections</span>
+          <span className="text-gradient-gold">Bộ sưu tập</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/60">
-          Hai bộ sưu tập ghép từ sản phẩm thật trên cửa hàng — giá theo từng món và tổng combo.
+          {curated.length > 0
+            ? 'Các bộ do team biên tập — kèm giá từng món và tổng combo.'
+            : 'Gợi ý combo từ sản phẩm trên cửa hàng. Khi team tạo bộ sưu tập trong admin, nội dung sẽ hiển thị ở đây.'}
         </p>
         <Separator className="mx-auto mt-10 max-w-md bg-white/10" />
       </header>
 
-      {isLoading && (
+      {loading && (
         <div className="space-y-8">
           <Skeleton className="h-[420px] w-full rounded-2xl border border-white/10 bg-white/5" />
           <Skeleton className="h-[420px] w-full rounded-2xl border border-white/10 bg-white/5" />
         </div>
       )}
 
-      {isError && (
+      {!loading && curated.length > 0 && (
+        <div className="space-y-12">
+          {curated.map((col) => {
+            const items = col.products ?? []
+            const total = items.reduce((s, p) => s + effectivePrice(p), 0)
+            return (
+              <Card
+                key={col.id}
+                className="overflow-hidden border-white/10 bg-card/80 shadow-[0_0_50px_-18px_rgba(247,147,26,0.15)] backdrop-blur"
+              >
+                <CardHeader className="border-b border-white/10 bg-black/25 p-6 sm:p-8">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <Badge className="mb-2 border border-[#F7931A]/40 bg-[#F7931A]/15 font-mono text-[10px] tracking-wider text-rose-100">
+                        Biên tập
+                      </Badge>
+                      <CardTitle className="text-2xl text-white sm:text-3xl">{col.name}</CardTitle>
+                      {col.description && (
+                        <p className="mt-2 max-w-xl text-sm text-white/60">{col.description}</p>
+                      )}
+                    </div>
+                    {items.length > 0 && (
+                      <div className="text-left sm:text-right">
+                        <p className="font-mono text-[11px] tracking-widest text-white/45 uppercase">Tổng combo</p>
+                        <p className="text-2xl font-semibold text-gradient-gold">{formatVnd(total)}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 sm:p-8">
+                  {items.length === 0 ? (
+                    <p className="text-sm text-white/50">Chưa có sản phẩm trong bộ này.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      {items.map((p, i) => {
+                        const price = effectivePrice(p)
+                        const tierLabels = ['#1', '#2', '#3', '#4']
+                        return (
+                          <div
+                            key={p.id}
+                            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/35 p-4 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]"
+                          >
+                            <span className="absolute right-3 top-3 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-white/80">
+                              {tierLabels[i] ?? `#${i + 1}`}
+                            </span>
+                            <div className="relative mx-auto mb-3 aspect-square w-full max-w-[200px] overflow-hidden rounded-xl">
+                              <Image
+                                src={p.origin_image || 'https://placehold.co/400x400/0f1115/f7931a?text=MS'}
+                                alt=""
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 640px) 100vw, 25vw"
+                                unoptimized
+                              />
+                            </div>
+                            <p className="line-clamp-2 min-h-[2.5rem] text-sm font-medium text-white">{p.name}</p>
+                            <p className="mt-2 font-mono text-lg font-semibold text-gradient-gold">{formatVnd(price)}</p>
+                            <Button
+                              asChild
+                              variant="outline"
+                              size="sm"
+                              className="mt-3 w-full border-white/15 bg-white/5 text-white hover:bg-white/10"
+                            >
+                              <Link href={productHref(p)}>Chi tiết</Link>
+                            </Button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-6 py-4">
+                  <span className="font-mono text-[10px] tracking-widest text-white/45 uppercase">Bộ sưu tập</span>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="secondary"
+                    className="rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15"
+                  >
+                    <Link href={`${BASE_PATH}/products`}>Xem tất cả sản phẩm</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+
+      {!loading && showFallback && isError && (
         <p className="rounded-xl border border-red-500/40 bg-red-950/30 p-4 text-center text-sm text-red-200">
           Không tải được sản phẩm. Vui lòng thử lại sau hoặc vào{' '}
           <Link href={`${BASE_PATH}/products`} className="text-primary underline-offset-4 hover:underline">
@@ -102,28 +214,30 @@ export default function CollectionsPageClient() {
         </p>
       )}
 
-      {!isLoading && !isError && products.length === 0 && (
+      {!loading && showFallback && !isError && products.length === 0 && (
         <p className="py-16 text-center text-white/60">
-          Chưa có sản phẩm để lên bộ sưu tập.{' '}
+          Chưa có sản phẩm để hiển thị bộ sưu tập.{' '}
           <Link href={`${BASE_PATH}/products`} className="text-primary underline-offset-4 hover:underline">
             Quay lại shop
           </Link>
         </p>
       )}
 
-      {!isLoading && !isError && products.length > 0 && (
+      {!loading && showFallback && !isError && products.length > 0 && (
         <div className="space-y-12">
-          {/* Combo 1 — New In stack */}
+          <p className="font-mono text-center text-[11px] tracking-widest text-white/45 uppercase">
+            Gợi ý tự động (chưa có bộ do admin tạo)
+          </p>
           <Card className="overflow-hidden border-white/10 bg-card/80 shadow-[0_0_50px_-18px_rgba(247,147,26,0.15)] backdrop-blur">
             <CardHeader className="border-b border-white/10 bg-black/25 p-6 sm:p-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <Badge className="mb-2 border border-[#F7931A]/40 bg-[#F7931A]/15 font-mono text-[10px] tracking-wider text-rose-100">
-                    Combo từ cửa hàng
+                    Combo tự động
                   </Badge>
                   <CardTitle className="text-2xl text-white sm:text-3xl">New In — Stack 4 món</CardTitle>
                   <p className="mt-2 max-w-xl text-sm text-white/60">
-                    Bốn sản phẩm mới nhất (theo thời gian tạo). Phối full set: nhẫn + đồ đi kèm trong cùng tông.
+                    Bốn sản phẩm mới nhất (theo thời gian tạo). Phối full set cùng tông.
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
@@ -183,7 +297,7 @@ export default function CollectionsPageClient() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-6 py-4">
-              <span className="font-mono text-[10px] tracking-widest text-white/45 uppercase">Gợi ý: New In</span>
+              <span className="font-mono text-[10px] tracking-widest text-white/45 uppercase">New In</span>
               <Button
                 asChild
                 size="sm"
@@ -194,7 +308,6 @@ export default function CollectionsPageClient() {
             </CardFooter>
           </Card>
 
-          {/* Combo 2 — Price spectrum */}
           {comboB.length >= 2 && (
             <Card className="overflow-hidden border-white/10 bg-card/80 shadow-[0_0_50px_-18px_rgba(247,147,26,0.15)] backdrop-blur">
               <CardHeader className="border-b border-white/10 bg-black/25 p-6 sm:p-8">
@@ -205,7 +318,7 @@ export default function CollectionsPageClient() {
                     </Badge>
                     <CardTitle className="text-2xl text-white sm:text-3xl">Từ phổ thông đến cao cấp</CardTitle>
                     <p className="mt-2 max-w-xl text-sm text-white/60">
-                      Chọn 4 mức giá (min → cao) trên danh sách hiện có — để so sánh và mix phong cách trong một nhìn.
+                      Bốn mức giá (thấp → cao) trên danh sách hiện có — để so sánh và mix phong cách.
                     </p>
                   </div>
                   <div className="text-left sm:text-right">
@@ -218,14 +331,14 @@ export default function CollectionsPageClient() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {comboB.map((p, i) => {
                     const price = effectivePrice(p)
-                    const labels = ['Mức thấp', 'Tầm trung', 'Cao cấp', 'Top giá']
+                    const tierLabels = ['Mức thấp', 'Tầm trung', 'Cao cấp', 'Top giá']
                     return (
                       <div
                         key={p.id}
                         className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/35 p-4 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]"
                       >
                         <span className="absolute right-3 top-3 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-white/80">
-                          {labels[i] ?? `#${i + 1}`}
+                          {tierLabels[i] ?? `#${i + 1}`}
                         </span>
                         <div className="relative mx-auto mb-3 aspect-square w-full max-w-[200px] overflow-hidden rounded-xl">
                           <Image
@@ -239,7 +352,12 @@ export default function CollectionsPageClient() {
                         </div>
                         <p className="line-clamp-2 min-h-[2.5rem] text-sm font-medium text-white">{p.name}</p>
                         <p className="mt-2 font-mono text-lg font-semibold text-gradient-gold">{formatVnd(price)}</p>
-                        <Button asChild variant="outline" size="sm" className="mt-3 w-full border-white/15 bg-white/5 text-white hover:bg-white/10">
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="mt-3 w-full border-white/15 bg-white/5 text-white hover:bg-white/10"
+                        >
                           <Link href={productHref(p)}>Chi tiết</Link>
                         </Button>
                       </div>
