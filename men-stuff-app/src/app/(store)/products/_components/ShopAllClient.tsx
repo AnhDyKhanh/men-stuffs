@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { BASE_PATH } from '@/lib/labels'
-import ProductGrid from '@/components/store/ProductGrid'
-import { useGetAllProducts } from '@/app/_hooks/getAllProductsMutation'
-import { useGetAllCategories } from '@/app/_hooks/useGetAllCategories'
-import type { Product } from '@/app/_models/product'
-import type { PlaceholderProduct } from '@/app/_constants/placeholderData'
+import ProductGrid from '@/app/(store)/_components/ProductGrid'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { useGetAllCategories } from '@/hooks/useGetAllCategories'
+import type { Product } from '@/models/product'
+import type { PlaceholderProduct } from '@/constants/placeholderData'
+import { getHotProductIdsToday, trackProductClick } from '@/lib/productHot'
 
 type CategoryItem = { id: string; name?: string }
 
@@ -45,6 +46,7 @@ export default function ShopAllClient() {
   const [categoryId, setCategoryId] = useState('')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [showHotOnly, setShowHotOnly] = useState(false)
 
   const { data: categoriesData } = useGetAllCategories()
   const categories: CategoryItem[] = Array.isArray(categoriesData)
@@ -69,6 +71,16 @@ export default function ShopAllClient() {
   const products = mapProductsToPlaceholder((response as { data?: Product[] })?.data ?? null, BASE_PATH)
   const total = (response as { total?: number })?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const hotProductIdsToday = useMemo(() => new Set(getHotProductIdsToday(8)), [])
+  const productsWithHotLabel = useMemo(
+    () =>
+      products.map((product) => ({
+        ...product,
+        label: hotProductIdsToday.has(product.id) ? ('hot' as const) : product.label,
+      })),
+    [products, hotProductIdsToday],
+  )
+  const visibleProducts = showHotOnly ? productsWithHotLabel.filter((p) => p.label === 'hot') : productsWithHotLabel
 
   const applyFilters = useCallback(() => {
     setSearch(searchInput.trim())
@@ -82,39 +94,48 @@ export default function ShopAllClient() {
     setCategoryId('')
     setDateFrom('')
     setDateTo('')
+    setShowHotOnly(false)
     setPage(1)
   }, [])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:py-12">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">Shop All</h1>
-        <p className="text-neutral-400">Khám phá toàn bộ sản phẩm — tìm kiếm, lọc theo danh mục và thời gian.</p>
+        <h1 className="text-4xl font-semibold tracking-tight text-white md:text-6xl">
+          Shop <span className="text-gradient-gold">All</span>
+        </h1>
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/60">
+          Khám phá toàn bộ sản phẩm — tìm kiếm, lọc theo danh mục và thời gian.
+        </p>
       </div>
 
       {/* Filters */}
-      <div className="mb-8 rounded-xl border border-neutral-800 bg-neutral-900/50 p-4">
+      <div className="mb-10 rounded-2xl border border-white/10 bg-black/30 p-5 backdrop-blur">
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-5">
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-300">Tìm kiếm</label>
+            <label className="mb-2 block font-mono text-[11px] font-medium tracking-widest text-white/55 uppercase">
+              Tìm kiếm
+            </label>
             <input
               type="search"
               placeholder="Tên sản phẩm..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white placeholder-neutral-500 focus:ring-2 focus:ring-neutral-500 focus:outline-none"
+              className="h-12 w-full rounded-xl border border-white/10 bg-black/35 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931A]"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-300">Danh mục</label>
+            <label className="mb-2 block font-mono text-[11px] font-medium tracking-widest text-white/55 uppercase">
+              Danh mục
+            </label>
             <select
               value={categoryId}
               onChange={(e) => {
                 setCategoryId(e.target.value)
                 setPage(1)
               }}
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:ring-2 focus:ring-neutral-500 focus:outline-none"
+              className="h-12 w-full rounded-xl border border-white/10 bg-black/35 px-4 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931A]"
             >
               <option value="">Tất cả</option>
               {categories.map((c) => (
@@ -125,7 +146,9 @@ export default function ShopAllClient() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-300">Từ ngày</label>
+            <label className="mb-2 block font-mono text-[11px] font-medium tracking-widest text-white/55 uppercase">
+              Từ ngày
+            </label>
             <input
               type="date"
               value={dateFrom}
@@ -133,11 +156,13 @@ export default function ShopAllClient() {
                 setDateFrom(e.target.value)
                 setPage(1)
               }}
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:ring-2 focus:ring-neutral-500 focus:outline-none"
+              className="h-12 w-full rounded-xl border border-white/10 bg-black/35 px-4 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931A]"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-300">Đến ngày</label>
+            <label className="mb-2 block font-mono text-[11px] font-medium tracking-widest text-white/55 uppercase">
+              Đến ngày
+            </label>
             <input
               type="date"
               value={dateTo}
@@ -145,40 +170,61 @@ export default function ShopAllClient() {
                 setDateTo(e.target.value)
                 setPage(1)
               }}
-              className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:ring-2 focus:ring-neutral-500 focus:outline-none"
+              className="h-12 w-full rounded-xl border border-white/10 bg-black/35 px-4 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F7931A]"
             />
           </div>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={applyFilters}
-              className="rounded-lg bg-white px-4 py-2 font-medium text-black transition hover:bg-neutral-200"
+              className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] px-4 text-sm font-semibold tracking-wider text-white shadow-[0_0_20px_-10px_rgba(234,88,12,0.55)] transition hover:shadow-[0_0_30px_-10px_rgba(247,147,26,0.65)]"
             >
               Áp dụng
             </button>
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-lg border border-neutral-600 px-4 py-2 text-neutral-300 transition hover:bg-neutral-800"
+              className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-white/15 bg-white/5 px-4 text-sm font-semibold text-white/80 transition hover:bg-white/8 hover:text-white"
             >
               Xóa lọc
             </button>
           </div>
         </div>
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowHotOnly((prev) => !prev)}
+            className={`inline-flex h-10 items-center justify-center rounded-full border px-4 text-xs font-semibold tracking-wider uppercase transition ${showHotOnly
+              ? 'border-rose-400/60 bg-rose-500/20 text-rose-100'
+              : 'border-white/15 bg-white/5 text-white/70 hover:bg-white/8 hover:text-white'
+              }`}
+          >
+            HOT hôm nay
+          </button>
+          <span className="font-mono text-[11px] tracking-widest text-white/45 uppercase">
+            {hotProductIdsToday.size} sản phẩm đang hot
+          </span>
+        </div>
       </div>
 
       {isError && <p className="mb-4 text-sm text-red-400">Không thể tải sản phẩm. Vui lòng thử lại.</p>}
 
-      {isLoading && products.length === 0 ? (
+      {isLoading && visibleProducts.length === 0 ? (
         <p className="py-12 text-neutral-400">Đang tải...</p>
-      ) : products.length === 0 ? (
+      ) : visibleProducts.length === 0 ? (
         <p className="py-12 text-neutral-400">Không có sản phẩm nào phù hợp.</p>
       ) : (
         <>
-          <p className="mb-4 text-sm text-neutral-500">
+          <p className="mb-6 font-mono text-xs tracking-widest text-white/45 uppercase">
             Hiển thị {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} / {total} sản phẩm
           </p>
-          <ProductGrid products={products} buyNowLabel="Thêm vào giỏ" columns={4} />
+          <ProductGrid
+            products={visibleProducts}
+            buyNowLabel="Thêm vào giỏ"
+            columns={4}
+            variant="dark"
+            onProductClick={trackProductClick}
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -187,18 +233,18 @@ export default function ShopAllClient() {
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-lg border border-neutral-600 px-4 py-2 text-neutral-300 transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/8 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Trước
               </button>
-              <span className="px-4 py-2 text-neutral-400">
+              <span className="px-4 py-2 font-mono text-xs tracking-widest text-white/55 uppercase">
                 Trang {page} / {totalPages}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-lg border border-neutral-600 px-4 py-2 text-neutral-300 transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/8 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Sau
               </button>

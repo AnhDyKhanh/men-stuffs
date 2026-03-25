@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isStaffByAccountId } from '@/lib/auth-server'
+import { adminRoutePrefixes } from '@/constants/webRoute'
+import { protectedUserRoutes } from '@/constants/webRoute'
 
 const COOKIE_ACCOUNT_ID = 'account_id'
-const protectedUserRoutes = ['/checkout', '/account']
 
 function getUserRole(request: NextRequest): 'guest' | 'user' | 'admin' {
   const role = request.cookies.get('role')?.value
@@ -19,7 +20,6 @@ function isUserRoute(pathname: string): boolean {
   return protectedUserRoutes.some((route) => pathname.includes(route))
 }
 
-const adminRoutePrefixes = ['/admin', '/dashboard', '/products-management', '/categories-management']
 
 function isAdminRoute(pathname: string): boolean {
   return adminRoutePrefixes.some((prefix) => pathname.startsWith(prefix))

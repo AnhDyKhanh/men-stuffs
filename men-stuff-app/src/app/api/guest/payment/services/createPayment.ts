@@ -1,6 +1,7 @@
 import { getSupabase } from '@/lib/supabase'
 import { getCurrentCustomerId } from '../../services/getCustomerAccount'
-import type { PaymentMethod, PaymentStatus } from '@/app/_models/order'
+import type { PaymentMethod, PaymentStatus } from '@/models/order'
+import { CartStatus } from '@/enum/cart.enum'
 
 export type CreateOrderItemDTO = {
   product_id: string
@@ -35,10 +36,18 @@ export async function createOrder(body: CreateOrderDTO) {
     return { data: null, error: 'Danh sách sản phẩm không được rỗng', status: 400 }
   }
 
+  if (!cart_id) {
+    return { data: null, error: 'Cart ID không được rỗng', status: 400 }
+  }
+
   const supabase = getSupabase()
 
   try {
     const customerId = await getCurrentCustomerId().catch(() => null)
+
+    if (!customerId) {
+      return { data: null, error: 'Unauthorized', status: 401 }
+    }
 
     // Bước 1: Tạo Order trước
     const { data: orderData, error: orderError } = await supabase
@@ -76,6 +85,19 @@ export async function createOrder(body: CreateOrderDTO) {
     if (itemsError) {
       await supabase.from('orders').delete().eq('id', orderId)
       throw itemsError
+    }
+
+    // Bước 5: Set status của cart tương ứng là inactive
+    const { error: cartError } = await supabase
+      .from('cart')
+      .update({ status: CartStatus.INACTIVE })
+      .eq('id', cart_id)
+
+    if (cartError) {
+      // Rollback order và order_items
+      await supabase.from('order_item').delete().eq('order_id', orderId)
+      await supabase.from('orders').delete().eq('id', orderId)
+      throw cartError
     }
 
     return {

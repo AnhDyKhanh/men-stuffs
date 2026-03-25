@@ -1,11 +1,11 @@
 import { cookies } from 'next/headers'
 import { labels, BASE_PATH } from '@/lib/labels'
 import { getUserRole } from '@/lib/auth'
-import { getMainNavLinks, getFooterColumns } from '@/app/_constants/placeholderData'
-import AnnouncementBar from '@/components/store/AnnouncementBar'
-import Header from '@/components/store/Header'
-import Footer from '@/components/store/Footer'
-import ChatbotWidget from '@/components/store/ChatbotWidget'
+import { getMainNavLinks, getFooterColumns } from '@/constants/placeholderData'
+import AnnouncementBar from '@/app/(store)/_components/AnnouncementBar'
+import Header from '@/app/(store)/_components/Header'
+import Footer from '@/app/(store)/_components/Footer'
+import ChatbotWidget from '@/app/(store)/_components/ChatbotWidget'
 
 const SITE_NAME = 'Men Stuffs'
 const COPYRIGHT_TEXT = '© 2024 Men Stuffs. All rights reserved.'
@@ -21,7 +21,10 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const accountLabel = userRole === 'guest' ? labels.common.login : labels.common.account
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="bg-void-texture relative flex min-h-screen flex-col">
+      <div className="pointer-events-none absolute inset-0 opacity-60">
+        <div className="bg-grid-pattern absolute inset-0" />
+      </div>
       <AnnouncementBar storeLink={`${BASE_PATH}/pages/contact`} storeLabel="Hệ thống cửa hàng" />
       <Header
         logoLabel={SITE_NAME}
@@ -34,7 +37,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         adminHref={userRole === 'admin' ? `${BASE_PATH}/dashboard` : undefined}
       />
 
-      <main id="page-content" className="flex-1">
+      <main id="page-content" className="relative z-10 flex-1">
         {children}
       </main>
 

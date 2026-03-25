@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import type { Product } from '@/app/_types/product'
-import DeleteProductButton from '@/app/_components/admin/DeleteProductButton'
+import type { Product } from '@/types/product'
+import DeleteProductButton from '@/app/(admin)/dashboard/_components/DeleteProductButton'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'

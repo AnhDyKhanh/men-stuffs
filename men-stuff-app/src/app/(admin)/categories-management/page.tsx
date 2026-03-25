@@ -1,6 +1,6 @@
 import CategoriesTable from '@/app/(admin)/dashboard/_components/CategoriesTable'
-import { getAllCategoryMutation } from '@/app/_hooks/getAllCategoryMutation'
-import type { Category } from '@/app/_types/category'
+import { getAllCategoryMutation } from '@/hooks/getAllCategoryMutation'
+import type { Category } from '@/types/category'
 import { labels, BASE_PATH } from '@/lib/labels'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'

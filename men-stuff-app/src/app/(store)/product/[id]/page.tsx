@@ -1,90 +1,136 @@
-import { getProductById } from '@/app/_hooks/getProductById'
+'use client'
+
+import { useGetProductById } from '@/hooks/getProductById'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
+import { Skeleton } from '@/components/ui/skeleton'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
-import ProductForm from './_component/ProductForm' // Import component vừa tạo
+import { notFound, useParams } from 'next/navigation'
+import ProductForm from './_component/ProductForm'
 import Rating from './_component/Rating'
 
-type PageProps = {
-  params: Promise<{ id: string }>
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(price)
 }
 
-export default async function ProductDetailPage({ params }: PageProps) {
-  const { id } = await params
-  const product = await getProductById(id)
+export default function ProductDetailPage() {
+  const { id } = useParams()
+  const { data: product, isLoading, isError } = useGetProductById(id as string)
 
-  if (!product) notFound()
+  // 1. Loading State với Skeleton cực mượt
+  if (isLoading) return <ProductDetailSkeleton />
+
+  // 2. Error hoặc không có sản phẩm
+  if (isError || !product) notFound()
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        {/* Breadcrumb nhỏ */}
-        <nav className="mb-8 text-[10px] tracking-[0.2em] text-gray-500 uppercase">
-          Home / Products / {product.name}
-        </nav>
+    <div className="min-h-screen text-white font-sans">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+
+        {/* Breadcrumb dùng Shadcn UI */}
+        <Breadcrumb className="mb-8 font-mono text-[11px] tracking-widest uppercase">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/" className="text-white/35 hover:text-white transition-colors">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/20" />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/products" className="text-white/35 hover:text-white transition-colors">Products</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="text-white/20" />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-white">{product.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
         <div className="grid gap-12 md:grid-cols-12">
-          {/* Cột trái: Ảnh sản phẩm (Chiếm 7/12 cột) */}
+          {/* CỘT TRÁI: GALLERY */}
           <div className="flex gap-4 md:col-span-7">
-            {/* Danh sách ảnh nhỏ bên cạnh (Thumbnails) */}
-            <div className="hidden w-20 flex-col gap-2 md:flex">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square cursor-pointer border border-zinc-800 bg-zinc-900">
-                  <Image
-                    src={product.thumbnail}
-                    alt="thumb"
-                    width={80}
-                    height={80}
-                    className="h-full object-cover opacity-50 hover:opacity-100"
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Ảnh chính */}
-            <div className="group flex flex-1 cursor-zoom-in items-center justify-center overflow-hidden bg-zinc-900">
+            {/* Ảnh chính - Dùng token bg-void-texture để đồng bộ */}
+            <div className="group relative flex flex-1 cursor-zoom-in items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-card/25 shadow-[0_0_60px_-18px_rgba(247,147,26,0.12)]">
               <Image
                 src={product.thumbnail}
                 alt={product.name}
                 width={800}
                 height={800}
-                className="h-auto w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-125"
+                priority
+                className="h-auto w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
               />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
             </div>
           </div>
 
-          {/* Cột phải: Thông tin */}
+          {/* CỘT PHẢI: INFO */}
           <div className="sticky top-24 flex h-fit flex-col pt-4 md:col-span-5">
-            <p className="mb-2 text-[10px] tracking-widest text-gray-500 uppercase">Men Stuff</p>
-            <h1 className="mb-2 text-3xl font-medium tracking-tight">{product.name}</h1>
-            {/* Thêm phần đánh giá ở đây */}
+            <span className="mb-2 font-mono text-[11px] tracking-widest text-white/45 uppercase">Men Stuffs</span>
+            <h1 className="mb-3 text-3xl font-semibold tracking-tight sm:text-4xl text-zinc-100">{product.name}</h1>
+
             <Rating score={5} reviews={36} />
 
-            <p className="mb-8 text-xl font-light">{product.price.toLocaleString('vi-VN')} VND</p>
+            <p className="mt-4 mb-8 font-mono text-2xl font-semibold text-gradient-gold">
+              {formatPrice(product.price)}
+            </p>
 
             <ProductForm product={product} />
 
-            <div className="mt-10 border-t border-zinc-800 pt-10">
-              <p className="text-sm leading-relaxed text-zinc-400 italic">
-                Different isn&apos;t abnormal — it&apos;s powerful. Men Stuff stands with you. Own it.
-              </p>
+            {/* <Separator className="mt-10 mb-10 bg-white/10" /> */}
+
+            <div className="mt-20 border-t border-white/10 pt-14">
+              <div className="max-w-3xl">
+                <h2 className="mb-8 w-fit border-b border-[#F7931A]/50 pb-2 font-mono text-sm tracking-widest text-white uppercase">
+                  Description
+                </h2>
+                <div className="space-y-6 leading-loose text-zinc-400 text-sm">
+                  <p>{product.description}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 text-xs font-mono uppercase tracking-wider">
+                    <div className="p-4 rounded-lg border border-white/5 bg-white/5">
+                      <span className="block text-white/30 mb-1">Material</span>
+                      <span className="text-white/80">925 Sterling Silver</span>
+                    </div>
+                    <div className="p-4 rounded-lg border border-white/5 bg-white/5">
+                      <span className="block text-white/30 mb-1">Craftsmanship</span>
+                      <span className="text-white/80">Hand-finished Artisans</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <p className="text-sm leading-relaxed text-white/55 italic">
+              Different isn&apos;t abnormal — it&apos;s powerful. Men Stuff stands with you. Own it.
+            </p>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
 
-        {/* Phần mô tả chi tiết dưới cùng */}
-        <div className="mt-20 border-t border-zinc-800 pt-16">
-          <div className="max-w-3xl">
-            <h2 className="mb-8 w-fit border-b border-white pb-2 text-xl tracking-widest uppercase">Description</h2>
-            <div className="space-y-6 leading-loose text-zinc-400">
-              <p>{product.description}</p>
-              <p>
-                <strong>Material:</strong> 925 Sterling Silver, Black Onyx Gemstone.
-              </p>
-              <p>
-                <strong>Craftsmanship:</strong> Hand-finished by master artisans with intricate floral carvings.
-              </p>
-            </div>
-          </div>
+/** Component Loading Skeleton để màn hình không bị giật lag khi fetch */
+function ProductDetailSkeleton() {
+  return (
+    <div className="min-h-screen bg-void-texture p-10">
+      <div className="mx-auto max-w-7xl grid grid-cols-12 gap-12">
+        <div className="col-span-7 flex gap-4">
+          <div className="w-20 space-y-2"><Skeleton className="h-20 w-full rounded-xl" /><Skeleton className="h-20 w-full rounded-xl" /></div>
+          <Skeleton className="h-[500px] flex-1 rounded-2xl" />
+        </div>
+        <div className="col-span-5 space-y-6">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-24 w-full" />
         </div>
       </div>
     </div>

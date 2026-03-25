@@ -1,26 +1,36 @@
+import { Data } from '@/types/response.type'
 import { getSupabase } from '@/lib/supabase'
 
 type GetProductByIdParams = {
   id: string
 }
 
-export async function getProductById(params: GetProductByIdParams) {
+export type GetProductByIdData = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  price: number
+  thumbnail: string
+  status: string
+  createdAt: string
+}
+
+export type GetProductByIdResponse = Data<GetProductByIdData>
+
+export async function getProductById(params: GetProductByIdParams): Promise<GetProductByIdResponse> {
   try {
     const { id } = params
     const supabase = getSupabase()
 
-    //làm sao để định nghĩa type cho data?
     const { data } = await supabase.from('product').select('*').eq('id', id).maybeSingle()
 
-    if (!data) return undefined
-
-    // // Lấy ảnh primary từ product_image (product_id trùng, is_primary = true)
-    // const { data: primaryImage } = await supabase
-    //   .from('product_image')
-    //   .select('image_url')
-    //   .eq('product_id', id)
-    //   .eq('is_primary', true)
-    //   .maybeSingle()
+    if (!data) return {
+      data: null,
+      error: 'Product not found',
+      message: 'Product not found',
+      status: 404,
+    }
 
     const product = {
       id: data.id,
@@ -30,12 +40,23 @@ export async function getProductById(params: GetProductByIdParams) {
       price: Number(data.price),
       thumbnail: data.origin_image ?? '',
       status: data.status ?? 'active',
-      createdAt: data.created_at ?? data.createdAt ?? new Date().toISOString(),
+      createdAt: data.created_at ?? new Date().toISOString(),
     }
-    return product
+
+    return {
+      data: product,
+      error: null,
+      message: 'Product fetched successfully',
+      status: 200,
+    }
+
   } catch (err) {
-    console.error('[API GET /api/admin/products/:id] exception:', err)
-    return { error: err instanceof Error ? err.message : 'Failed to fetch product' }
+    return {
+      data: null,
+      error: err instanceof Error ? err.message : 'Failed to fetch product',
+      message: 'Failed to fetch product',
+      status: 500,
+    }
   }
 }
 
