@@ -145,9 +145,9 @@ export default function CollectionsManagementClient() {
         </Card>
       )}
 
-      <Card>
+      <Card className="border-gray-200 bg-white text-gray-900 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">{dict.createCollection}</CardTitle>
+          <CardTitle className="text-lg text-gray-900">{dict.createCollection}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <div className="min-w-[200px] flex-1 space-y-1">
@@ -172,16 +172,16 @@ export default function CollectionsManagementClient() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-gray-200 bg-white text-gray-900 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Danh sách</CardTitle>
+          <CardTitle className="text-lg text-gray-900">Danh sách</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {isLoading && <p className="text-sm text-gray-500">Đang tải…</p>}
           {!isLoading && collections.length === 0 && (
             <p className="text-sm text-gray-600">Chưa có bộ sưu tập nào. Tạo ở trên hoặc kiểm tra đã chạy SQL chưa.</p>
           )}
-          <ul className="divide-y rounded-lg border">
+          <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">
             {collections.map((c) => (
               <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
                 <div>
