@@ -4,6 +4,7 @@ import { labels, BASE_PATH } from '@/lib/labels'
 import { getAccountIdFromCookie, getUserRole } from '@/lib/auth'
 import { isStaffByAccountId } from '@/lib/auth-server'
 import LogoutButton from '@/components/shared/LogoutButton'
+import AdminThemeApplier from './AdminThemeApplier'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
@@ -13,7 +14,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (userRole !== 'admin' && !staffOk) {
     return (
-      <div className="container mx-auto px-4 py-12 text-center">
+      <div className="admin-theme container mx-auto px-4 py-12 text-center">
+        <AdminThemeApplier />
         <h1 className="mb-4 text-2xl font-bold">Truy cập bị từ chối</h1>
         <p className="mb-4 text-gray-600">
           Bạn cần đăng nhập với tài khoản nhân sự (admin / manager / staff) trong hệ thống.
@@ -26,8 +28,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <aside className="min-h-screen w-64 border-r bg-white">
+    <div className="admin-theme admin flex min-h-screen bg-background">
+      <AdminThemeApplier />
+      <aside className="min-h-screen w-64 border-r border-border bg-card">
         <div className="p-6">
           <Link href={`${BASE_PATH}/dashboard`} className="text-2xl font-bold text-blue-600">
             Khu vực Admin
@@ -36,37 +39,37 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <nav className="space-y-2 px-4">
           <Link
             href={`${BASE_PATH}/dashboard`}
-            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+            className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.dashboard}
           </Link>
           <Link
             href={`${BASE_PATH}/products-management`}
-            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+            className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.products}
           </Link>
           <Link
             href={`${BASE_PATH}/categories-management`}
-            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+            className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.categories}
           </Link>
           <Link
             href={`${BASE_PATH}/collections-management`}
-            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+            className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.collectionsManagement}
           </Link>
           <Link
             href={`${BASE_PATH}/order`}
-            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+            className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.orders}
           </Link>
           <Link
             href={`${BASE_PATH}/task-management`}
-            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+            className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.staffTasks}
           </Link>
@@ -77,7 +80,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="border-b bg-white px-6 py-4">
+        <header className="border-b bg-card px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold text-gray-800">Bảng điều khiển Admin</h1>
             <div className="flex items-center gap-4">
