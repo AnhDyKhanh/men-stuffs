@@ -5,6 +5,7 @@ export const adminRoutePrefixes = [
   '/categories-management',
   '/collections-management',
   '/order',
+  '/task-management',
 ] as const
 
 export const protectedUserRoutes = [

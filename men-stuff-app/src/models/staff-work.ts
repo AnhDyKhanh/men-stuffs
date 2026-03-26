@@ -17,7 +17,8 @@ export type StaffWork = {
   title: string | null
   description: string | null
   status: StaffWorkStatus | null
-  taskType: TaskType | null
+  /** Cột DB: task_type */
+  task_type: TaskType | null
   created_at: Date | null
 }
 
@@ -25,4 +26,9 @@ export type StaffWorkWithRelations = StaffWork & {
   assignedToStaff?: Staff | null
   createdByStaff?: Staff | null
   relatedOrder?: Order | null
+}
+
+/** Dòng list từ GET /api/admin/staff-work (có join tên người được giao). */
+export type StaffWorkAdminRow = StaffWork & {
+  assignee_full_name?: string | null
 }
