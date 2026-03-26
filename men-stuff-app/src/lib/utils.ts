@@ -11,6 +11,8 @@ export function getBaseUrl() {
 }
 
 export function getFetchUrl(apiRoute: string) {
+  // In browser, always use relative URL so requests follow current host/port.
+  if (typeof window !== 'undefined') return apiRoute
   return `${getBaseUrl()}${apiRoute}`
 }
 

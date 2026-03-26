@@ -12,7 +12,7 @@ export interface PlaceholderProduct {
   href: string
   rating?: number
   reviewCount?: number
-  label?: 'new' | 'sale'
+  label?: 'new' | 'sale' | 'hot'
 }
 
 export interface HeroSlide {
@@ -62,7 +62,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
   const products: Omit<PlaceholderProduct, 'priceFormatted' | 'href'>[] = [
     {
       id: '1',
-      name: 'Silver Ring Classic',
+      name: 'Nhẫn bạc cổ điển',
       price: 2900000,
       imageUrl: '',
       rating: 5,
@@ -71,7 +71,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     },
     {
       id: '2',
-      name: 'Lotus Serene Spoon',
+      name: 'Muỗng trang trí hoa sen',
       price: 2950000,
       imageUrl: '',
       rating: 0,
@@ -80,7 +80,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     },
     {
       id: '3',
-      name: 'Sunpact Black Silver',
+      name: 'Nhẫn bạc đen Sunpact',
       price: 1350000,
       imageUrl: '',
       rating: 5,
@@ -89,7 +89,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     },
     {
       id: '4',
-      name: 'Tide Helios Black Silver',
+      name: 'Nhẫn Tide Helios đen bạc',
       price: 1150000,
       imageUrl: '',
       rating: 5,
@@ -98,7 +98,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     },
     {
       id: '5',
-      name: 'Suncrest Black Silver',
+      name: 'Nhẫn Suncrest đen bạc',
       price: 885000,
       imageUrl: '',
       rating: 5,
@@ -107,7 +107,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     },
     {
       id: '6',
-      name: 'Ripple Helios Black Silver',
+      name: 'Nhẫn Ripple Helios đen bạc',
       price: 845000,
       imageUrl: '',
       rating: 5,
@@ -116,7 +116,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     },
     {
       id: '7',
-      name: 'Helios Faliraki Sunglasses',
+      name: 'Kính mát Helios Faliraki',
       price: 1750000,
       imageUrl: '',
       rating: 5,
@@ -124,7 +124,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     },
     {
       id: '8',
-      name: 'Helios Card Set',
+      name: 'Bộ bài Helios',
       price: 555000,
       imageUrl: '',
       rating: 5,
@@ -136,7 +136,7 @@ export function getPlaceholderProducts(locale: string, basePath: string): Placeh
     ...p,
     priceFormatted: formatPrice(p.price),
     href: `${basePath}/product/${p.id}`,
-    imageUrl: p.imageUrl || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
+    imageUrl: p.imageUrl || 'https://placehold.co/400x400/f5f5f5/999?text=S%E1%BA%A3n+ph%E1%BA%A9m',
   }))
 }
 
@@ -154,19 +154,18 @@ export interface FeaturedCategory {
   href: string
 }
 
-const FEATURED_CATEGORIES_META: { id: string; titleVi: string; titleEn: string; imageUrl: string }[] = [
-  { id: 'rings', titleVi: 'Nhẫn', titleEn: 'Rings', imageUrl: '/categories/rings.png' },
-  { id: 'bracelets', titleVi: 'Vòng tay', titleEn: 'Bracelets', imageUrl: '/categories/bracelets.png' },
-  { id: 'pendants', titleVi: 'Mặt dây', titleEn: 'Pendants', imageUrl: '/categories/pendants.png' },
-  { id: 'accessories', titleVi: 'Phụ kiện', titleEn: 'Accessories', imageUrl: '/categories/accessories.png' },
+const FEATURED_CATEGORIES_META: { id: string; title: string; imageUrl: string }[] = [
+  { id: 'rings', title: 'Nhẫn', imageUrl: '/categories/rings.png' },
+  { id: 'bracelets', title: 'Vòng tay', imageUrl: '/categories/bracelets.png' },
+  { id: 'pendants', title: 'Mặt dây', imageUrl: '/categories/pendants.png' },
+  { id: 'accessories', title: 'Phụ kiện', imageUrl: '/categories/accessories.png' },
 ]
 
 /** Featured categories for home page. */
-export function getFeaturedCategories(basePath: string, locale?: string): FeaturedCategory[] {
-  const isVi = locale !== 'en'
+export function getFeaturedCategories(basePath: string): FeaturedCategory[] {
   return FEATURED_CATEGORIES_META.map((c) => ({
     id: c.id,
-    title: isVi ? c.titleVi : c.titleEn,
+    title: c.title,
     imageUrl: c.imageUrl,
     href: `${basePath}/products`,
   }))
@@ -176,22 +175,22 @@ export function getHeroSlides(basePath: string): HeroSlide[] {
   return [
     {
       id: '1',
-      title: 'Unique Handcrafted Jewelry',
-      subtitle: 'Discover the collection',
+      title: 'Trang sức thủ công độc bản',
+      subtitle: 'Khám phá bộ sưu tập',
       imageUrl: '/hero/slide-1.png',
       href: `${basePath}/products`,
     },
     {
       id: '2',
-      title: 'New Arrivals',
-      subtitle: 'Shop the latest',
+      title: 'Hàng mới về',
+      subtitle: 'Mua sắm những sản phẩm mới nhất',
       imageUrl: '/hero/slide-2.png',
       href: `${basePath}/products`,
     },
     {
       id: '3',
-      title: 'Best Sellers',
-      subtitle: 'Customer favorites',
+      title: 'Bán chạy nhất',
+      subtitle: 'Được khách hàng yêu thích',
       imageUrl: '/hero/slide-3.png',
       href: `${basePath}/products`,
     },
@@ -201,8 +200,8 @@ export function getHeroSlides(basePath: string): HeroSlide[] {
 /**
  * Category/product banner grid on home page.
  *
- * If latestProduct is provided, \"New In\" banner will use:
- * - latestProduct.title as title (fallback \"New In\")
+ * If latestProduct is provided, the new-arrivals banner will use:
+ * - latestProduct.title as title (fallback \"Hàng mới về\")
  * - latestProduct.href as link to product detail
  * - latestProduct.imageUrl if available, otherwise static image
  */
@@ -210,7 +209,7 @@ export function getTwoBannerRows(
   basePath: string,
   latestProduct?: { title?: string | null; href?: string; imageUrl?: string | null },
 ): BannerItem[][] {
-  const newInTitle = latestProduct?.title || 'New In'
+  const newInTitle = latestProduct?.title || 'Hàng mới về'
   const newInHref = latestProduct?.href || `${basePath}/products`
   const newInImage = latestProduct?.imageUrl || '/banners/new-in.jpg'
 
@@ -218,13 +217,13 @@ export function getTwoBannerRows(
     [
       {
         id: '1',
-        title: 'Silver Ring For Men',
+        title: 'Nhẫn bạc nam',
         imageUrl: '/banners/rings.jpg',
         href: `${basePath}/products`,
       },
       {
         id: '2',
-        title: 'Angelic Collection',
+        title: 'Bộ sưu tập Thiên thần',
         imageUrl: '/banners/collection.jpg',
         href: `${basePath}/products`,
       },
@@ -238,7 +237,7 @@ export function getTwoBannerRows(
       },
       {
         id: '4',
-        title: 'Silver Pendant',
+        title: 'Mặt dây bạc',
         imageUrl: '/banners/new-in.jpg',
         href: `${basePath}/products`,
       },
@@ -246,13 +245,13 @@ export function getTwoBannerRows(
     [
       {
         id: '5',
-        title: 'Silver Bracelet',
+        title: 'Vòng tay bạc',
         imageUrl: '/banners/bracelet.jpg',
         href: `${basePath}/products`,
       },
       {
         id: '6',
-        title: 'Silver Earrings',
+        title: 'Hoa tai bạc',
         imageUrl: '/banners/earring.jpg',
         href: `${basePath}/products`,
       },
@@ -261,39 +260,43 @@ export function getTwoBannerRows(
 }
 
 export function getAnnouncementMessages(): string[] {
-  return ['Free shipping nationwide', '1-for-1 exchange within 3 days', 'Lifetime warranty on selected items']
+  return [
+    'Miễn phí vận chuyển toàn quốc',
+    'Đổi 1 đổi 1 trong 3 ngày',
+    'Bảo hành trọn đời cho sản phẩm được chọn',
+  ]
 }
 
 export function getFooterColumns(basePath: string): FooterColumn[] {
   return [
     {
-      title: 'Connect with us',
+      title: 'Kết nối với chúng tôi',
       links: [
         { key: 'footer-connect-facebook', label: 'Facebook', href: '#' },
         { key: 'footer-connect-instagram', label: 'Instagram', href: '#' },
       ],
     },
     {
-      title: 'Customer care',
+      title: 'Chăm sóc khách hàng',
       links: [
-        { key: 'footer-care-payment', label: 'Payment', href: `${basePath}/pages/policies/delivery` },
-        { key: 'footer-care-delivery', label: 'Delivery', href: `${basePath}/pages/policies/delivery` },
-        { key: 'footer-care-return', label: 'Return policy', href: `${basePath}/pages/policies/delivery` },
-        { key: 'footer-care-contact', label: 'Contact', href: `${basePath}/pages/contact` },
+        { key: 'footer-care-payment', label: 'Thanh toán', href: `${basePath}/pages/policies/delivery` },
+        { key: 'footer-care-delivery', label: 'Giao hàng', href: `${basePath}/pages/policies/delivery` },
+        { key: 'footer-care-return', label: 'Chính sách đổi trả', href: `${basePath}/pages/policies/delivery` },
+        { key: 'footer-care-contact', label: 'Liên hệ', href: `${basePath}/pages/contact` },
       ],
     },
     {
-      title: 'About us',
+      title: 'Về chúng tôi',
       links: [
-        { key: 'footer-about-story', label: 'Our story', href: `${basePath}/pages/about` },
-        { key: 'footer-about-stores', label: 'Store locations', href: `${basePath}/pages/contact` },
+        { key: 'footer-about-story', label: 'Câu chuyện thương hiệu', href: `${basePath}/pages/about` },
+        { key: 'footer-about-stores', label: 'Hệ thống cửa hàng', href: `${basePath}/pages/contact` },
       ],
     },
     {
-      title: 'For customers',
+      title: 'Dành cho khách hàng',
       links: [
-        { key: 'footer-customers-blog', label: 'Blog', href: '#' },
-        { key: 'footer-customers-size-guide', label: 'Size guide', href: '#' },
+        { key: 'footer-customers-blog', label: 'Bài viết', href: '#' },
+        { key: 'footer-customers-size-guide', label: 'Hướng dẫn chọn cỡ', href: '#' },
       ],
     },
   ]
@@ -304,6 +307,6 @@ export function getMainNavLinks(basePath: string): NavLink[] {
     { key: 'nav-shop-all', label: 'Shop all', href: `${basePath}/products` },
     { key: 'nav-new-in', label: 'New in', href: `${basePath}/new-in` },
     { key: 'nav-feedback', label: 'Feedback', href: `${basePath}/pages/contact` },
-    { key: 'nav-collections', label: 'Collections', href: `${basePath}/products` },
+    { key: 'nav-collections', label: 'Bộ sưu tập', href: `${basePath}/collections` },
   ]
 }

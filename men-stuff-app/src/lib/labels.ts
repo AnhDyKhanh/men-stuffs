@@ -72,6 +72,15 @@ export const labels = {
     editCategory: 'Chỉnh sửa',
     backToCategories: 'Quay lại danh mục',
     orders: 'Đơn hàng',
+    collections: 'Bộ sưu tập',
+    collectionsManagement: 'Quản lý bộ sưu tập',
+    collectionsHint:
+      'Tạo bộ sưu tập, gắn sản phẩm và thứ tự hiển thị. Cần chạy scripts/create-collection-tables.sql trên Supabase một lần.',
+    collectionName: 'Tên bộ sưu tập',
+    collectionDescription: 'Mô tả',
+    collectionProducts: 'Sản phẩm trong bộ',
+    saveProducts: 'Lưu sản phẩm',
+    createCollection: 'Tạo bộ sưu tập',
     ordersPage: {
       kicker: 'Vận hành cửa hàng',
       title: 'Đơn hàng',

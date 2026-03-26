@@ -1,36 +1,19 @@
 'use client'
 
-import Link from 'next/link'
-import { useState } from 'react'
-import type { Product } from '@/types/product'
 import DeleteProductButton from '@/app/(admin)/dashboard/_components/DeleteProductButton'
 import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import type { Product } from '@/models/product'
+import dayjs from 'dayjs'
+import Link from 'next/link'
+import { useState } from 'react'
 
 const PAGE_SIZES = [5, 10, 20, 50] as const
-
-export type ProductsTableDict = {
-  productName: string
-  productPrice: string
-  status: string
-  createdAt: string
-  actions: string
-  active: string
-  inactive: string
-  editProduct: string
-  noProducts: string
-  createProduct: string
-  prev: string
-  next: string
-  pageOf: string
-  rowsPerPage: string
-}
 
 interface ProductsTableProps {
   products: Product[]
   locale: string
-  dict: ProductsTableDict
   createProductHref: string
   variant?: 'default' | 'white'
 }
@@ -38,7 +21,6 @@ interface ProductsTableProps {
 export default function ProductsTable({
   products,
   locale,
-  dict,
   createProductHref,
   variant = 'default',
 }: ProductsTableProps) {
@@ -64,15 +46,28 @@ export default function ProductsTable({
       currency: 'VND',
     }).format(value)
 
-  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US')
+  // Hiện tại chỉ dùng theo giờ VN
+  const formatDate = (dateInput?: string | Date | null): string => {
+    if (!dateInput) return '-'
+
+    // If already in expected "DD/MM/YYYY ..." format, keep it as-is (drop time part)
+    if (typeof dateInput === 'string' && /^\d{2}\/\d{2}\/\d{4}/.test(dateInput)) {
+      return dateInput.split(' ')[0]
+    }
+
+    // Otherwise, parse and format consistently
+    const date = dayjs(dateInput)
+    if (!date.isValid()) return '-'
+    return date.format('DD/MM/YYYY')
+  }
 
   if (products.length === 0) {
     return (
       <Card className={cardClass}>
         <CardContent className={`flex flex-col items-center justify-center py-12 ${isWhite ? 'text-gray-700' : ''}`}>
-          <p className={`mb-4 ${mutedClass}`}>{dict.noProducts}</p>
+          <p className={`mb-4 ${mutedClass}`}>Không có sản phẩm</p>
           <Button asChild>
-            <Link href={createProductHref}>{dict.createProduct}</Link>
+            <Link href={createProductHref}>Thêm sản phẩm mới</Link>
           </Button>
         </CardContent>
       </Card>
@@ -84,7 +79,7 @@ export default function ProductsTable({
       <CardHeader className={`${headerClass} px-6 py-4`}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <span className={`text-sm ${mutedClass}`}>
-            {dict.rowsPerPage}:{' '}
+            Số dòng mỗi trang
             <select
               value={pageSize}
               onChange={(e) => {
@@ -102,18 +97,18 @@ export default function ProductsTable({
           </span>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
-              {dict.prev}
+              Quay lại
             </Button>
-            <span className={`min-w-[120px] text-center text-sm ${mutedClass}`}>
+            {/* <span className={`min-w-[120px] text-center text-sm ${mutedClass}`}>
               {dict.pageOf.replace('{page}', String(page)).replace('{total}', String(totalPages))}
-            </span>
+            </span> */}
             <Button
               variant="outline"
               size="sm"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
             >
-              {dict.next}
+              Tiếp
             </Button>
           </div>
         </div>
@@ -122,11 +117,11 @@ export default function ProductsTable({
         <Table>
           <TableHeader>
             <TableRow className={headerRowClass || rowClass}>
-              <TableHead className={`px-6 ${headerTextClass}`}>{dict.productName}</TableHead>
-              <TableHead className={`px-6 ${headerTextClass}`}>{dict.productPrice}</TableHead>
-              <TableHead className={`px-6 ${headerTextClass}`}>{dict.status}</TableHead>
-              <TableHead className={`px-6 ${headerTextClass}`}>{dict.createdAt}</TableHead>
-              <TableHead className={`px-6 text-right ${headerTextClass}`}>{dict.actions}</TableHead>
+              <TableHead className={`px-6 ${headerTextClass}`}>Tên sản phẩm</TableHead>
+              <TableHead className={`px-6 ${headerTextClass}`}>Giá sản phẩm</TableHead>
+              <TableHead className={`px-6 ${headerTextClass}`}>Trạng thái</TableHead>
+              <TableHead className={`px-6 ${headerTextClass}`}>Ngày tạo</TableHead>
+              <TableHead className={`px-6 text-right ${headerTextClass}`}>Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -136,25 +131,25 @@ export default function ProductsTable({
                   <div className="font-medium">{product.name}</div>
                   <div className={`text-xs ${mutedClass}`}>ID: {product.id}</div>
                 </TableCell>
-                <TableCell className={`px-6 py-4 ${cellClass}`}>{formatPrice(product.price)}</TableCell>
+                <TableCell className={`px-6 py-4 ${cellClass}`}>{formatPrice(product.price ?? 0)}</TableCell>
                 <TableCell className={`px-6 py-4 ${cellClass}`}>
                   <span
                     className={
-                      product.status === 'active'
+                      product.is_active === 'active'
                         ? 'rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800'
                         : `rounded-full px-2 py-0.5 text-xs font-medium ${mutedClass} ${isWhite ? 'bg-gray-100' : 'bg-muted'}`
                     }
                   >
-                    {product.status === 'active' ? dict.active : dict.inactive}
+                    {product.is_active === 'active' ? "ACTIVE" : "INACTIVE"}
                   </span>
                 </TableCell>
                 <TableCell className={`px-6 py-4 text-sm ${cellClass} ${mutedClass}`}>
-                  {formatDate(product.created_at)}
+                  <span className="font-medium">{formatDate(product.created_at)}</span>
                 </TableCell>
                 <TableCell className={`px-6 py-4 text-right ${cellClass}`}>
                   <div className="flex justify-end gap-3">
                     <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                      <Link href={`/products-management/${product.id}`}>{dict.editProduct}</Link>
+                      <Link href={`/products-management/${product.id}`}>Chỉnh sửa sản phẩm</Link>
                     </Button>
                     <DeleteProductButton productId={product.id} />
                   </div>

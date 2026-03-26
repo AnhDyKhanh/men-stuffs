@@ -8,6 +8,8 @@ interface ProductGridProps {
   columns?: 2 | 3 | 4
   /** Dark background variant (light text, light borders) */
   variant?: 'default' | 'dark'
+  showNewCornerBadge?: boolean
+  onProductClick?: (productId: string) => void
 }
 
 const COLUMN_CLASSES = {
@@ -16,7 +18,14 @@ const COLUMN_CLASSES = {
   4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
 } as const
 
-export default function ProductGrid({ products, buyNowLabel, columns = 4, variant = 'default' }: ProductGridProps) {
+export default function ProductGrid({
+  products,
+  buyNowLabel,
+  columns = 4,
+  variant = 'default',
+  showNewCornerBadge = false,
+  onProductClick,
+}: ProductGridProps) {
   if (products.length === 0) {
     return <p className="text-center text-neutral-400">No products to display.</p>
   }
@@ -25,7 +34,13 @@ export default function ProductGrid({ products, buyNowLabel, columns = 4, varian
     <ul className={`grid gap-6 ${COLUMN_CLASSES[columns]}`} role="list" aria-label="Product list">
       {products.map((product) => (
         <li key={product.id}>
-          <ProductCard product={product} buyNowLabel={buyNowLabel} variant={variant} />
+          <ProductCard
+            product={product}
+            buyNowLabel={buyNowLabel}
+            variant={variant}
+            showNewCornerBadge={showNewCornerBadge}
+            onProductClick={onProductClick}
+          />
         </li>
       ))}
     </ul>

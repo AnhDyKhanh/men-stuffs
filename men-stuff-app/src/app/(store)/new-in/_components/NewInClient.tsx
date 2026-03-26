@@ -6,6 +6,7 @@ import ProductGrid from '@/app/(store)/_components/ProductGrid'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import type { Product } from '@/models/product'
 import type { PlaceholderProduct } from '@/constants/placeholderData'
+import { trackProductClick } from '@/lib/productHot'
 
 const NEW_IN_SIZE = 30
 const CURRENCY = 'VND'
@@ -66,7 +67,14 @@ export default function NewInClient() {
       ) : (
         <>
           <p className="mb-4 text-sm text-white/45">{products.length} sản phẩm mới</p>
-          <ProductGrid products={products} buyNowLabel="Thêm vào giỏ" columns={4} variant="dark" />
+          <ProductGrid
+            products={products}
+            buyNowLabel="Thêm vào giỏ"
+            columns={4}
+            variant="dark"
+            showNewCornerBadge
+            onProductClick={trackProductClick}
+          />
           <div className="mt-8 text-center">
             <Link
               href={`${BASE_PATH}/products`}

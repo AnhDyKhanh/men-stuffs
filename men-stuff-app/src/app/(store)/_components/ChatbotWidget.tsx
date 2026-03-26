@@ -7,6 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { BASE_PATH } from '@/lib/labels'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { getHotProductIdsToday, trackProductClick } from '@/lib/productHot'
+import type { Product } from '@/models/product'
 import { Sparkles, Send, X } from 'lucide-react'
 
 const STORAGE_PREFS = 'men_stuffs_chatbot_prefs_v1'
@@ -21,6 +24,16 @@ type Message = {
   id: string
   role: 'user' | 'bot'
   text: string
+  products?: ChatProduct[]
+}
+
+type ChatProduct = {
+  id: string
+  name: string
+  priceFormatted: string
+  href: string
+  imageUrl: string
+  badge?: 'HOT' | 'NEW'
 }
 
 const QUICK_LINKS: { label: string; href: string; topic: string }[] = [
@@ -87,15 +100,87 @@ function botReply(userText: string): string {
   return `Mình chưa hiểu hết ý bạn. Thử hỏi: "New In có gì mới?", "xem giỏ hàng", hoặc bấm một gợi ý nhanh — mình sẽ học thói quen (trên máy bạn) để ưu tiên gợi ý phù hợp hơn sau này.`
 }
 
+function formatPrice(value: number): string {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+function linePrice(p: Product): number {
+  const base = p.price ?? 0
+  const d = p.discount_price
+  if (d != null && d > 0 && d < base) return d
+  return base
+}
+
+function ts(created: Product['created_at']): number {
+  if (!created) return 0
+  const t = new Date(created as unknown as string).getTime()
+  return Number.isFinite(t) ? t : 0
+}
+
+/** Rẻ nhất / đắt nhất / mới nhất — theo batch sản phẩm đang tải. */
+function buildCatalogSummary(products: Product[]): string | null {
+  if (!products.length) return null
+  const priced = products.map((p) => ({ p, v: linePrice(p) })).filter((x) => x.v > 0)
+  if (!priced.length) return null
+  const byMoney = [...priced].sort((a, b) => a.v - b.v)
+  const cheapest = byMoney[0]
+  const expensive = byMoney[byMoney.length - 1]
+  const newestP = [...products].sort((a, b) => ts(b.created_at) - ts(a.created_at))[0]
+  const nv = linePrice(newestP)
+  return [
+    `Trong danh mục đang xem được:`,
+    `• Rẻ nhất: "${cheapest.p.name ?? '—'}" — ${formatPrice(cheapest.v)}`,
+    `• Đắt nhất: "${expensive.p.name ?? '—'}" — ${formatPrice(expensive.v)}`,
+    `• Mới nhất: "${newestP.name ?? '—'}" — ${formatPrice(nv)}`,
+  ].join('\n')
+}
+
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const [isDropActive, setIsDropActive] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
+  const { data: productsResponse } = useGetAllProducts({
+    page: 1,
+    size: 120,
+    orderBy: 'created_at',
+    ascending: false,
+  })
 
   const prefs = useMemo(() => loadPrefs(), [messages, isOpen])
 
   const suggestions = useMemo(() => rankedSuggestions(prefs).slice(0, 4), [prefs])
+  const rawProducts = useMemo(
+    () => ((productsResponse as { data?: Product[] })?.data ?? []) as Product[],
+    [productsResponse],
+  )
+
+  const catalogSummary = useMemo(() => buildCatalogSummary(rawProducts), [rawProducts])
+
+  const allProducts = useMemo((): ChatProduct[] => {
+    return rawProducts.map((p) => ({
+      id: p.id,
+      name: p.name ?? 'Sản phẩm',
+      priceFormatted: formatPrice(linePrice(p)),
+      imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
+      href: `${BASE_PATH}/product/${p.slug || p.id}`,
+    }))
+  }, [rawProducts])
+
+  const hotProducts = useMemo(() => {
+    const hotIds = new Set(getHotProductIdsToday(6))
+    const hot = allProducts.filter((p) => hotIds.has(p.id)).map((p) => ({ ...p, badge: 'HOT' as const }))
+    return hot.slice(0, 4)
+  }, [allProducts])
+
+  const newProducts = useMemo(() => {
+    return allProducts.slice(0, 4).map((p) => ({ ...p, badge: 'NEW' as const }))
+  }, [allProducts])
 
   useEffect(() => {
     listRef.current?.scrollTo(0, listRef.current.scrollHeight)
@@ -123,7 +208,7 @@ export default function ChatbotWidget() {
     }
   }, [messages])
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     const text = input.trim()
     if (!text) return
 
@@ -131,10 +216,101 @@ export default function ChatbotWidget() {
     setMessages((prev) => [...prev, userMsg])
     setInput('')
 
+    const lower = text.toLowerCase()
+
+    const asksCart = /giỏ|cart|trong giỏ|xem giỏ|giỏ hàng/i.test(lower)
+    if (asksCart) {
+      bumpTopic('cart')
+      try {
+        const res = await fetch(`${BASE_PATH}/api/guest/cart`, { cache: 'no-store', credentials: 'include' })
+        const json = (await res.json()) as {
+          data?: { cartItems?: Array<{ quantity: number; price: number; product: { name?: string } }> }
+        }
+        const items = json?.data?.cartItems ?? []
+        if (!res.ok || json?.data === undefined) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `b-${Date.now()}`,
+              role: 'bot',
+              text:
+                'Mình không đọc được giỏ lúc này — thường là bạn chưa đăng nhập (giỏ gắn với tài khoản). Đăng nhập rồi mở Giỏ hàng trên menu. Dưới đây là vài gợi ý để bạn xem trước:',
+              products: newProducts.slice(0, 3),
+            },
+          ])
+          return
+        }
+        if (items.length === 0) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `b-${Date.now()}`,
+              role: 'bot',
+              text:
+                'Giỏ của bạn đang trống — thêm vài món đi cho vui. Dưới đây là gợi ý nhanh (bấm để xem chi tiết):',
+              products: newProducts.slice(0, 4),
+            },
+          ])
+          return
+        }
+        const lines = items.map((it) => {
+          const lineTotal = it.price * it.quantity
+          return `• ${it.product?.name ?? 'Sản phẩm'} × ${it.quantity} — ${formatPrice(lineTotal)}`
+        })
+        const subtotal = items.reduce((s, it) => s + it.price * it.quantity, 0)
+        const cartText = `Trong giỏ của bạn:\n${lines.join('\n')}\nTạm tính: ${formatPrice(subtotal)}`
+        setMessages((prev) => [...prev, { id: `b-${Date.now()}`, role: 'bot', text: cartText }])
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            role: 'bot',
+            text: 'Không tải được giỏ. Mở trang Giỏ hàng trên menu hoặc thử lại sau.',
+          },
+        ])
+      }
+      return
+    }
+
+    const asksPriceFacts =
+      /đắt nhất|rẻ nhất|giá cao|giá thấp|expensive|cheap|mới nhất|mới ra|hàng mới|giá|bao nhiêu|khoảng giá/i.test(
+        lower,
+      )
+    if (asksPriceFacts) {
+      bumpTopic('products')
+      if (catalogSummary) {
+        setMessages((prev) => [...prev, { id: `b-${Date.now()}`, role: 'bot', text: catalogSummary }])
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            role: 'bot',
+            text: `Chưa có dữ liệu sản phẩm để so sánh giá lúc này. Xem danh sách tại ${BASE_PATH}/products hoặc New In ${BASE_PATH}/new-in.`,
+          },
+        ])
+      }
+      return
+    }
+
+    const asksConsulting =
+      /tư vấn|tu van|goi y|gợi ý|nên mua|mua gì|phối|mix|match|hot|best/.test(lower) && !asksPriceFacts
+
     const reply = botReply(text)
-    const botMsg: Message = { id: `b-${Date.now()}`, role: 'bot', text: reply }
+    const botMsg: Message = asksConsulting
+      ? {
+          id: `b-${Date.now()}`,
+          role: 'bot',
+          text:
+            hotProducts.length > 0
+              ? 'Mình gợi ý vài sản phẩm đang HOT hôm nay cho bạn. Kéo một card bất kỳ vào chat để mình phân tích chi tiết + gợi ý đồ đi kèm.'
+              : 'Mình gợi ý vài sản phẩm NEW phù hợp để bạn tham khảo trước. Bạn có thể kéo card vào chat để mình tư vấn sâu hơn.',
+          products: hotProducts.length > 0 ? hotProducts : newProducts,
+        }
+      : { id: `b-${Date.now()}`, role: 'bot', text: reply }
     setMessages((prev) => [...prev, botMsg])
-  }, [input])
+  }, [catalogSummary, hotProducts, newProducts])
 
   const onChip = useCallback((topic: string, href: string) => {
     bumpTopic(topic)
@@ -145,6 +321,42 @@ export default function ChatbotWidget() {
       text: `Đã ghi nhớ bạn quan tâm "${topic}". Mở link: ${href}`,
     }
     setMessages((prev) => [...prev, userMsg, botMsg])
+  }, [])
+
+  const handleDropProduct = useCallback((event: React.DragEvent<HTMLElement>) => {
+    event.preventDefault()
+    setIsDropActive(false)
+    const raw = event.dataTransfer.getData('application/x-menstuff-product')
+    if (!raw) return
+    try {
+      const product = JSON.parse(raw) as {
+        id: string
+        name: string
+        priceFormatted?: string
+        href?: string
+        imageUrl?: string
+      }
+      trackProductClick(product.id)
+      const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', text: `[Kéo vào chat] ${product.name}` }
+      const botMsg: Message = {
+        id: `b-${Date.now() + 1}`,
+        role: 'bot',
+        text: `Mẫu "${product.name}" hợp style tối giản, đi chơi hoặc đi làm đều ổn. Bạn có thể phối với vòng tay bạc trơn + dây chuyền mảnh để tổng thể cân bằng hơn.`,
+        products: [
+          {
+            id: product.id,
+            name: product.name,
+            priceFormatted: product.priceFormatted ?? 'Đang cập nhật',
+            href: product.href ?? `${BASE_PATH}/products`,
+            imageUrl: product.imageUrl ?? 'https://placehold.co/400x400/f5f5f5/999?text=Product',
+            badge: 'HOT',
+          },
+        ],
+      }
+      setMessages((prev) => [...prev, userMsg, botMsg])
+    } catch {
+      // ignore invalid payload
+    }
   }, [])
 
   return (
@@ -164,6 +376,12 @@ export default function ChatbotWidget() {
           className="fixed right-6 bottom-24 z-50 flex w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden border-white/10 bg-card/95 p-0 text-card-foreground shadow-[0_0_40px_-12px_rgba(247,147,26,0.35)] backdrop-blur-md"
           role="dialog"
           aria-label="Trợ lý Men Stuffs"
+          onDragOver={(event) => {
+            event.preventDefault()
+            setIsDropActive(true)
+          }}
+          onDragLeave={() => setIsDropActive(false)}
+          onDrop={handleDropProduct}
         >
           <CardHeader className="flex flex-row items-center justify-between gap-2 border-b border-white/10 bg-background/80 px-4 py-3">
             <div>
@@ -196,23 +414,52 @@ export default function ChatbotWidget() {
             </div>
 
             <div ref={listRef} className="flex max-h-[280px] min-h-[200px] flex-col gap-3 overflow-y-auto px-4 py-2">
+              {isDropActive && (
+                <div className="rounded-lg border border-dashed border-[#F7931A]/70 bg-[#F7931A]/10 px-3 py-2 text-center text-xs text-white/80">
+                  Thả sản phẩm vào đây để được tư vấn chi tiết
+                </div>
+              )}
               {messages.length === 0 && (
                 <p className="py-6 text-center text-sm text-muted-foreground">
-                  Chọn gợi ý nhanh hoặc hỏi về <strong className="text-foreground">New In</strong>, sản phẩm, giỏ hàng.
-                  Trợ lý ghi nhớ <em>thói quen</em> (số lần bạn bấm chủ đề) ngay trên trình duyệt của bạn.
+                  Chọn gợi ý nhanh hoặc hỏi về <strong className="text-foreground">New In</strong>, sản phẩm hot, giỏ hàng.
+                  Bạn cũng có thể kéo card sản phẩm từ trang vào khung chat để nhận tư vấn phối đồ.
                 </p>
               )}
               {messages.map((m) => (
                 <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <span
-                    className={`max-w-[90%] whitespace-pre-wrap rounded-xl px-3 py-2 text-sm ${
+                  <div
+                    className={`max-w-[90%] rounded-xl px-3 py-2 text-sm ${
                       m.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'border border-white/10 bg-muted/40 text-foreground'
                     }`}
                   >
-                    {m.text}
-                  </span>
+                    <p className="whitespace-pre-wrap">{m.text}</p>
+                    {m.products && m.products.length > 0 && (
+                      <div className="mt-3 grid grid-cols-1 gap-2">
+                        {m.products.map((p) => (
+                          <Link
+                            key={`${m.id}-${p.id}`}
+                            href={p.href}
+                            onClick={() => trackProductClick(p.id)}
+                            className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 p-2 transition hover:border-[#F7931A]/45"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={p.imageUrl} alt={p.name} className="h-12 w-12 rounded-md object-cover" />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-xs font-medium text-white">{p.name}</p>
+                              <p className="text-[11px] text-white/70">{p.priceFormatted}</p>
+                            </div>
+                            {p.badge && (
+                              <span className="rounded-full border border-rose-400/40 bg-rose-500/15 px-2 py-0.5 font-mono text-[10px] tracking-wider text-rose-100">
+                                {p.badge}
+                              </span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

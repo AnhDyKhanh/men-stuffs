@@ -3,6 +3,7 @@ export const adminRoutePrefixes = [
   '/dashboard',
   '/products-management',
   '/categories-management',
+  '/collections-management',
   '/order',
 ] as const
 

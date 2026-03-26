@@ -55,10 +55,10 @@ function mapCategoriesToFeatured(
   limit = 4,
 ): FeaturedCategory[] {
   if (!categories || categories.length === 0) {
-    return getPlaceholderFeaturedCategories(basePath, 'vi')
+    return getPlaceholderFeaturedCategories(basePath)
   }
 
-  const placeholderCats = getPlaceholderFeaturedCategories(basePath, 'vi')
+  const placeholderCats = getPlaceholderFeaturedCategories(basePath)
 
   return categories.slice(0, limit).map(
     (cat, index): FeaturedCategory => ({
