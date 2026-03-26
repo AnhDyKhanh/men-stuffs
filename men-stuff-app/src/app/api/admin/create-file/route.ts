@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { isStaffByAccountId } from '@/lib/auth-server'
+import { uploadImage } from '../../services/uploadImage'
 
 const COOKIE_ACCOUNT_ID = 'account_id'
 
@@ -27,23 +28,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
-    const supabase = getSupabaseAdmin()
+    const result = await uploadImage(file)
+    if ('error' in result) return NextResponse.json(result, { status: 500 })
+    return NextResponse.json(result, { status: 200 })
 
-    const fileExtension = file.name.split('.').pop()
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`
-    const filePath = `${fileName}`
-
-    const { error: uploadError } = await supabase.storage.from('image').upload(filePath, file)
-
-    if (uploadError) {
-      return NextResponse.json({ error: uploadError.message }, { status: 500 })
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('image').getPublicUrl(filePath)
-
-    return NextResponse.json({ url: publicUrl }, { status: 200 })
   } catch {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
