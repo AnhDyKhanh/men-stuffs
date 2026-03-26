@@ -1,27 +1,24 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useAdminOrders, useUpdateOrderStatus } from '@/hooks/useAdminOrders'
+import { useCallback, useMemo, useState } from 'react'
+import { useAdminStaffWork, useUpdateStaffWorkStatus } from '@/hooks/useAdminStaffWork'
 import { labels, BASE_PATH } from '@/lib/labels'
-import type { Staff } from '@/models/staff'
-import { API_ROUTES } from '@/constants/apiRouter'
-import type { OrderStatus } from '@/models/order'
+import type { StaffWorkStatus } from '@/models/staff-work'
 import { Button } from '@/components/ui/button'
-import { OrdersToolbar } from './OrdersToolbar'
-import { OrdersTable } from './OrdersTable'
+import { TasksToolbar } from './TasksToolbar'
+import { TasksTable } from './TasksTable'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const PAGE_SIZE = 20
 
-export function OrdersPageClient() {
-  const dict = labels.admin.ordersPage
+export function TasksPageClient() {
+  const dict = labels.admin.tasksPage
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [mineOnly, setMineOnly] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [searchApplied, setSearchApplied] = useState('')
-  const [staffOptions, setStaffOptions] = useState<Staff[] | null>(null)
-  const [isStaffLoading, setIsStaffLoading] = useState(false)
 
   const query = useMemo(
     () => ({
@@ -29,38 +26,18 @@ export function OrdersPageClient() {
       size: PAGE_SIZE,
       status: statusFilter === 'all' ? null : statusFilter,
       search: searchApplied.trim() || null,
+      mine: mineOnly,
     }),
-    [page, statusFilter, searchApplied],
+    [page, statusFilter, searchApplied, mineOnly],
   )
 
-  const { data, isLoading, isFetching, refetch } = useAdminOrders(query)
-  const updateStatus = useUpdateOrderStatus()
+  const { data, isLoading, isFetching, refetch } = useAdminStaffWork(query)
+  const updateStatus = useUpdateStaffWorkStatus()
   const [updatingId, setUpdatingId] = useState<string | null>(null)
 
-  const orders = data?.data ?? []
+  const tasks = data?.data ?? []
   const total = data?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
-
-  useEffect(() => {
-    let cancelled = false
-    async function loadStaff() {
-      setIsStaffLoading(true)
-      try {
-        const res = await fetch(API_ROUTES.STAFF.GET_ALL, { cache: 'no-store' })
-        const payload = (await res.json().catch(() => null)) as { data?: Staff[]; error?: string } | null
-        if (!res.ok) throw new Error(payload?.error || 'Không tải được nhân viên')
-        if (!cancelled) setStaffOptions(payload?.data ?? [])
-      } catch {
-        if (!cancelled) setStaffOptions([])
-      } finally {
-        if (!cancelled) setIsStaffLoading(false)
-      }
-    }
-    void loadStaff()
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   const handleSearch = useCallback(() => {
     setSearchApplied(searchInput)
@@ -72,33 +49,22 @@ export function OrdersPageClient() {
     setPage(1)
   }, [])
 
-  const onOrderStatusChange = useCallback(
-    (orderId: string, status: OrderStatus) => {
-      setUpdatingId(orderId)
+  const handleMineOnly = useCallback((v: boolean) => {
+    setMineOnly(v)
+    setPage(1)
+  }, [])
+
+  const onTaskStatusChange = useCallback(
+    (taskId: string, status: StaffWorkStatus) => {
+      setUpdatingId(taskId)
       updateStatus.mutate(
-        { id: orderId, status },
+        { id: taskId, status },
         {
           onSettled: () => setUpdatingId(null),
         },
       )
     },
     [updateStatus],
-  )
-
-  const handleAssignStaff = useCallback(
-    async (orderId: string, staffId: string) => {
-      const res = await fetch(API_ROUTES.STAFF_WORK.ASSIGN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId, staffId }),
-      })
-      const payload = (await res.json().catch(() => null)) as { error?: string; ok?: boolean } | null
-      if (!res.ok || payload?.ok !== true) {
-        throw new Error(payload?.error || 'Gán nhân viên thất bại')
-      }
-      await refetch()
-    },
-    [refetch],
   )
 
   return (
@@ -119,9 +85,11 @@ export function OrdersPageClient() {
         </div>
       </div>
 
-      <OrdersToolbar
+      <TasksToolbar
         statusFilter={statusFilter}
         onStatusChange={handleStatusFilter}
+        mineOnly={mineOnly}
+        onMineOnlyChange={handleMineOnly}
         search={searchInput}
         onSearchChange={setSearchInput}
         onSearch={handleSearch}
@@ -130,33 +98,30 @@ export function OrdersPageClient() {
         dict={{
           filterStatus: dict.filterStatus,
           all: dict.allStatuses,
+          mineOnly: dict.mineOnly,
+          allTasks: dict.allTasks,
+          scope: dict.scope,
           searchPlaceholder: dict.searchPlaceholder,
           search: dict.searchButton,
           refresh: dict.refresh,
         }}
       />
 
-      <OrdersTable
-        orders={orders}
+      <TasksTable
+        tasks={tasks}
         isLoading={isLoading}
-        staffOptions={isStaffLoading ? null : staffOptions}
         dict={{
           tableTitle: dict.tableTitle,
-          colCode: dict.colCode,
-          colCustomer: dict.colCustomer,
-          colPhone: dict.colPhone,
-          colTotal: dict.colTotal,
+          colTitle: dict.colTitle,
+          colType: dict.colType,
           colStatus: dict.colStatus,
-          colPayment: dict.colPayment,
+          colOrder: dict.colOrder,
+          colAssignee: dict.colAssignee,
+          colDescription: dict.colDescription,
           colCreated: dict.colCreated,
-          colAction: dict.colAction,
           empty: dict.empty,
-          paymentCod: dict.paymentCod,
-          paymentBank: dict.paymentBank,
-          paymentMomo: dict.paymentMomo,
         }}
-        onStatusChange={onOrderStatusChange}
-        onAssignStaff={handleAssignStaff}
+        onStatusChange={onTaskStatusChange}
         updatingId={updatingId}
       />
 
