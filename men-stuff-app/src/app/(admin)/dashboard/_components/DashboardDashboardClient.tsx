@@ -1,7 +1,7 @@
 'use client'
 
-import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
-import DashboardQuickActions from './DashboardQuickActions'
+import { useGetAllProducts } from '@/hooks/getAllProductsMutation';
+import DashboardQuickActions from './DashboardQuickActions';
 
 function formatRevenue(value: number) {
   return new Intl.NumberFormat('vi-VN', {
@@ -47,7 +47,6 @@ export default function DashboardDashboardClient() {
       </section>
 
       <DashboardQuickActions
-        locale="vi"
         createProductLabel="Tạo sản phẩm mới"
         productsLabel="Quản lý sản phẩm"
         quickActionsLabel="Thao tác nhanh"
