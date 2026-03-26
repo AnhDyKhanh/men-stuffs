@@ -1,18 +1,23 @@
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { labels, BASE_PATH } from '@/lib/labels'
-import { getUserRole } from '@/lib/auth'
+import { getAccountIdFromCookie, getUserRole } from '@/lib/auth'
+import { isStaffByAccountId } from '@/lib/auth-server'
 import LogoutButton from '@/components/shared/LogoutButton'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
   const userRole = getUserRole(cookieStore)
+  const accountId = getAccountIdFromCookie(cookieStore)
+  const staffOk = accountId ? await isStaffByAccountId(accountId) : false
 
-  if (userRole !== 'admin') {
+  if (userRole !== 'admin' && !staffOk) {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
         <h1 className="mb-4 text-2xl font-bold">Truy cập bị từ chối</h1>
-        <p className="mb-4 text-gray-600">Bạn cần đăng nhập với tài khoản admin.</p>
+        <p className="mb-4 text-gray-600">
+          Bạn cần đăng nhập với tài khoản nhân sự (admin / manager / staff) trong hệ thống.
+        </p>
         <Link href={`${BASE_PATH}/login`} className="text-blue-600 hover:underline">
           Đăng nhập Admin
         </Link>
@@ -48,10 +53,22 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             {labels.admin.categories}
           </Link>
           <Link
+            href={`${BASE_PATH}/collections-management`}
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+          >
+            {labels.admin.collectionsManagement}
+          </Link>
+          <Link
             href={`${BASE_PATH}/order`}
             className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
           >
             {labels.admin.orders}
+          </Link>
+          <Link
+            href={`${BASE_PATH}/task-management`}
+            className="block rounded-lg px-4 py-3 text-gray-700 transition hover:bg-gray-100 hover:text-blue-600"
+          >
+            {labels.admin.staffTasks}
           </Link>
           <div className="border-t pt-4">
             <LogoutButton />

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     orderBy: searchParams.get('orderBy') || 'created_at',
     ascending: searchParams.get('ascending') === 'true',
     search: searchParams.get('search') ?? undefined,
-    categoryId: searchParams.get('categoryId') ?? undefined,
+    categoryId: searchParams.get('categoryId')?.split(',') ?? [],
     dateFrom: searchParams.get('dateFrom') ?? undefined,
     dateTo: searchParams.get('dateTo') ?? undefined,
   }

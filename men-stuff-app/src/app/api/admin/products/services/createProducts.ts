@@ -56,6 +56,7 @@ export async function createProduct(body: CreateProductDTO): Promise<Data<Produc
           discount_price,
           material,
           is_active,
+          origin_image: null,
         },
       ])
       .select()

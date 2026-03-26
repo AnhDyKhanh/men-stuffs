@@ -1,8 +1,10 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAdminOrders, useUpdateOrderStatus } from '@/hooks/useAdminOrders'
 import { labels, BASE_PATH } from '@/lib/labels'
+import type { Staff } from '@/models/staff'
+import { API_ROUTES } from '@/constants/apiRouter'
 import type { OrderStatus } from '@/models/order'
 import { Button } from '@/components/ui/button'
 import { OrdersToolbar } from './OrdersToolbar'
@@ -18,6 +20,8 @@ export function OrdersPageClient() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchInput, setSearchInput] = useState('')
   const [searchApplied, setSearchApplied] = useState('')
+  const [staffOptions, setStaffOptions] = useState<Staff[] | null>(null)
+  const [isStaffLoading, setIsStaffLoading] = useState(false)
 
   const query = useMemo(
     () => ({
@@ -36,6 +40,27 @@ export function OrdersPageClient() {
   const orders = data?.data ?? []
   const total = data?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+
+  useEffect(() => {
+    let cancelled = false
+    async function loadStaff() {
+      setIsStaffLoading(true)
+      try {
+        const res = await fetch(API_ROUTES.STAFF.GET_ALL, { cache: 'no-store' })
+        const payload = (await res.json().catch(() => null)) as { data?: Staff[]; error?: string } | null
+        if (!res.ok) throw new Error(payload?.error || 'Không tải được nhân viên')
+        if (!cancelled) setStaffOptions(payload?.data ?? [])
+      } catch {
+        if (!cancelled) setStaffOptions([])
+      } finally {
+        if (!cancelled) setIsStaffLoading(false)
+      }
+    }
+    void loadStaff()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handleSearch = useCallback(() => {
     setSearchApplied(searchInput)
@@ -58,6 +83,22 @@ export function OrdersPageClient() {
       )
     },
     [updateStatus],
+  )
+
+  const handleAssignStaff = useCallback(
+    async (orderId: string, staffId: string) => {
+      const res = await fetch(API_ROUTES.STAFF_WORK.ASSIGN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, staffId }),
+      })
+      const payload = (await res.json().catch(() => null)) as { error?: string; ok?: boolean } | null
+      if (!res.ok || payload?.ok !== true) {
+        throw new Error(payload?.error || 'Gán nhân viên thất bại')
+      }
+      await refetch()
+    },
+    [refetch],
   )
 
   return (
@@ -98,6 +139,7 @@ export function OrdersPageClient() {
       <OrdersTable
         orders={orders}
         isLoading={isLoading}
+        staffOptions={isStaffLoading ? null : staffOptions}
         dict={{
           tableTitle: dict.tableTitle,
           colCode: dict.colCode,
@@ -114,6 +156,7 @@ export function OrdersPageClient() {
           paymentMomo: dict.paymentMomo,
         }}
         onStatusChange={onOrderStatusChange}
+        onAssignStaff={handleAssignStaff}
         updatingId={updatingId}
       />
 

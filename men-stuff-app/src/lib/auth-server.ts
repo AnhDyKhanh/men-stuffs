@@ -14,3 +14,11 @@ export async function isStaffByAccountId(accountId: string): Promise<boolean> {
   const { data, error } = await getSupabase().from(STAFF_TABLE).select('id').eq('account_id', accountId).maybeSingle()
   return !error && data != null
 }
+
+/** UUID nhân viên (bảng staff) theo account đăng nhập; dùng lọc "việc của tôi". */
+export async function getStaffIdByAccountId(accountId: string): Promise<string | null> {
+  if (!accountId) return null
+  const { data, error } = await getSupabase().from(STAFF_TABLE).select('id').eq('account_id', accountId).maybeSingle()
+  if (error || !data?.id) return null
+  return data.id as string
+}

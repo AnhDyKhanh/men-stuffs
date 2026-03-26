@@ -24,4 +24,19 @@ export const API_ROUTES = {
     GET_DETAIL: (id: string) => `/api/admin/orders/${id}`,
     PATCH_STATUS: (id: string) => `/api/admin/orders/${id}`,
   },
-}
+  COLLECTIONS: {
+    PUBLIC: '/api/collections',
+    ADMIN: '/api/admin/collections',
+    ADMIN_ITEMS: (id: string) => `/api/admin/collections/${id}/items`,
+    ADMIN_ONE: (id: string) => `/api/admin/collections/${id}`,
+  },
+  STAFF: {
+    GET_ALL: '/api/admin/staff',
+  },
+  STAFF_WORK: {
+    GET_ALL: '/api/admin/staff-work',
+    PATCH_STATUS: (id: string) => `/api/admin/staff-work/${id}`,
+    ASSIGN: '/api/admin/staff-work/assign',
+  },
+} as const
+

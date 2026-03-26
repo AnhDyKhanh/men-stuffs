@@ -68,7 +68,8 @@ export default function ProductCard({
       >
         <Link href={product.href} className="block aspect-square" aria-label={product.name} onClick={handleProductClick}>
           <Image
-            src={product.imageUrl}
+            //nếu ko có ảnh or product.imageUrl = "" thì lấy từ folder sau public\products\no-image.webp
+            src={product.imageUrl && product.imageUrl !== "" ? product.imageUrl : '/products/no-image.webp'}
             alt=""
             width={400}
             height={400}

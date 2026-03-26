@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { API_ROUTES } from '@/constants/apiRouter'
 import { toast } from 'sonner'
+import type { Staff } from '@/models/staff'
 
 function formatVnd(n: number | null | undefined) {
   if (n == null) return '—'
@@ -62,6 +63,8 @@ type Props = {
   isLoading: boolean
   dict: Dict
   onStatusChange: (orderId: string, status: OrderStatus) => void
+  staffOptions: Staff[] | null | undefined
+  onAssignStaff: (orderId: string, staffId: string) => Promise<void>
   updatingId?: string | null
 }
 
@@ -88,19 +91,23 @@ type OrderDetailData = {
   items: OrderDetailItem[]
 }
 
-const MOCK_SHIPPERS = [
-  { id: 'shipper-1', name: 'Phạm Ngọc Duy Khánh', phone: '0901234567' },
-  { id: 'shipper-2', name: 'Phạm Ngọc Duy Minh', phone: '0912345678' },
-]
-
-export function OrdersTable({ orders, isLoading, dict, onStatusChange, updatingId }: Props) {
+export function OrdersTable({
+  orders,
+  isLoading,
+  dict,
+  onStatusChange,
+  staffOptions,
+  onAssignStaff,
+  updatingId,
+}: Props) {
   const rows = orders ?? []
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isDetailLoading, setIsDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState<string | null>(null)
   const [detail, setDetail] = useState<OrderDetailData | null>(null)
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
-  const [selectedShipperId, setSelectedShipperId] = useState<string>('')
+  const [selectedStaffId, setSelectedStaffId] = useState<string>('')
+  const [isAssigningStaff, setIsAssigningStaff] = useState(false)
 
   const handleOpenDetail = async (orderId: string) => {
     setSelectedOrderId(orderId)
@@ -108,7 +115,7 @@ export function OrdersTable({ orders, isLoading, dict, onStatusChange, updatingI
     setIsDetailLoading(true)
     setDetailError(null)
     setDetail(null)
-    setSelectedShipperId('')
+    setSelectedStaffId('')
 
     try {
       const res = await fetch(API_ROUTES.ORDERS.GET_DETAIL(orderId), { cache: 'no-store' })
@@ -128,21 +135,30 @@ export function OrdersTable({ orders, isLoading, dict, onStatusChange, updatingI
     }
   }
 
-  const handleAssignShipper = () => {
+  const handleAssignStaff = async () => {
     if (!detail || selectedOrderId !== detail.id) return
-    if (!selectedShipperId) {
-      toast.error('Vui long chon nguoi giao hang')
+    if (!selectedStaffId) {
+      toast.error('Vui lòng chọn nhân viên')
       return
     }
 
-    const shipper = MOCK_SHIPPERS.find((s) => s.id === selectedShipperId)
-    if (!shipper) {
-      toast.error('Khong tim thay shipper da chon')
+    const staff = staffOptions?.find((s) => s.id === selectedStaffId)
+    if (!staff) {
+      toast.error('Không tìm thấy nhân viên đã chọn')
       return
     }
 
-    toast.success(`Da them ${shipper.name} (${shipper.phone}) cho don ${detail.order_code ?? detail.id.slice(0, 8)}`)
-    setIsDetailOpen(false)
+    try {
+      setIsAssigningStaff(true)
+      await onAssignStaff(detail.id, selectedStaffId)
+      toast.success(`Đã giao cho ${staff.full_name ?? staff.id} cho đơn ${detail.order_code ?? detail.id.slice(0, 8)}`)
+      setIsDetailOpen(false)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Gán staff thất bại'
+      toast.error(msg)
+    } finally {
+      setIsAssigningStaff(false)
+    }
   }
 
   return (
@@ -289,15 +305,15 @@ export function OrdersTable({ orders, isLoading, dict, onStatusChange, updatingI
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-slate-800">Chọn người giao hàng</p>
-                <Select value={selectedShipperId} onValueChange={setSelectedShipperId}>
+                <p className="text-sm font-semibold text-slate-800">Chọn nhân viên</p>
+                <Select value={selectedStaffId} onValueChange={setSelectedStaffId} disabled={isAssigningStaff}>
                   <SelectTrigger className="border-slate-300 bg-white text-slate-900">
-                    <SelectValue placeholder="Chon shipper..." />
+                    <SelectValue placeholder="Chọn staff..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {MOCK_SHIPPERS.map((shipper) => (
-                      <SelectItem key={shipper.id} value={shipper.id}>
-                        {shipper.name} - {shipper.phone}
+                    {(staffOptions ?? []).map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.full_name ?? s.id} {s.phone ? `- ${s.phone}` : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -306,7 +322,12 @@ export function OrdersTable({ orders, isLoading, dict, onStatusChange, updatingI
             </div>
           )}
           <DialogFooter>
-            <Button type="button" className="bg-slate-900 text-white hover:bg-slate-800" onClick={handleAssignShipper}>
+            <Button
+              type="button"
+              className="bg-slate-900 text-white hover:bg-slate-800"
+              onClick={() => void handleAssignStaff()}
+              disabled={isAssigningStaff}
+            >
               Thêm người giao hàng
             </Button>
           </DialogFooter>

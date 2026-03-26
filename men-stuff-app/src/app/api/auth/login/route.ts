@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       .maybeSingle()
 
     if (accountError || !account) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+      return NextResponse.json({ error: 'Không tìm thấy Account' }, { status: 401 })
     }
 
     const isMatch = await bcrypt.compare(password, account.password ?? '')
