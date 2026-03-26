@@ -60,10 +60,35 @@ export async function getAllStaffWork(options: GetStaffWorkOptions = {}): Promis
 
     if (error) throw error
 
-    const rows: StaffWorkAdminRow[] = (data ?? []).map((row: Record<string, unknown>) => {
+    const staffWorkRows = (data ?? []) as Array<StaffWorkAdminRow & { assigned_to?: string | null }>
+
+    // Lấy full_name của staff dựa theo assigned_to để render cột "Người được giao".
+    const assignedToIds = Array.from(
+      new Set(staffWorkRows.map((r) => r.assigned_to).filter((id): id is string => !!id)),
+    )
+
+    let staffNameById: Map<string, string | null> = new Map()
+    if (assignedToIds.length) {
+      const { data: staffRows, error: staffError } = await supabase
+        .from('staff')
+        .select('id, full_name')
+        .in('id', assignedToIds)
+
+      if (staffError) throw staffError
+
+      staffNameById = new Map(
+        (staffRows ?? []).map((s: Record<string, unknown>) => [
+          String(s.id),
+          (s.full_name as string | null) ?? null,
+        ]),
+      )
+    }
+
+    const rows: StaffWorkAdminRow[] = staffWorkRows.map((row) => {
+      const assignee_full_name = row.assigned_to ? staffNameById.get(row.assigned_to) ?? null : null
       return {
         ...(row as StaffWorkAdminRow),
-        assignee_full_name: (row as StaffWorkAdminRow & { assignee_full_name?: unknown }).assignee_full_name ?? null,
+        assignee_full_name,
       }
     })
 
