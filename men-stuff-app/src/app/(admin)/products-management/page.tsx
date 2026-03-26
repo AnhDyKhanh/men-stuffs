@@ -186,7 +186,7 @@ export default function AdminProductsPage() {
       />
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-h-[85vh] overflow-auto sm:max-w-2xl p-4">
+        <DialogContent className="max-h-[85vh] overflow-auto border-slate-200 bg-white text-slate-900 sm:max-w-2xl p-4">
           <DialogHeader>
             <DialogTitle>Tạo sản phẩm mới</DialogTitle>
           </DialogHeader>
