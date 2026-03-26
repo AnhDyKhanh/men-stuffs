@@ -14,6 +14,7 @@ export type CreateOrderDTO = {
   total_amount: number
   payment_method: PaymentMethod
   payment_status?: PaymentStatus
+  delivery_method?: 'pickup_at_shop' | 'home_delivery'
   shipping_address: string
   receiver_name: string
   receiver_phone: string
@@ -26,6 +27,7 @@ export async function createOrder(body: CreateOrderDTO) {
     total_amount,
     payment_method,
     payment_status = 'pending',
+    delivery_method = 'pickup_at_shop',
     shipping_address,
     receiver_name,
     receiver_phone,
@@ -59,7 +61,10 @@ export async function createOrder(body: CreateOrderDTO) {
         status: 'pending',
         payment_method,
         payment_status,
-        shipping_address,
+        shipping_address:
+          delivery_method === 'pickup_at_shop'
+            ? `Nhận tại shop - ${shipping_address || 'Showroom Men Stuffs'}`
+            : shipping_address,
         receiver_name,
         receiver_phone,
       })

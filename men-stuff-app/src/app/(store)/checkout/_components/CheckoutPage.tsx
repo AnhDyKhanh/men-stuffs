@@ -15,6 +15,14 @@ import { OrderSummary } from './OrderSummary'
 import { PAYMENT_METHOD_LABELS } from '../_constants/payment'
 import { PaymentMethod } from '@/enum/payment.enum'
 import { useRouter } from 'next/navigation'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export default function CheckoutPage() {
   const { data: cartResponse, isLoading } = useGetCustomerCurrentCart()
@@ -31,6 +39,8 @@ export default function CheckoutPage() {
   })
   const [address, setAddress] = useState({ province: '', district: '' })
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'bank_transfer' | 'momo'>('cod')
+  const [deliveryMethod, setDeliveryMethod] = useState<'pickup_at_shop' | 'home_delivery' | null>(null)
+  const [showDeliveryDialog, setShowDeliveryDialog] = useState(false)
 
   const cartItems = useMemo(() => cartResponse?.cartItems ?? [], [cartResponse?.cartItems])
   const cartId = cartResponse?.cartId ?? ''
@@ -42,16 +52,38 @@ export default function CheckoutPage() {
     }, 0)
   }, [cartItems])
 
-  const handleSubmit = () => {
-    if (!formData.phone || !address.province || !formData.street || !paymentMethod) {
-      return toast.error('Vui lòng điền đầy đủ thông tin giao hàng')
+  const validateFormBeforePayment = () => {
+    if (!formData.phone || !paymentMethod) {
+      toast.error('Vui lòng điền đầy đủ thông tin giao hàng')
+      return false
     }
+    if (deliveryMethod === 'pickup_at_shop' && (!formData.firstName || !formData.lastName)) {
+      toast.error('Vui lòng nhập họ tên người nhận')
+      return false
+    }
+    if (deliveryMethod !== 'pickup_at_shop' && (!address.province || !formData.street)) {
+      toast.error('Vui lòng điền địa chỉ nhận hàng')
+      return false
+    }
+    return true
+  }
+
+  const handleSubmit = () => {
+    if (!deliveryMethod) {
+      setShowDeliveryDialog(true)
+      return
+    }
+    if (!validateFormBeforePayment()) return
 
     const payload = {
       cart_id: cartId,
       total_amount: subtotal,
       payment_method: paymentMethod,
-      shipping_address: `${formData.street}, ${address.district}, ${address.province}`.trim(),
+      delivery_method: deliveryMethod,
+      shipping_address:
+        deliveryMethod === 'pickup_at_shop'
+          ? 'Showroom Men Stuffs'
+          : `${formData.street}, ${address.district}, ${address.province}`.trim(),
       receiver_name: `${formData.firstName} ${formData.lastName}`.trim(),
       receiver_phone: formData.phone,
       items: cartItems.map((item: CartItem) => ({
@@ -64,7 +96,7 @@ export default function CheckoutPage() {
     createPayment(payload, {
       onSuccess: () => {
         toast.success('Thanh toán thành công')
-        router.push('/')
+        router.push('/cart')
       },
       onError: () => {
         toast.error('Thanh toán thất bại')
@@ -151,7 +183,13 @@ export default function CheckoutPage() {
             <Button
               size="lg"
               className="rounded-none bg-white px-8 py-6 font-bold tracking-widest text-black uppercase hover:bg-zinc-200"
-              onClick={handleSubmit}
+              onClick={() => {
+                if (!deliveryMethod) {
+                  setShowDeliveryDialog(true)
+                  return
+                }
+                handleSubmit()
+              }}
               disabled={isSubmitting || cartItems.length === 0}
             >
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -165,6 +203,58 @@ export default function CheckoutPage() {
           <OrderSummary items={cartItems} subtotal={subtotal} isLoading={isLoading} />
         </div>
       </div>
+
+      <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
+        <DialogContent className="border-zinc-800 bg-black text-white">
+          <DialogHeader>
+            <DialogTitle>Bạn muốn nhận hàng theo cách nào?</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Chọn cách nhận hàng trước khi tiếp tục thanh toán.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod('pickup_at_shop')}
+              className={`w-full rounded-xl border p-4 text-left transition ${
+                deliveryMethod === 'pickup_at_shop'
+                  ? 'border-[#F7931A] bg-[#F7931A]/10'
+                  : 'border-zinc-700 bg-zinc-900/50 hover:border-zinc-500'
+              }`}
+            >
+              <p className="text-sm font-semibold">Nhận hàng tại shop</p>
+              <p className="mt-1 text-xs text-zinc-400">Ưu tiên xử lý - có cập nhật trạng thái sẵn sàng</p>
+            </button>
+
+            <button
+              type="button"
+              disabled
+              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/20 p-4 text-left opacity-50"
+            >
+              <p className="text-sm font-semibold">Nhận hàng tại nhà</p>
+              <p className="mt-1 text-xs text-zinc-500">Coming soon</p>
+            </button>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              onClick={() => {
+                if (!deliveryMethod) {
+                  toast.error('Vui lòng chọn cách nhận hàng')
+                  return
+                }
+                setShowDeliveryDialog(false)
+                handleSubmit()
+              }}
+              className="bg-white text-black hover:bg-zinc-200"
+            >
+              Tiếp tục thanh toán
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { API_ROUTES } from '@/constants/apiRouter'
 import { BASE_PATH } from '@/lib/labels'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import { getHotProductIdsToday, trackProductClick } from '@/lib/productHot'
 import type { Product } from '@/models/product'
+import { getOrderStatusLabel } from '@/constants/orderStatus'
 import { Sparkles, Send, X } from 'lucide-react'
 
 const STORAGE_PREFS = 'men_stuffs_chatbot_prefs_v1'
@@ -79,18 +81,27 @@ function botReply(userText: string): string {
   const t = userText.toLowerCase()
 
   if (/new\s*in|mới|hàng mới|arrival/i.test(t)) {
-    bumpTopic('new_in')
     return `Bạn có thể xem hàng mới tại trang New In — mình ưu tiên gợi ý này khi bạn hỏi về sản phẩm mới. Mở: ${BASE_PATH}/new-in`
   }
   if (/giỏ|cart|thanh toán|checkout/i.test(t)) {
-    bumpTopic('cart')
     return `Giỏ hàng & thanh toán: xem giỏ tại ${BASE_PATH}/cart và thanh toán tại ${BASE_PATH}/checkout khi bạn đã đăng nhập.`
   }
-  if (/đơn|order|ship|giao hàng|vận chuyển/i.test(t)) {
-    return `Đơn hàng sau khi đặt sẽ được xử lý theo trạng thái (chờ xác nhận → giao hàng). Bạn có thể xem lại thông tin nhận hàng trong email/xác nhận đơn (nếu team đã bật).`
+  if (/nhận tại shop|pickup|lấy tại shop|cửa hàng/i.test(t)) {
+    return `Bạn có thể chọn nhận tại shop ngay ở bước checkout. Luồng trạng thái sẽ đi theo: đã nhận đơn -> đang chuẩn bị -> đã sẵn sàng -> đã nhận hàng.`
+  }
+  if (/giao tận nhà|giao về nhà|ship về nhà/i.test(t)) {
+    return `Nhận hàng tại nhà hiện đang ở trạng thái Coming soon. Bạn có thể dùng nhận tại shop để đặt đơn ngay.`
+  }
+  if (/liên hệ|contact|hotline|hỗ trợ/i.test(t)) {
+    return `Bạn có thể vào trang liên hệ tại ${BASE_PATH}/pages/contact hoặc nhắn trực tiếp trong khung chat này, mình sẽ hướng dẫn nhanh cho bạn.`
+  }
+  if (/đổi trả|hoàn tiền|refund/i.test(t)) {
+    return `Để hỗ trợ đổi trả/hoàn tiền nhanh nhất, bạn gửi mã đơn + lý do ở trang liên hệ ${BASE_PATH}/pages/contact để team xử lý.`
+  }
+  if (/collection|bộ sưu tập|combo/i.test(t)) {
+    return `Bạn có thể xem bộ sưu tập tại ${BASE_PATH}/collections và thêm từng món hoặc thêm cả bộ vào giỏ hàng.`
   }
   if (/giá|sale|giảm/i.test(t)) {
-    bumpTopic('products')
     return `Giá hiển thị theo từng sản phẩm — vào Tất cả sản phẩm để lọc và so sánh: ${BASE_PATH}/products`
   }
   if (/chào|hello|hi\b/i.test(t)) {
@@ -141,7 +152,19 @@ function buildCatalogSummary(products: Product[]): string | null {
 
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [orderAlertCount, setOrderAlertCount] = useState(0)
+  const [prefs, setPrefs] = useState<Prefs>(() => loadPrefs())
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      const raw = localStorage.getItem(STORAGE_HISTORY)
+      if (!raw) return []
+      const parsed = JSON.parse(raw) as Message[]
+      return Array.isArray(parsed) ? parsed.slice(-40) : []
+    } catch {
+      return []
+    }
+  })
   const [input, setInput] = useState('')
   const [isDropActive, setIsDropActive] = useState(false)
   const listRef = useRef<HTMLDivElement>(null)
@@ -151,8 +174,6 @@ export default function ChatbotWidget() {
     orderBy: 'created_at',
     ascending: false,
   })
-
-  const prefs = useMemo(() => loadPrefs(), [messages, isOpen])
 
   const suggestions = useMemo(() => rankedSuggestions(prefs).slice(0, 4), [prefs])
   const rawProducts = useMemo(
@@ -182,22 +203,14 @@ export default function ChatbotWidget() {
     return allProducts.slice(0, 4).map((p) => ({ ...p, badge: 'NEW' as const }))
   }, [allProducts])
 
+  const recordTopic = useCallback((topic: string) => {
+    bumpTopic(topic)
+    setPrefs(loadPrefs())
+  }, [])
+
   useEffect(() => {
     listRef.current?.scrollTo(0, listRef.current.scrollHeight)
   }, [messages])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const raw = localStorage.getItem(STORAGE_HISTORY)
-      if (raw) {
-        const parsed = JSON.parse(raw) as Message[]
-        if (Array.isArray(parsed) && parsed.length) setMessages(parsed.slice(-40))
-      }
-    } catch {
-      /* ignore */
-    }
-  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined' || messages.length === 0) return
@@ -208,7 +221,7 @@ export default function ChatbotWidget() {
     }
   }, [messages])
 
-  const handleSend = useCallback(async () => {
+  const handleSend = async () => {
     const text = input.trim()
     if (!text) return
 
@@ -217,8 +230,13 @@ export default function ChatbotWidget() {
     setInput('')
 
     const lower = text.toLowerCase()
+    if (/new\s*in|mới|hàng mới|arrival/i.test(lower)) recordTopic('new_in')
+    if (/giỏ|cart|thanh toán|checkout/i.test(lower)) recordTopic('cart')
+    if (/giá|sale|giảm|sản phẩm|products/i.test(lower)) recordTopic('products')
+    if (/liên hệ|contact|hỗ trợ|hotline/i.test(lower)) recordTopic('contact')
 
     const asksCart = /giỏ|cart|trong giỏ|xem giỏ|giỏ hàng/i.test(lower)
+    const asksOrderStatus = /đơn|order|trang thái|chuẩn bị|sẵn sàng|nhận hàng/i.test(lower)
     if (asksCart) {
       bumpTopic('cart')
       try {
@@ -273,6 +291,47 @@ export default function ChatbotWidget() {
       return
     }
 
+    if (asksOrderStatus) {
+      try {
+        const res = await fetch(API_ROUTES.GUEST.ORDERS, { cache: 'no-store', credentials: 'include' })
+        const json = (await res.json()) as {
+          data?: { orders?: Array<{ order_code: string | null; status: string | null }>; processingCount?: number }
+        }
+        const orders = json?.data?.orders ?? []
+        if (!res.ok || orders.length === 0) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `b-${Date.now()}`,
+              role: 'bot',
+              text: 'Bạn chưa có đơn nào gần đây. Khi đặt đơn nhận tại shop, mình sẽ cập nhật tiến độ cho bạn.',
+            },
+          ])
+          return
+        }
+        const lines = orders.slice(0, 3).map((order) => {
+          return `• ${order.order_code ?? 'Đơn gần nhất'}: ${getOrderStatusLabel(order.status)}`
+        })
+        const processing = Number(json?.data?.processingCount ?? 0)
+        const hasReady = orders.some((order) => order.status === 'ready_for_pickup')
+        const tail = hasReady
+          ? 'Có đơn đã sẵn sàng, bạn có thể đến shop nhận hàng.'
+          : processing > 0
+            ? `Hiện còn ${processing} đơn đang xử lý.`
+            : 'Tất cả đơn đang ở trạng thái hoàn tất.'
+        setMessages((prev) => [
+          ...prev,
+          { id: `b-${Date.now()}`, role: 'bot', text: `Tiến độ đơn hàng:\n${lines.join('\n')}\n${tail}` },
+        ])
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { id: `b-${Date.now()}`, role: 'bot', text: 'Không tải được trạng thái đơn lúc này. Thử lại sau nhé.' },
+        ])
+      }
+      return
+    }
+
     const asksPriceFacts =
       /đắt nhất|rẻ nhất|giá cao|giá thấp|expensive|cheap|mới nhất|mới ra|hàng mới|giá|bao nhiêu|khoảng giá/i.test(
         lower,
@@ -310,10 +369,34 @@ export default function ChatbotWidget() {
         }
       : { id: `b-${Date.now()}`, role: 'bot', text: reply }
     setMessages((prev) => [...prev, botMsg])
-  }, [catalogSummary, hotProducts, newProducts])
+  }
+
+  useEffect(() => {
+    let mounted = true
+    const loadOrderAlerts = async () => {
+      try {
+        const res = await fetch(API_ROUTES.GUEST.ORDERS, { cache: 'no-store', credentials: 'include' })
+        if (!res.ok) return
+        const json = (await res.json()) as {
+          data?: { processingCount?: number; orders?: Array<{ status: string | null }> }
+        }
+        const processing = Number(json?.data?.processingCount ?? 0)
+        const readyCount = (json?.data?.orders ?? []).filter((item) => item.status === 'ready_for_pickup').length
+        if (mounted) setOrderAlertCount(processing + readyCount)
+      } catch {
+        if (mounted) setOrderAlertCount(0)
+      }
+    }
+    void loadOrderAlerts()
+    const timer = setInterval(() => void loadOrderAlerts(), 20000)
+    return () => {
+      mounted = false
+      clearInterval(timer)
+    }
+  }, [])
 
   const onChip = useCallback((topic: string, href: string) => {
-    bumpTopic(topic)
+    recordTopic(topic)
     const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', text: `[Gợi ý] ${href}` }
     const botMsg: Message = {
       id: `b-${Date.now()}`,
@@ -321,7 +404,7 @@ export default function ChatbotWidget() {
       text: `Đã ghi nhớ bạn quan tâm "${topic}". Mở link: ${href}`,
     }
     setMessages((prev) => [...prev, userMsg, botMsg])
-  }, [])
+  }, [recordTopic])
 
   const handleDropProduct = useCallback((event: React.DragEvent<HTMLElement>) => {
     event.preventDefault()
@@ -338,10 +421,19 @@ export default function ChatbotWidget() {
       }
       trackProductClick(product.id)
       const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', text: `[Kéo vào chat] ${product.name}` }
+      const rawValue = Number((product.priceFormatted ?? '').replace(/[^\d]/g, ''))
+      const related = allProducts
+        .filter((item) => item.id !== product.id)
+        .filter((item) => {
+          const itemValue = Number(item.priceFormatted.replace(/[^\d]/g, ''))
+          if (!rawValue || !itemValue) return true
+          return itemValue >= rawValue * 0.65 && itemValue <= rawValue * 1.35
+        })
+        .slice(0, 3)
       const botMsg: Message = {
         id: `b-${Date.now() + 1}`,
         role: 'bot',
-        text: `Mẫu "${product.name}" hợp style tối giản, đi chơi hoặc đi làm đều ổn. Bạn có thể phối với vòng tay bạc trơn + dây chuyền mảnh để tổng thể cân bằng hơn.`,
+        text: `Mẫu "${product.name}" hợp style tối giản, đi chơi hoặc đi làm đều ổn. Gợi ý phối nhanh: 1 item làm điểm nhấn + 1 item nền trung tính để tổng thể cân bằng hơn. Dưới đây là vài món liên quan cùng tầm giá để bạn mix thêm:`,
         products: [
           {
             id: product.id,
@@ -351,13 +443,14 @@ export default function ChatbotWidget() {
             imageUrl: product.imageUrl ?? 'https://placehold.co/400x400/f5f5f5/999?text=Product',
             badge: 'HOT',
           },
+          ...related,
         ],
       }
       setMessages((prev) => [...prev, userMsg, botMsg])
     } catch {
       // ignore invalid payload
     }
-  }, [])
+  }, [allProducts])
 
   return (
     <>
@@ -368,12 +461,17 @@ export default function ChatbotWidget() {
         className="fixed right-6 bottom-6 z-50 h-14 w-14 rounded-full border border-white/15 bg-linear-to-br from-[#0F1115] to-[#1a1d24] text-white shadow-glow-orange focus-visible:ring-2 focus-visible:ring-[#F7931A]"
         aria-label={isOpen ? 'Đóng trợ lý Men Stuffs' : 'Mở trợ lý Men Stuffs'}
       >
+        {orderAlertCount > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
+            {orderAlertCount > 99 ? '99+' : orderAlertCount}
+          </span>
+        )}
         {isOpen ? <X className="h-6 w-6" /> : <Sparkles className="h-6 w-6 text-[#F7931A]" />}
       </Button>
 
       {isOpen && (
         <Card
-          className="fixed right-6 bottom-24 z-50 flex w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden border-white/10 bg-card/95 p-0 text-card-foreground shadow-[0_0_40px_-12px_rgba(247,147,26,0.35)] backdrop-blur-md"
+          className="fixed right-4 top-20 z-50 flex h-[min(680px,calc(100dvh-6rem))] w-[380px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden border-white/10 bg-card/95 p-0 text-card-foreground shadow-[0_0_40px_-12px_rgba(247,147,26,0.35)] backdrop-blur-md sm:right-6"
           role="dialog"
           aria-label="Trợ lý Men Stuffs"
           onDragOver={(event) => {
@@ -390,12 +488,24 @@ export default function ChatbotWidget() {
                 <span className="text-gradient-gold">Trợ lý</span> mua sắm
               </p>
             </div>
-            <Badge variant="secondary" className="font-mono text-[10px]">
-              Beta
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="font-mono text-[10px]">
+                Beta
+              </Badge>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-white/70 hover:bg-white/10 hover:text-white"
+                onClick={() => setIsOpen(false)}
+                aria-label="Đóng chatbot"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
 
-          <CardContent className="flex flex-col gap-3 p-0">
+          <CardContent className="flex min-h-0 flex-1 flex-col gap-3 p-0">
             <div className="flex flex-wrap gap-2 border-b border-white/10 px-4 py-2">
               {suggestions.map((s) => (
                 <Button
@@ -413,7 +523,7 @@ export default function ChatbotWidget() {
               ))}
             </div>
 
-            <div ref={listRef} className="flex max-h-[280px] min-h-[200px] flex-col gap-3 overflow-y-auto px-4 py-2">
+            <div ref={listRef} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-2">
               {isDropActive && (
                 <div className="rounded-lg border border-dashed border-[#F7931A]/70 bg-[#F7931A]/10 px-3 py-2 text-center text-xs text-white/80">
                   Thả sản phẩm vào đây để được tư vấn chi tiết
@@ -479,7 +589,7 @@ export default function ChatbotWidget() {
               ))}
             </div>
 
-            <div className="flex gap-2 border-t border-white/10 p-3">
+            <div className="mt-auto flex shrink-0 gap-2 border-t border-white/10 bg-background/95 p-3">
               <Input
                 type="text"
                 value={input}
