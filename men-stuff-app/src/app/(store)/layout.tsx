@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers'
-import { labels, BASE_PATH } from '@/lib/labels'
+import { BASE_PATH } from '@/lib/labels'
 import { getUserRole } from '@/lib/auth'
 import { getMainNavLinks, getFooterColumns } from '@/constants/placeholderData'
 import AnnouncementBar from '@/app/(store)/_components/AnnouncementBar'
@@ -18,7 +18,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const footerColumns = getFooterColumns(BASE_PATH)
 
   const accountHref = userRole === 'guest' ? `${BASE_PATH}/login` : `${BASE_PATH}/account`
-  const accountLabel = userRole === 'guest' ? labels.common.login : labels.common.account
+  const accountLabel = userRole === 'guest' ? 'Đăng nhập' : 'Tài khoản'
 
   return (
     <div className="bg-void-texture relative flex min-h-screen flex-col">
@@ -32,8 +32,8 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         accountHref={accountHref}
         accountLabel={accountLabel}
         cartHref={`${BASE_PATH}/cart`}
-        cartLabel={labels.common.cart}
-        searchLabel={labels.common.search}
+        cartLabel="Giỏ hàng"
+        searchLabel="Tìm kiếm"
         adminHref={userRole === 'admin' ? `${BASE_PATH}/dashboard` : undefined}
       />
 
