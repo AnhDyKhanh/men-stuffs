@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     orderBy: searchParams.get('orderBy') || 'created_at',
     ascending: searchParams.get('ascending') === 'true',
     search: searchParams.get('search') ?? undefined,
-    categoryId: searchParams.get('categoryId') ?? undefined,
+    categoryId: searchParams.get('categoryId')?.split(',') ?? [],
     dateFrom: searchParams.get('dateFrom') ?? undefined,
     dateTo: searchParams.get('dateTo') ?? undefined,
   }
@@ -29,7 +29,21 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    // const body = await request.json()
+    const formData = await request.formData()
+
+    const body = {
+      category_id: formData.get('category_id') as string,
+      name: formData.get('name') as string,
+      slug: formData.get('slug') as string,
+      description: formData.get('description') as string,
+      price: Number(formData.get('price')),
+      discount_price: Number(formData.get('discount_price')),
+      material: formData.get('material') as string,
+      is_active: formData.get('is_active') as 'active' | 'inactive',
+      origin_image: formData.get('origin_image') as File,
+    }
+
     const product = await createProduct(body)
 
     return NextResponse.json(product)

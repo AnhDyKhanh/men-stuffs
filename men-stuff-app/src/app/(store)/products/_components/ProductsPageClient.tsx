@@ -29,7 +29,8 @@ function mapProductsToPlaceholder(products: Product[] | null | undefined, basePa
     name: p.name ?? 'Sản phẩm',
     price: p.price ?? 0,
     priceFormatted: formatPrice(p.price ?? 0),
-    imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
+    //nếu ko có ảnh thì lấy từ folder sau public\products\no-image.webp
+    imageUrl: p.origin_image || '/products/no-image.webp',
     href: `${basePath}/product/${p.slug || p.id}`,
     rating: 0,
     reviewCount: 0,
@@ -148,7 +149,7 @@ export default function ProductsPageClient({
     size: PAGE_SIZE,
     orderBy: 'created_at',
     ascending: false,
-    categoryId: categoryId || undefined,
+    categoryId: categoryId ? [categoryId] : [],
     search: searchApplied || undefined,
   })
 

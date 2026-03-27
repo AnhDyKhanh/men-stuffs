@@ -6,7 +6,7 @@ create table if not exists public.collection (
   name text not null,
   description text,
   created_at timestamptz not null default now()
-);
+); 
 
 create table if not exists public.collection_item (
   collection_id uuid not null references public.collection (id) on delete cascade,

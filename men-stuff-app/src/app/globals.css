@@ -202,3 +202,26 @@ src/components/store/PrimaryButton.tsx — pill gradient CTA
 Hiện tại chưa bắt buộc; dùng class như trên là đủ thống nhất.
 
 Tóm lại: Màn mới storefront → tạo trong (store), dùng text-gradient-gold / border-white/10 / bg-[#0F1115]/70 / CTA bg-linear-to-r, và ưu tiên shadcn (Card, Button) với token mới. Nếu bạn nói rõ màn mới là gì (ví dụ /wishlist), mình có thể scaffold sẵn 1 page + 1 component template cho team. */
+
+.admin-theme,
+.admin {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #f8fafc;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --primary: #ea580c;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --accent: #fff7ed;
+  --accent-foreground: #0f172a;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+}

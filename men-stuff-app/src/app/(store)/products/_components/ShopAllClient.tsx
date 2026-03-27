@@ -63,7 +63,7 @@ export default function ShopAllClient() {
     orderBy: 'created_at',
     ascending: false,
     search: search || undefined,
-    categoryId: categoryId || undefined,
+    categoryId: categoryId ? [categoryId] : [],
     dateFrom: dateFrom || undefined,
     dateTo: dateTo || undefined,
   })
