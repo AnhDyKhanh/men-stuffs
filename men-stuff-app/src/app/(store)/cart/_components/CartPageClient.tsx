@@ -61,9 +61,9 @@ export default function CartPageClient({ cartItems, basePath }: CartPageClientPr
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     const discount = (subtotal * discountPercent) / 100
     const shipping = subtotal > 1_000_000 ? 0 : 30_000
-    const tax = (subtotal - discount) * 0.08
-    const total = subtotal - discount + shipping + tax
-    return { subtotal, discount, shipping, tax, total }
+    
+    const total = subtotal - discount + shipping 
+    return { subtotal, discount, shipping,  total }
   }, [cartItems, discountPercent])
 
   const handleApplyDiscount = () => {
@@ -245,7 +245,7 @@ export default function CartPageClient({ cartItems, basePath }: CartPageClientPr
                 onClick={() => router.push(`${basePath}/checkout`)}
                 className="h-12 w-full rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] text-sm font-semibold tracking-wider text-white shadow-[0_0_20px_-5px_rgba(234,88,12,0.5)] transition hover:shadow-[0_0_30px_-5px_rgba(247,147,26,0.6)]"
               >
-                Thanh toán ngay
+                Tạo đơn hàng
               </Button>
             </CardContent>
           </Card>
