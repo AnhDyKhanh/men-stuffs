@@ -3,6 +3,7 @@
 import { CreateProductDTO } from '@/app/api/admin/products/services/createProducts'
 import { API_ROUTES } from '@/constants/apiRouter'
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 // export type CreateProductDTO = {
 //   category_id: string
@@ -34,5 +35,13 @@ async function createProduct(payload: CreateProductDTO) {
 export function useCreateProductMutation() {
   return useMutation({
     mutationFn: createProduct,
+    onSuccess: (data) => {
+      toast.success('Đã tạo sản phẩm thành công')
+      return data
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Lỗi hệ thống')
+      return error
+    },
   })
 }

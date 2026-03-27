@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BASE_PATH } from '@/lib/labels'
 import { API_ROUTES } from '@/constants/apiRouter'
@@ -12,7 +13,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
+import { useAddToCart } from '@/hooks/useAddToCart'
+import { useAuth } from '@/hooks/useAuth'
+import RequireLoginDialog from '@/components/shared/RequireLoginDialog'
 import type { Product } from '@/models/product'
+import { toast } from 'sonner'
 
 type CollectionFromApi = {
   id: string
@@ -71,6 +76,37 @@ async function fetchPublicCollections(): Promise<CollectionFromApi[]> {
 }
 
 export default function CollectionsPageClient() {
+  const router = useRouter()
+  const { isAuthenticated } = useAuth()
+  const { mutateAsync: addToCart, isPending: addingToCart } = useAddToCart()
+  const [showRequireLoginDialog, setShowRequireLoginDialog] = useState(false)
+
+  const addProductToCart = async (product: Product) => {
+    if (!isAuthenticated) {
+      setShowRequireLoginDialog(true)
+      return
+    }
+    const price = effectivePrice(product)
+    await addToCart({
+      productId: product.id,
+      quantity: 1,
+      priceAtTime: price,
+    })
+  }
+
+  const addCollectionToCart = async (items: Product[]) => {
+    if (items.length === 0) return
+    if (!isAuthenticated) {
+      setShowRequireLoginDialog(true)
+      return
+    }
+    for (const item of items) {
+      await addProductToCart(item)
+    }
+    toast.success('Đã thêm bộ sưu tập vào giỏ hàng')
+    router.push(`${BASE_PATH}/cart`)
+  }
+
   const { data: curated = [], isLoading: loadingCurated } = useQuery({
     queryKey: ['@public-collections'],
     queryFn: fetchPublicCollections,
@@ -83,7 +119,7 @@ export default function CollectionsPageClient() {
     ascending: false,
   })
 
-  const products = (data?.data ?? []) as Product[]
+  const products = useMemo(() => (data?.data ?? []) as Product[], [data])
 
   const comboA = useMemo(() => comboNewInStack(products), [products])
   const comboB = useMemo(() => comboPriceSpectrum(products), [products])
@@ -95,7 +131,8 @@ export default function CollectionsPageClient() {
   const loading = loadingCurated || (showFallback && loadingProducts)
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <>
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
       <header className="mb-10 text-center sm:mb-14">
         <p className="mb-3 font-mono text-[11px] tracking-[0.25em] text-muted-foreground uppercase">Men Stuffs</p>
         <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl">
@@ -174,11 +211,19 @@ export default function CollectionsPageClient() {
                             <p className="line-clamp-2 min-h-[2.5rem] text-sm font-medium text-white">{p.name}</p>
                             <p className="mt-2 font-mono text-lg font-semibold text-gradient-gold">{formatVnd(price)}</p>
                             <Button
-                              asChild
                               variant="outline"
                               size="sm"
                               className="mt-3 w-full border-white/15 bg-white/5 text-white hover:bg-white/10"
+                              onClick={() => {
+                                addProductToCart(p)
+                                  .then(() => toast.success('Đã thêm sản phẩm vào giỏ hàng'))
+                                  .catch(() => toast.error('Thêm vào giỏ thất bại'))
+                              }}
+                              disabled={addingToCart}
                             >
+                              Thêm vào giỏ
+                            </Button>
+                            <Button asChild variant="ghost" size="sm" className="mt-2 w-full text-white/70 hover:text-white">
                               <Link href={productHref(p)}>Chi tiết</Link>
                             </Button>
                           </div>
@@ -190,12 +235,15 @@ export default function CollectionsPageClient() {
                 <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-6 py-4">
                   <span className="font-mono text-[10px] tracking-widest text-white/45 uppercase">Bộ sưu tập</span>
                   <Button
-                    asChild
                     size="sm"
                     variant="secondary"
                     className="rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15"
+                    onClick={() => {
+                      addCollectionToCart(items).catch(() => toast.error('Không thể thêm bộ sưu tập lúc này'))
+                    }}
+                    disabled={addingToCart || items.length === 0}
                   >
-                    <Link href={`${BASE_PATH}/products`}>Xem tất cả sản phẩm</Link>
+                    Thêm cả bộ vào giỏ
                   </Button>
                 </CardFooter>
               </Card>
@@ -298,13 +346,26 @@ export default function CollectionsPageClient() {
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-6 py-4">
               <span className="font-mono text-[10px] tracking-widest text-white/45 uppercase">New In</span>
-              <Button
-                asChild
-                size="sm"
-                className="rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] font-semibold text-primary-foreground shadow-glow-orange"
-              >
-                <Link href={`${BASE_PATH}/new-in`}>Xem New In</Link>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15"
+                  onClick={() => {
+                    addCollectionToCart(comboA).catch(() => toast.error('Không thể thêm bộ sưu tập lúc này'))
+                  }}
+                  disabled={addingToCart || comboA.length === 0}
+                >
+                  Thêm cả bộ vào giỏ
+                </Button>
+                <Button
+                  asChild
+                  size="sm"
+                  className="rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] font-semibold text-primary-foreground shadow-glow-orange"
+                >
+                  <Link href={`${BASE_PATH}/new-in`}>Xem New In</Link>
+                </Button>
+              </div>
             </CardFooter>
           </Card>
 
@@ -367,19 +428,37 @@ export default function CollectionsPageClient() {
               </CardContent>
               <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-6 py-4">
                 <span className="font-mono text-[10px] tracking-widest text-white/45 uppercase">Shop All</span>
-                <Button
-                  asChild
-                  size="sm"
-                  variant="secondary"
-                  className="rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15"
-                >
-                  <Link href={`${BASE_PATH}/products`}>Xem tất cả</Link>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15"
+                    onClick={() => {
+                      addCollectionToCart(comboB).catch(() => toast.error('Không thể thêm bộ sưu tập lúc này'))
+                    }}
+                    disabled={addingToCart || comboB.length === 0}
+                  >
+                    Thêm cả bộ vào giỏ
+                  </Button>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="secondary"
+                    className="rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15"
+                  >
+                    <Link href={`${BASE_PATH}/products`}>Xem tất cả</Link>
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           )}
         </div>
       )}
-    </div>
+      </div>
+      <RequireLoginDialog
+        showRequireLoginDialog={showRequireLoginDialog}
+        onClose={() => setShowRequireLoginDialog(false)}
+      />
+    </>
   )
 }

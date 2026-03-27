@@ -5,7 +5,15 @@ import type { Cart } from './cart'
  * Order entity (table: orders)
  * Many-to-one with customer; one-to-one with cart (cart_id unique).
  */
-export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'delivered' | 'cancelled' | string
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'ready_for_pickup'
+  | 'picked_up'
+  | 'shipping'
+  | 'delivered'
+  | 'cancelled'
+  | string
 
 export type PaymentMethod = 'cod' | 'bank_transfer' | 'momo' | string
 

@@ -6,16 +6,23 @@ export type SubmitFeedbackDTO = {
   comment: string
   product_id?: string | null
   order_id?: string | null
+  image_urls?: string[]
 }
 
 export async function submitFeedback(body: SubmitFeedbackDTO) {
-  const { rating, comment, product_id, order_id } = body
+  const { rating, comment, product_id, order_id, image_urls = [] } = body
   const validRating = Math.min(5, Math.max(1, Number(rating)))
   const trimmedComment = typeof comment === 'string' ? comment.trim() : ''
 
   try {
     const supabase = getSupabase()
-    const customerId = await getCurrentCustomerId().catch(() => null)
+    const customerIdRaw = await getCurrentCustomerId().catch(() => null)
+    const customerId = typeof customerIdRaw === 'string' ? customerIdRaw : null
+    const normalizedImages = image_urls.filter(Boolean).slice(0, 5)
+    const finalComment =
+      normalizedImages.length > 0
+        ? `${trimmedComment}${trimmedComment ? '\n\n' : ''}Ảnh đính kèm:\n${normalizedImages.join('\n')}`
+        : trimmedComment
 
     const { data, error } = await supabase
       .from('feedback')
@@ -24,7 +31,7 @@ export async function submitFeedback(body: SubmitFeedbackDTO) {
         product_id: product_id ?? null,
         order_id: order_id ?? null,
         rating: validRating,
-        comment: trimmedComment || null,
+        comment: finalComment || null,
       })
       .select('id')
       .single()

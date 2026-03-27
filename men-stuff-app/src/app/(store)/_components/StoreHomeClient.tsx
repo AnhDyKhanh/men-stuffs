@@ -1,78 +1,21 @@
 'use client'
 
-import Link from 'next/link'
-import { labels, BASE_PATH } from '@/lib/labels'
-import {
-  getHeroSlides,
-  getNewProducts as getPlaceholderNewProducts,
-  getFeaturedCategories as getPlaceholderFeaturedCategories,
-  getTwoBannerRows,
-  type PlaceholderProduct,
-} from '@/constants/placeholderData'
-import type { FeaturedCategory } from '@/constants/placeholderData'
+import FeaturedCategoriesSection from '@/app/(store)/_components/FeaturedCategoriesSection'
 import HeroSlideshow from '@/app/(store)/_components/HeroSlideshow'
 import ProductGrid from '@/app/(store)/_components/ProductGrid'
 import TwoBannerSection from '@/app/(store)/_components/TwoBannerSection'
-import FeaturedCategoriesSection from '@/app/(store)/_components/FeaturedCategoriesSection'
+import {
+  getHeroSlides,
+  getNewProducts as getPlaceholderNewProducts,
+  getTwoBannerRows,
+  type PlaceholderProduct
+} from '@/constants/placeholderData'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import { useGetAllCategories } from '@/hooks/useGetAllCategories'
+import { BASE_PATH, labels } from '@/lib/labels'
 import type { Product } from '@/models/product'
-
-const CURRENCY = 'VND'
-const LOCALE_VI = 'vi-VN'
-
-function formatPrice(value: number): string {
-  return new Intl.NumberFormat(LOCALE_VI, {
-    style: 'currency',
-    currency: CURRENCY,
-    maximumFractionDigits: 0,
-  }).format(value)
-}
-
-function mapProductsToPlaceholder(products: Product[] | null | undefined, basePath: string): PlaceholderProduct[] {
-  if (!products) return []
-
-  return products.map((p) => {
-    const price = p.price ?? 0
-
-    return {
-      id: p.id,
-      name: p.name ?? 'Sản phẩm',
-      price,
-      priceFormatted: formatPrice(price),
-      imageUrl: p.origin_image || 'https://placehold.co/400x400/f5f5f5/999?text=Product',
-      href: `${basePath}/product/${p.id}`,
-      rating: 0,
-      reviewCount: 0,
-      label: 'new',
-    }
-  })
-}
-
-function mapCategoriesToFeatured(
-  categories: { id: string; name?: string; slug?: string }[] | null | undefined,
-  basePath: string,
-  limit = 4,
-): FeaturedCategory[] {
-  if (!categories || categories.length === 0) {
-    return getPlaceholderFeaturedCategories(basePath)
-  }
-
-  const placeholderCats = getPlaceholderFeaturedCategories(basePath)
-
-  return categories.slice(0, limit).map(
-    (cat, index): FeaturedCategory => ({
-      id: cat.id,
-      title: cat.name || `Danh mục ${index + 1}`,
-      imageUrl: (() => {
-        const key = cat.slug || cat.id
-        const matched = placeholderCats.find((p) => p.id === key || p.id === cat.id)
-        return matched?.imageUrl ?? placeholderCats[0]?.imageUrl ?? '/categories/rings.png'
-      })(),
-      href: `${basePath}/products?categoryId=${encodeURIComponent(cat.slug || cat.id)}`,
-    }),
-  )
-}
+import Link from 'next/link'
+import { mapCategoriesToFeatured, mapProductsToPlaceholder } from '../_utils/home-page.utils'
 
 export default function StoreHomeClient() {
   const heroSlides = getHeroSlides(BASE_PATH)
