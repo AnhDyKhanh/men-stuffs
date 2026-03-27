@@ -16,13 +16,6 @@ type Props = {
   onSearch: () => void
   onRefresh: () => void
   isLoading?: boolean
-  dict: {
-    filterStatus: string
-    all: string
-    searchPlaceholder: string
-    search: string
-    refresh: string
-  }
 }
 
 export function OrdersToolbar({
@@ -33,24 +26,23 @@ export function OrdersToolbar({
   onSearch,
   onRefresh,
   isLoading,
-  dict,
 }: Props) {
   return (
     <Card className=" border-slate-200 bg-white text-slate-900 shadow-sm">
       <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-2">
           <Label htmlFor="order-status-filter" className="font-mono text-[11px] tracking-widest text-slate-500 uppercase">
-            {dict.filterStatus}
+            Trạng thái
           </Label>
           <Select value={statusFilter} onValueChange={onStatusChange}>
             <SelectTrigger
               id="order-status-filter"
               className="w-full min-w-[200px] border-slate-300 bg-white text-slate-900 sm:w-[240px]"
             >
-              <SelectValue placeholder={dict.all} />
+              <SelectValue placeholder="Tất cả" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{dict.all}</SelectItem>
+              <SelectItem value="all">Tất cả</SelectItem>
               {ORDER_STATUS_OPTIONS.map((o) => (
                 <SelectItem key={o.value} value={o.value}>
                   {o.label}
@@ -62,7 +54,7 @@ export function OrdersToolbar({
 
         <div className="flex w-full flex-1 flex-col gap-2 sm:max-w-md">
           <Label htmlFor="order-search" className="font-mono text-[11px] tracking-widest text-slate-500 uppercase">
-            {dict.search}
+            Tìm kiếm
           </Label>
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -72,12 +64,12 @@ export function OrdersToolbar({
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-                placeholder={dict.searchPlaceholder}
+                placeholder="Mã đơn, SĐT, tên người nhận…"
                 className="border-slate-300 bg-white pl-10 text-slate-900 placeholder:text-slate-400"
               />
             </div>
             <Button type="button" variant="secondary" onClick={onSearch} className="shrink-0 border border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200">
-              {dict.search}
+              Tìm
             </Button>
             <Button
               type="button"
@@ -86,7 +78,7 @@ export function OrdersToolbar({
               onClick={onRefresh}
               disabled={isLoading}
               className="shrink-0 border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-              aria-label={dict.refresh}
+              aria-label="Làm mới"
             >
               <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>

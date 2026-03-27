@@ -1,3 +1,5 @@
+import { ProductStatus } from "@/models"
+
 export interface ProductQueryOptions {
   page?: number
   size?: number
@@ -11,4 +13,6 @@ export interface ProductQueryOptions {
   dateFrom?: string
   /** Lọc theo ngày tạo đến (ISO string) */
   dateTo?: string
+  /** Lọc theo status active or inactive */
+  status?: ProductStatus
 }

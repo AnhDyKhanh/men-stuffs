@@ -1,5 +1,5 @@
 'use client'
-import ProductsTable from '@/app/(admin)/dashboard/_components/ProductsTable'
+import ProductsTable from '@/app/(admin)/products-management/_components/ProductsTable'
 import CreateProductDialog from '@/app/(admin)/products-management/_components/CreateProductDialog'
 import { Button } from '@/components/ui/button'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
@@ -12,6 +12,7 @@ export default function AdminProductsPage() {
     size: 100,
     orderBy: 'created_at',
     ascending: false,
+    status: 'active',
   })
   const { data: productsData, refetch } = productsQuery
   const products = productsData?.data ?? []

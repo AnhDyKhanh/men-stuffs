@@ -13,6 +13,7 @@ export async function getAllProducts(options: ProductQueryOptions = {}): Promise
     categoryId,
     dateFrom,
     dateTo,
+    status,
   } = options
 
   const safePage = Math.max(1, Number(page))
@@ -36,6 +37,9 @@ export async function getAllProducts(options: ProductQueryOptions = {}): Promise
     }
     if (dateTo) {
       query = query.lte('created_at', dateTo)
+    }
+    if (status) {
+      query = query.eq('is_active', status)
     }
 
     const { data, error, count } = await query.order(orderBy, { ascending }).range(from, to)

@@ -173,6 +173,7 @@ export default function ChatbotWidget() {
     size: 120,
     orderBy: 'created_at',
     ascending: false,
+    status: 'active',
   })
 
   const suggestions = useMemo(() => rankedSuggestions(prefs).slice(0, 4), [prefs])
@@ -359,14 +360,14 @@ export default function ChatbotWidget() {
     const reply = botReply(text)
     const botMsg: Message = asksConsulting
       ? {
-          id: `b-${Date.now()}`,
-          role: 'bot',
-          text:
-            hotProducts.length > 0
-              ? 'Mình gợi ý vài sản phẩm đang HOT hôm nay cho bạn. Kéo một card bất kỳ vào chat để mình phân tích chi tiết + gợi ý đồ đi kèm.'
-              : 'Mình gợi ý vài sản phẩm NEW phù hợp để bạn tham khảo trước. Bạn có thể kéo card vào chat để mình tư vấn sâu hơn.',
-          products: hotProducts.length > 0 ? hotProducts : newProducts,
-        }
+        id: `b-${Date.now()}`,
+        role: 'bot',
+        text:
+          hotProducts.length > 0
+            ? 'Mình gợi ý vài sản phẩm đang HOT hôm nay cho bạn. Kéo một card bất kỳ vào chat để mình phân tích chi tiết + gợi ý đồ đi kèm.'
+            : 'Mình gợi ý vài sản phẩm NEW phù hợp để bạn tham khảo trước. Bạn có thể kéo card vào chat để mình tư vấn sâu hơn.',
+        products: hotProducts.length > 0 ? hotProducts : newProducts,
+      }
       : { id: `b-${Date.now()}`, role: 'bot', text: reply }
     setMessages((prev) => [...prev, botMsg])
   }
@@ -538,11 +539,10 @@ export default function ChatbotWidget() {
               {messages.map((m) => (
                 <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`max-w-[90%] rounded-xl px-3 py-2 text-sm ${
-                      m.role === 'user'
+                    className={`max-w-[90%] rounded-xl px-3 py-2 text-sm ${m.role === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'border border-white/10 bg-muted/40 text-foreground'
-                    }`}
+                      }`}
                   >
                     <p className="whitespace-pre-wrap">{m.text}</p>
                     {m.products && m.products.length > 0 && (

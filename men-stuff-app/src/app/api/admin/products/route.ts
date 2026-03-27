@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getAllProducts } from './services/getAllProducts'
 import { createProduct } from './services/createProducts'
+import { ProductStatus } from '@/models'
 
 /**
  * GET /api/admin/products
@@ -17,6 +18,7 @@ export async function GET(request: Request) {
     categoryId: searchParams.get('categoryId')?.split(',') ?? [],
     dateFrom: searchParams.get('dateFrom') ?? undefined,
     dateTo: searchParams.get('dateTo') ?? undefined,
+    status: searchParams.get('status') as ProductStatus ?? undefined,
   }
 
   const result = await getAllProducts(options)
