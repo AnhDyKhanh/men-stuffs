@@ -29,6 +29,7 @@ export default function StoreHomeClient() {
     size: 8,
     orderBy: 'created_at',
     ascending: false,
+    status: 'active'
   })
 
   const apiProducts = (productsResponse?.data ?? null) as Product[] | null

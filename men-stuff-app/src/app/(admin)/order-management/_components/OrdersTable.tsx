@@ -1,6 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -9,16 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import type { Order, OrderStatus } from '@/models/order'
-import { ORDER_STATUS_OPTIONS } from './orderConstants'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { API_ROUTES } from '@/constants/apiRouter'
-import { toast } from 'sonner'
+import type { Order, OrderStatus } from '@/models/order'
 import type { Staff } from '@/models/staff'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { ORDER_STATUS_OPTIONS } from './orderConstants'
 
 function formatVnd(n: number | null | undefined) {
   if (n == null) return '—'
@@ -35,33 +35,9 @@ function formatDate(iso: string | Date | null | undefined) {
   }).format(d)
 }
 
-type Dict = {
-  tableTitle: string
-  colCode: string
-  colCustomer: string
-  colPhone: string
-  colTotal: string
-  colStatus: string
-  colPayment: string
-  colCreated: string
-  colAction: string
-  empty: string
-  paymentCod: string
-  paymentBank: string
-  paymentMomo: string
-}
-
-const paymentLabel = (m: string | null | undefined, dict: Dict) => {
-  if (m === 'cod') return dict.paymentCod
-  if (m === 'bank_transfer') return dict.paymentBank
-  if (m === 'momo') return dict.paymentMomo
-  return m ?? '—'
-}
-
 type Props = {
   orders: Order[] | null | undefined
   isLoading: boolean
-  dict: Dict
   onStatusChange: (orderId: string, status: OrderStatus) => void
   staffOptions: Staff[] | null | undefined
   onAssignStaff: (orderId: string, staffId: string) => Promise<void>
@@ -94,7 +70,6 @@ type OrderDetailData = {
 export function OrdersTable({
   orders,
   isLoading,
-  dict,
   onStatusChange,
   staffOptions,
   onAssignStaff,
@@ -166,7 +141,7 @@ export function OrdersTable({
       <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
         <CardHeader className="border-b border-slate-200 pb-4">
           <CardTitle className="text-lg font-semibold tracking-tight text-slate-900">
-            {dict.tableTitle}
+            Danh sách đơn hàng
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -179,22 +154,22 @@ export function OrdersTable({
               </div>
             )}
             {!isLoading && rows.length === 0 && (
-              <p className="p-8 text-center text-sm text-slate-500">{dict.empty}</p>
+              <p className="p-8 text-center text-sm text-slate-500">Không có đơn hàng</p>
             )}
             {!isLoading && rows.length > 0 && (
               <div className="w-full overflow-x-auto">
                 <Table className="min-w-[1100px]">
                   <TableHeader>
                     <TableRow className="border-slate-200 hover:bg-slate-50">
-                      <TableHead className="text-slate-600">{dict.colCode}</TableHead>
-                      <TableHead className="text-slate-600">{dict.colCustomer}</TableHead>
-                      <TableHead className="text-slate-600">{dict.colPhone}</TableHead>
-                      <TableHead className="text-slate-600">{dict.colTotal}</TableHead>
-                      <TableHead className="text-slate-600">{dict.colPayment}</TableHead>
+                      <TableHead className="text-slate-600">Mã đơn</TableHead>
+                      <TableHead className="text-slate-600">Khách hàng</TableHead>
+                      <TableHead className="text-slate-600">SĐT</TableHead>
+                      <TableHead className="text-slate-600">Tổng tiền</TableHead>
+                      <TableHead className="text-slate-600">Phương thức thanh toán</TableHead>
                       <TableHead className="text-slate-600">Địa chỉ nhận</TableHead>
-                      <TableHead className="text-slate-600">{dict.colCreated}</TableHead>
-                      <TableHead className="text-slate-600">{dict.colStatus}</TableHead>
-                      <TableHead className="text-slate-600">{dict.colAction}</TableHead>
+                      <TableHead className="text-slate-600">Thời gian</TableHead>
+                      <TableHead className="text-slate-600">Trạng thái</TableHead>
+                      <TableHead className="text-slate-600">Hành động</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -204,7 +179,7 @@ export function OrdersTable({
                         <TableCell className="max-w-[140px] truncate">{o.receiver_name ?? '—'}</TableCell>
                         <TableCell className="font-mono text-xs">{o.receiver_phone ?? '—'}</TableCell>
                         <TableCell className="font-mono text-sm">{formatVnd(o.total_amount)}</TableCell>
-                        <TableCell className="text-xs">{paymentLabel(o.payment_method, dict)}</TableCell>
+                        <TableCell className="text-xs">{o.payment_method ?? '—'}</TableCell>
                         <TableCell className="text-xs">{o.shipping_address ?? '—'}</TableCell>
                         <TableCell className="text-xs text-slate-500">{formatDate(o.created_at as unknown as string)}</TableCell>
                         <TableCell>

@@ -41,6 +41,7 @@ export function useGetAllProducts(options: ProductQueryOptions) {
       options.categoryId,
       options.dateFrom,
       options.dateTo,
+      options.status,
     ],
     queryFn: () => fetchAllProducts(options),
     placeholderData: (prev) => prev,

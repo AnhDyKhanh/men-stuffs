@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { labels, BASE_PATH } from '@/lib/labels'
+import LogoutButton from '@/components/shared/LogoutButton'
 import { getAccountIdFromCookie, getUserRole } from '@/lib/auth'
 import { isStaffByAccountId } from '@/lib/auth-server'
-import LogoutButton from '@/components/shared/LogoutButton'
+import { labels } from '@/lib/labels'
+import { cookies } from 'next/headers'
+import Link from 'next/link'
 import AdminThemeApplier from './AdminThemeApplier'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <p className="mb-4 text-gray-600">
           Bạn cần đăng nhập với tài khoản nhân sự (admin / manager / staff) trong hệ thống.
         </p>
-        <Link href={`${BASE_PATH}/login`} className="text-blue-600 hover:underline">
+        <Link href={`/login`} className="text-blue-600 hover:underline">
           Đăng nhập Admin
         </Link>
       </div>
@@ -32,43 +32,43 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <AdminThemeApplier />
       <aside className="min-h-screen w-64 border-r border-border bg-card">
         <div className="p-6">
-          <Link href={`${BASE_PATH}/dashboard`} className="text-2xl font-bold text-blue-600">
+          <Link href={`/dashboard`} className="text-2xl font-bold text-blue-600">
             Khu vực Admin
           </Link>
         </div>
         <nav className="space-y-2 px-4">
           <Link
-            href={`${BASE_PATH}/dashboard`}
+            href={`/dashboard`}
             className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.dashboard}
           </Link>
           <Link
-            href={`${BASE_PATH}/products-management`}
+            href={`/products-management`}
             className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.products}
           </Link>
           <Link
-            href={`${BASE_PATH}/categories-management`}
+            href={`/categories-management`}
             className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.categories}
           </Link>
           <Link
-            href={`${BASE_PATH}/collections-management`}
+            href={`/collections-management`}
             className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.collectionsManagement}
           </Link>
           <Link
-            href={`${BASE_PATH}/order`}
+            href={`/order-management`}
             className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.orders}
           </Link>
           <Link
-            href={`${BASE_PATH}/task-management`}
+            href={`/task-management`}
             className="block rounded-lg px-4 py-3 text-foreground transition hover:bg-muted hover:text-blue-600"
           >
             {labels.admin.staffTasks}

@@ -157,7 +157,7 @@ export default function CreateProductDialog({ open, onOpenChangeAction, onCreate
 
               <div className="space-y-2">
                 <Label>Trạng thái</Label>
-                <Select value={status} onValueChange={(v) => setStatus(v as ProductStatus)}>
+                <Select disabled value={status} onValueChange={(v) => setStatus(v as ProductStatus)}>
                   <SelectTrigger className="w-full border-input bg-background">
                     <SelectValue />
                   </SelectTrigger>
