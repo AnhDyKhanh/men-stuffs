@@ -17,6 +17,7 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [images, setImages] = useState<File[]>([])
 
   const submit = useCallback(async () => {
     if (rating < 1) {
@@ -26,15 +27,16 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
     setError(null)
     setLoading(true)
     try {
+      const formData = new FormData()
+      formData.append('rating', String(rating))
+      if (comment.trim()) formData.append('comment', comment.trim())
+      if (productId) formData.append('product_id', productId)
+      if (orderId) formData.append('order_id', orderId)
+      images.slice(0, 5).forEach((file) => formData.append('images', file))
+
       const res = await fetch('/api/guest/feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rating,
-          comment: comment.trim() || undefined,
-          product_id: productId ?? undefined,
-          order_id: orderId ?? undefined,
-        }),
+        body: formData,
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -44,12 +46,13 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
       setSent(true)
       setComment('')
       setRating(0)
+      setImages([])
     } catch {
       setError('Lỗi kết nối. Vui lòng thử lại.')
     } finally {
       setLoading(false)
     }
-  }, [rating, comment, productId, orderId])
+  }, [rating, comment, productId, orderId, images])
 
   const close = useCallback(() => {
     setOpen(false)
@@ -142,6 +145,26 @@ export default function FeedbackWidget({ productId, orderId }: FeedbackWidgetPro
                   rows={3}
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white placeholder-neutral-500 focus:border-white focus:ring-1 focus:ring-white focus:outline-none"
                 />
+              </div>
+
+              <div className="mt-4">
+                <label htmlFor="feedback-images" className="mb-2 block text-sm font-medium text-neutral-300">
+                  Hình ảnh thực tế (tối đa 5 ảnh)
+                </label>
+                <input
+                  id="feedback-images"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                    const picked = Array.from(e.target.files ?? []).slice(0, 5)
+                    setImages(picked)
+                  }}
+                  className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-sm text-white file:mr-3 file:rounded file:border-0 file:bg-neutral-700 file:px-3 file:py-1 file:text-white"
+                />
+                {images.length > 0 && (
+                  <p className="mt-2 text-xs text-neutral-400">Đã chọn {images.length} ảnh.</p>
+                )}
               </div>
 
               {error && (

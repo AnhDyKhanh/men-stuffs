@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { CartItem } from '@/types/cart'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +13,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Minus, Plus, Trash2, ArrowLeft, TicketPercent } from 'lucide-react'
 import { toast } from 'sonner'
+import { API_ROUTES } from '@/constants/apiRouter'
+import { getOrderStatusLabel, isProcessingOrder, STORE_ORDER_FLOW } from '@/constants/orderStatus'
+
+type GuestOrder = {
+  id: string
+  order_code: string | null
+  status: string | null
+  created_at: string | null
+  total_amount: number | null
+}
+
+type GuestOrderResponse = {
+  data?: {
+    orders?: GuestOrder[]
+    processingCount?: number
+  }
+}
 
 interface CartPageClientProps {
   cartItems: CartItem[]
@@ -22,6 +40,19 @@ export default function CartPageClient({ cartItems, basePath }: CartPageClientPr
   const [discountCode, setDiscountCode] = useState('')
   const [discountPercent, setDiscountPercent] = useState(0)
   const router = useRouter()
+  const { data: orderProgress } = useQuery({
+    queryKey: ['guest-orders-progress'],
+    queryFn: async () => {
+      const res = await fetch(API_ROUTES.GUEST.ORDERS, { cache: 'no-store', credentials: 'include' })
+      if (!res.ok) return { orders: [] as GuestOrder[], processingCount: 0 }
+      const json = (await res.json()) as GuestOrderResponse
+      return {
+        orders: json?.data?.orders ?? [],
+        processingCount: Number(json?.data?.processingCount ?? 0),
+      }
+    },
+    staleTime: 20_000,
+  })
 
   const formatVnd = (amount: number) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
@@ -220,6 +251,57 @@ export default function CartPageClient({ cartItems, basePath }: CartPageClientPr
           </Card>
         </aside>
       </div>
+
+      <section className="mt-8 rounded-2xl border border-white/10 bg-[#0F1115]/70 p-5 shadow-[0_0_50px_-14px_rgba(247,147,26,0.1)] backdrop-blur">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-white">Tiến độ đơn nhận tại shop</h2>
+          <span className="rounded-full bg-red-600/90 px-2.5 py-1 text-xs font-semibold text-white">
+            {orderProgress?.processingCount ?? 0} đơn đang xử lý
+          </span>
+        </div>
+
+        {(orderProgress?.orders?.length ?? 0) === 0 ? (
+          <p className="text-sm text-white/55">Bạn chưa có đơn hàng nào gần đây.</p>
+        ) : (
+          <div className="space-y-4">
+            {orderProgress?.orders?.slice(0, 5).map((order) => {
+              const status = order.status ?? 'pending'
+              const currentIndex = STORE_ORDER_FLOW.indexOf(status as (typeof STORE_ORDER_FLOW)[number])
+              return (
+                <div key={order.id} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <p className="font-mono text-xs text-white/75">
+                      Đơn {order.order_code ?? `#${order.id.slice(0, 8)}`}
+                    </p>
+                    <p className="text-xs text-[#F7931A]">{getOrderStatusLabel(status)}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {STORE_ORDER_FLOW.map((step, idx) => {
+                      const active = currentIndex >= idx
+                      return (
+                        <div
+                          key={step}
+                          className={`rounded-lg border px-2 py-2 text-center text-[11px] ${
+                            active
+                              ? 'border-[#F7931A]/60 bg-[#F7931A]/15 text-white'
+                              : 'border-white/10 bg-white/5 text-white/45'
+                          }`}
+                        >
+                          {getOrderStatusLabel(step)}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {isProcessingOrder(status) && (
+                    <p className="mt-2 text-xs text-white/60">Đơn hàng đang được xử lý, shop sẽ thông báo khi sẵn sàng.</p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </section>
     </div>
   )
 }
