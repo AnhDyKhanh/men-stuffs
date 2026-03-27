@@ -2,13 +2,14 @@
 
 import { useCreatePayment } from '@/hooks/createPayment'
 import { useGetCustomerCurrentCart } from '@/hooks/getCustomerCurrentCart'
+import { useGetCustomerAccountInfor } from '@/hooks/getCustomerAccountInfor' // Import hook lấy profile
 import { CartItem } from '@/types/cart'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ChevronLeft, Loader2 } from 'lucide-react'
+import { ChevronLeft, Loader2, User, LogOut, MapPin } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import AddressSelector from './AddressSelector'
 import { OrderSummary } from './OrderSummary'
@@ -25,9 +26,12 @@ import {
 } from '@/components/ui/dialog'
 
 export default function CheckoutPage() {
-  const { data: cartResponse, isLoading } = useGetCustomerCurrentCart()
+  const { data: cartResponse, isLoading: isCartLoading } = useGetCustomerCurrentCart()
+  const { data: accountResponse } = useGetCustomerAccountInfor() // Gọi API lấy thông tin người dùng
   const { mutate: createPayment, isPending: isSubmitting } = useCreatePayment()
   const router = useRouter()
+
+  const customer = accountResponse?.data
 
   // State
   const [formData, setFormData] = useState({
@@ -38,42 +42,44 @@ export default function CheckoutPage() {
     postalCode: '',
   })
   const [address, setAddress] = useState({ province: '', district: '' })
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'bank_transfer' | 'momo'>('cod')
+  const [paymentMethod, setPaymentMethod] = useState<string>('cod')
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup_at_shop' | 'home_delivery' | null>(null)
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false)
+
+  // LOGIC AUTO-FILL: Khi customer có dữ liệu, điền ngay vào formData
+  useEffect(() => {
+    if (customer) {
+      const nameParts = customer.full_name?.trim().split(' ') || []
+      const lastName = nameParts[0] || ''
+      const firstName = nameParts.slice(1).join(' ') || ''
+
+      setFormData((prev) => ({
+        ...prev,
+        firstName: prev.firstName || firstName,
+        lastName: prev.lastName || lastName,
+        phone: prev.phone || customer.phone || '',
+      }))
+    }
+  }, [customer])
 
   const cartItems = useMemo(() => cartResponse?.cartItems ?? [], [cartResponse?.cartItems])
   const cartId = cartResponse?.cartId ?? ''
 
-  // Tính toán logic (Dùng useMemo để tránh re-render rác)
   const subtotal = useMemo(() => {
-    return cartItems.reduce((sum: number, item: CartItem) => {
-      return sum + item.quantity * item.price
-    }, 0)
+    return cartItems.reduce((sum: number, item: CartItem) => sum + item.quantity * item.price, 0)
   }, [cartItems])
-
-  const validateFormBeforePayment = () => {
-    if (!formData.phone || !paymentMethod) {
-      toast.error('Vui lòng điền đầy đủ thông tin giao hàng')
-      return false
-    }
-    if (deliveryMethod === 'pickup_at_shop' && (!formData.firstName || !formData.lastName)) {
-      toast.error('Vui lòng nhập họ tên người nhận')
-      return false
-    }
-    if (deliveryMethod !== 'pickup_at_shop' && (!address.province || !formData.street)) {
-      toast.error('Vui lòng điền địa chỉ nhận hàng')
-      return false
-    }
-    return true
-  }
 
   const handleSubmit = () => {
     if (!deliveryMethod) {
       setShowDeliveryDialog(true)
       return
     }
-    if (!validateFormBeforePayment()) return
+    
+    // Validation đơn giản
+    if (!formData.phone || !formData.firstName || !formData.lastName) {
+      toast.error('Vui lòng điền đầy đủ thông tin liên hệ')
+      return
+    }
 
     const payload = {
       cart_id: cartId,
@@ -84,7 +90,7 @@ export default function CheckoutPage() {
         deliveryMethod === 'pickup_at_shop'
           ? 'Showroom Men Stuffs'
           : `${formData.street}, ${address.district}, ${address.province}`.trim(),
-      receiver_name: `${formData.firstName} ${formData.lastName}`.trim(),
+      receiver_name: `${formData.lastName} ${formData.firstName}`.trim(),
       receiver_phone: formData.phone,
       items: cartItems.map((item: CartItem) => ({
         product_id: item.product_id,
@@ -98,15 +104,12 @@ export default function CheckoutPage() {
         toast.success('Thanh toán thành công')
         router.push('/cart')
       },
-      onError: () => {
-        toast.error('Thanh toán thất bại')
-      },
+      onError: () => toast.error('Thanh toán thất bại'),
     })
   }
 
   const handleAddressChange = useCallback((p: string | null, d: string | null) => {
     setAddress((prev) => {
-      // Chỉ update nếu giá trị thực sự thay đổi để chặn đứng vòng lặp
       if (prev.province === (p ?? '') && prev.district === (d ?? '')) return prev
       return { province: p ?? '', district: d ?? '' }
     })
@@ -118,43 +121,71 @@ export default function CheckoutPage() {
         {/* LEFT: INFORMATION */}
         <div className="space-y-8 md:col-span-7">
           <header className="space-y-4">
-            <h1 className="text-2xl font-bold tracking-tighter">HELIOS GLOBAL</h1>
+            <h1 className="text-2xl font-bold tracking-tighter">MEN STUFF</h1>
             <nav className="flex gap-2 text-[10px] text-zinc-500 uppercase">
               <Link href="/cart">Cart</Link> <span>/</span> <span className="text-white">Information</span>
             </nav>
           </header>
 
-          <div className="grid gap-4">
-            <h2 className="text-lg font-medium">Shipping Address</h2>
+          {/* HIỂN THỊ LOGGED IN USER (Giống ảnh của bạn) */}
+          {customer && (
+            <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-black font-bold text-xl">
+                  {customer.full_name?.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Logged in as</p>
+                  <p className="text-sm font-medium">{customer.full_name}</p>
+                </div>
+              </div>
+              <p className="text-[10px] font-bold uppercase text-[#F7931A] tracking-widest">
+                {customer.point} Points
+              </p>
+            </div>
+          )}
+
+          <div className="grid gap-6">
+            <h2 className="text-xl font-semibold tracking-tight">Shipping Address</h2>
+            
             <div className="grid grid-cols-2 gap-4">
               <Input
                 placeholder="First name"
-                className="border-zinc-800 bg-transparent"
+                className="h-12 border-zinc-800 bg-transparent focus:border-white transition-all"
+                value={formData.firstName} // FILL DATA
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               />
               <Input
                 placeholder="Last name"
-                className="border-zinc-800 bg-transparent"
+                className="h-12 border-zinc-800 bg-transparent focus:border-white transition-all"
+                value={formData.lastName} // FILL DATA
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
               />
             </div>
-            <Input
-              placeholder="Street Address"
-              className="border-zinc-800 bg-transparent"
-              onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-            />
 
-            <AddressSelector onAddressChange={handleAddressChange} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                    <Input
+                        placeholder="Street Address"
+                        className="h-12 border-zinc-800 bg-transparent focus:border-white transition-all"
+                        value={formData.street}
+                        onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                    />
+                </div>
+                <AddressSelector onAddressChange={handleAddressChange} />
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <Input
                 placeholder="Phone number"
-                className="border-zinc-800 bg-transparent"
+                className="h-12 border-zinc-800 bg-transparent focus:border-white transition-all"
+                value={formData.phone} // FILL DATA
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
               <Input
                 placeholder="Postal code (Optional)"
-                className="border-zinc-800 bg-transparent"
+                className="h-12 border-zinc-800 bg-transparent focus:border-white transition-all"
+                value={formData.postalCode}
                 onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
               />
             </div>
@@ -199,9 +230,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* RIGHT: ORDER SUMMARY */}
-        <div className="sticky top-12 h-fit rounded-2xl border border-zinc-900 bg-zinc-900/20 p-8 md:col-span-5">
-          <OrderSummary items={cartItems} subtotal={subtotal} isLoading={isLoading} />
-        </div>
+       
       </div>
 
       <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
