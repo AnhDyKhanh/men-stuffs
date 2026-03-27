@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { Product } from '@/models/product'
 import dayjs from 'dayjs'
+import { Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import EditProductDialog from './EditProductDialog'
 
 const PAGE_SIZES = [5, 10, 20, 50] as const
 
@@ -35,7 +37,8 @@ export default function ProductsTable({
   const selectClass = isWhite ? 'bg-white border-gray-300 text-gray-900' : 'bg-background border-input'
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const totalPages = Math.max(1, Math.ceil(products.length / pageSize))
   const start = (page - 1) * pageSize
   const pageProducts = products.slice(start, start + pageSize)
@@ -59,6 +62,16 @@ export default function ProductsTable({
     const date = dayjs(dateInput)
     if (!date.isValid()) return '-'
     return date.format('DD/MM/YYYY')
+  }
+
+  const openEditDialog = (product: Product) => {
+    setEditingProduct(product)
+    setIsEditDialogOpen(true)
+  }
+
+  const closeEditDialog = () => {
+    setIsEditDialogOpen(false)
+    setEditingProduct(null)
   }
 
   if (products.length === 0) {
@@ -148,8 +161,14 @@ export default function ProductsTable({
                 </TableCell>
                 <TableCell className={`px-6 py-4 text-right ${cellClass}`}>
                   <div className="flex justify-end gap-3">
-                    <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                      <Link href={`/products-management/${product.id}`}>Chỉnh sửa sản phẩm</Link>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      onClick={() => openEditDialog(product)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      <span className="sr-only">Chỉnh sửa</span>
                     </Button>
                     <DeleteProductButton productId={product.id} />
                   </div>
@@ -159,6 +178,16 @@ export default function ProductsTable({
           </TableBody>
         </Table>
       </CardContent>
+      {editingProduct && (
+        <EditProductDialog
+          key={editingProduct.id}
+          open={isEditDialogOpen}
+          initialValues={editingProduct}
+          onOpenChangeAction={(open) => {
+            if (!open) closeEditDialog()
+          }}
+        />
+      )}
     </Card>
   )
 }

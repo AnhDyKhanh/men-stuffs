@@ -151,6 +151,7 @@ export default function ProductsPageClient({
     ascending: false,
     categoryId: categoryId ? [categoryId] : [],
     search: searchApplied || undefined,
+    status: 'active'
   })
 
   const products = response?.data ?? null

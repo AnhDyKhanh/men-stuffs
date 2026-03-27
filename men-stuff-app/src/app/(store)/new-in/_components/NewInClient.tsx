@@ -45,6 +45,7 @@ export default function NewInClient() {
     size: NEW_IN_SIZE,
     orderBy: 'created_at',
     ascending: false,
+    status: 'active'
   })
 
   const products = mapProductsToPlaceholder((response as { data?: Product[] })?.data ?? null, BASE_PATH)

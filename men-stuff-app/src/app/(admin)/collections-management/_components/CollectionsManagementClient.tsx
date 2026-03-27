@@ -44,6 +44,7 @@ export default function CollectionsManagementClient() {
     size: 200,
     orderBy: 'created_at',
     ascending: false,
+    status: 'active',
   })
   const allProducts = (productsRes?.data ?? []) as Product[]
 
