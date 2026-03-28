@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireStaffOr401 } from '@/lib/apiStaffAuth'
-import { replaceCollectionItems, isMissingTableError } from '@/app/api/admin/collections/services/collectionQueries'
+import { isMissingTableError } from '@/app/api/admin/collections/services/collectionErrors'
+import { replaceCollectionItems } from '@/app/api/admin/collections/services/createCollection'
 
 type Params = { params: Promise<{ id: string }> }
 
