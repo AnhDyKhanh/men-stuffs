@@ -2,12 +2,15 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { API_ROUTES } from '@/constants/apiRouter'
 import { BASE_PATH } from '@/lib/labels'
+import { resolveStoreNavigation } from '@/lib/storeChatNavigation'
+import { useGuestOrderBadge } from '@/hooks/useGuestOrderBadge'
 import { useGetAllProducts } from '@/hooks/getAllProductsMutation'
 import { getHotProductIdsToday, trackProductClick } from '@/lib/productHot'
 import type { Product } from '@/models/product'
@@ -41,6 +44,8 @@ type ChatProduct = {
 const QUICK_LINKS: { label: string; href: string; topic: string }[] = [
   { label: 'New In', href: `${BASE_PATH}/new-in`, topic: 'new_in' },
   { label: 'Tất cả SP', href: `${BASE_PATH}/products`, topic: 'products' },
+  { label: 'Đơn hàng', href: `${BASE_PATH}/account?tab=orders`, topic: 'orders' },
+  { label: 'Lịch sử', href: `${BASE_PATH}/account?tab=history`, topic: 'history' },
   { label: 'Giỏ hàng', href: `${BASE_PATH}/cart`, topic: 'cart' },
   { label: 'Liên hệ', href: `${BASE_PATH}/pages/contact`, topic: 'contact' },
 ]
@@ -84,7 +89,7 @@ function botReply(userText: string): string {
     return `Bạn có thể xem hàng mới tại trang New In — mình ưu tiên gợi ý này khi bạn hỏi về sản phẩm mới. Mở: ${BASE_PATH}/new-in`
   }
   if (/giỏ|cart|thanh toán|checkout/i.test(t)) {
-    return `Giỏ hàng & thanh toán: xem giỏ tại ${BASE_PATH}/cart và thanh toán tại ${BASE_PATH}/checkout khi bạn đã đăng nhập.`
+    return `Giỏ hàng: ${BASE_PATH}/cart — thanh toán: ${BASE_PATH}/checkout. Tiến độ đơn nhận tại shop xem trong **Tài khoản → Đơn hàng của tôi** (${BASE_PATH}/account?tab=orders).`
   }
   if (/nhận tại shop|pickup|lấy tại shop|cửa hàng/i.test(t)) {
     return `Bạn có thể chọn nhận tại shop ngay ở bước checkout. Luồng trạng thái sẽ đi theo: đã nhận đơn -> đang chuẩn bị -> đã sẵn sàng -> đã nhận hàng.`
@@ -105,10 +110,10 @@ function botReply(userText: string): string {
     return `Giá hiển thị theo từng sản phẩm — vào Tất cả sản phẩm để lọc và so sánh: ${BASE_PATH}/products`
   }
   if (/chào|hello|hi\b/i.test(t)) {
-    return `Chào bạn! Mình là trợ lý Men Stuffs — hỏi về **New In**, **sản phẩm**, **giỏ hàng** hoặc chọn gợi ý nhanh bên dưới nhé.`
+    return `Chào bạn! Mình là trợ lý Men Stuffs — bạn có thể **bảo mình đưa tới trang** (vd: "tôi muốn xem đơn hàng", "mở New In", "/products") hoặc hỏi về sản phẩm, giỏ hàng, tiến độ đơn.`
   }
 
-  return `Mình chưa hiểu hết ý bạn. Thử hỏi: "New In có gì mới?", "xem giỏ hàng", hoặc bấm một gợi ý nhanh — mình sẽ học thói quen (trên máy bạn) để ưu tiên gợi ý phù hợp hơn sau này.`
+  return `Mình chưa hiểu hết ý bạn. Thử: "tôi muốn xem đơn hàng", "mở trang liên hệ", hoặc gõ đường dẫn như /collections — mình sẽ chuyển trang giúp bạn.`
 }
 
 function formatPrice(value: number): string {
@@ -151,8 +156,9 @@ function buildCatalogSummary(products: Product[]): string | null {
 }
 
 export default function ChatbotWidget() {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-  const [orderAlertCount, setOrderAlertCount] = useState(0)
+  const { data: orderBadge } = useGuestOrderBadge()
   const [prefs, setPrefs] = useState<Prefs>(() => loadPrefs())
   const [messages, setMessages] = useState<Message[]>(() => {
     if (typeof window === 'undefined') return []
@@ -176,7 +182,7 @@ export default function ChatbotWidget() {
     status: 'active',
   })
 
-  const suggestions = useMemo(() => rankedSuggestions(prefs).slice(0, 4), [prefs])
+  const suggestions = useMemo(() => rankedSuggestions(prefs).slice(0, 6), [prefs])
   const rawProducts = useMemo(
     () => ((productsResponse as { data?: Product[] })?.data ?? []) as Product[],
     [productsResponse],
@@ -233,11 +239,21 @@ export default function ChatbotWidget() {
     const lower = text.toLowerCase()
     if (/new\s*in|mới|hàng mới|arrival/i.test(lower)) recordTopic('new_in')
     if (/giỏ|cart|thanh toán|checkout/i.test(lower)) recordTopic('cart')
+    if (/đơn hàng|orders/i.test(lower)) recordTopic('orders')
+    if (/lịch sử|history/i.test(lower)) recordTopic('history')
     if (/giá|sale|giảm|sản phẩm|products/i.test(lower)) recordTopic('products')
     if (/liên hệ|contact|hỗ trợ|hotline/i.test(lower)) recordTopic('contact')
 
+    const nav = resolveStoreNavigation(text)
+    if (nav) {
+      router.push(nav.href)
+      setMessages((prev) => [...prev, { id: `b-${Date.now()}`, role: 'bot', text: nav.reply }])
+      return
+    }
+
     const asksCart = /giỏ|cart|trong giỏ|xem giỏ|giỏ hàng/i.test(lower)
-    const asksOrderStatus = /đơn|order|trang thái|chuẩn bị|sẵn sàng|nhận hàng/i.test(lower)
+    const asksOrderStatus =
+      /đơn hàng|\borders\b|trạng thái|chuẩn bị|sẵn sàng|nhận hàng|tiến độ/i.test(lower)
     if (asksCart) {
       bumpTopic('cart')
       try {
@@ -318,11 +334,15 @@ export default function ChatbotWidget() {
         const tail = hasReady
           ? 'Có đơn đã sẵn sàng, bạn có thể đến shop nhận hàng.'
           : processing > 0
-            ? `Hiện còn ${processing} đơn đang xử lý.`
+            ? `Hiện còn ${processing} đơn đang xử lý (đếm theo các bước nhận tại shop).`
             : 'Tất cả đơn đang ở trạng thái hoàn tất.'
         setMessages((prev) => [
           ...prev,
-          { id: `b-${Date.now()}`, role: 'bot', text: `Tiến độ đơn hàng:\n${lines.join('\n')}\n${tail}` },
+          {
+            id: `b-${Date.now()}`,
+            role: 'bot',
+            text: `Tiến độ đơn hàng:\n${lines.join('\n')}\n${tail}\n\nNhắn **muốn xem đơn hàng** (hoặc bấm gợi ý Đơn hàng) để mình chuyển trang chi tiết.`,
+          },
         ])
       } catch {
         setMessages((prev) => [
@@ -371,41 +391,6 @@ export default function ChatbotWidget() {
       : { id: `b-${Date.now()}`, role: 'bot', text: reply }
     setMessages((prev) => [...prev, botMsg])
   }
-
-  useEffect(() => {
-    let mounted = true
-    const loadOrderAlerts = async () => {
-      try {
-        const res = await fetch(API_ROUTES.GUEST.ORDERS, { cache: 'no-store', credentials: 'include' })
-        if (!res.ok) return
-        const json = (await res.json()) as {
-          data?: { processingCount?: number; orders?: Array<{ status: string | null }> }
-        }
-        const processing = Number(json?.data?.processingCount ?? 0)
-        const readyCount = (json?.data?.orders ?? []).filter((item) => item.status === 'ready_for_pickup').length
-        if (mounted) setOrderAlertCount(processing + readyCount)
-      } catch {
-        if (mounted) setOrderAlertCount(0)
-      }
-    }
-    void loadOrderAlerts()
-    const timer = setInterval(() => void loadOrderAlerts(), 20000)
-    return () => {
-      mounted = false
-      clearInterval(timer)
-    }
-  }, [])
-
-  const onChip = useCallback((topic: string, href: string) => {
-    recordTopic(topic)
-    const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', text: `[Gợi ý] ${href}` }
-    const botMsg: Message = {
-      id: `b-${Date.now()}`,
-      role: 'bot',
-      text: `Đã ghi nhớ bạn quan tâm "${topic}". Mở link: ${href}`,
-    }
-    setMessages((prev) => [...prev, userMsg, botMsg])
-  }, [recordTopic])
 
   const handleDropProduct = useCallback((event: React.DragEvent<HTMLElement>) => {
     event.preventDefault()
@@ -459,12 +444,20 @@ export default function ChatbotWidget() {
         type="button"
         size="icon"
         onClick={() => setIsOpen((o) => !o)}
+        title={
+          (orderBadge?.count ?? 0) > 0 && orderBadge?.title
+            ? orderBadge.title
+            : 'Trợ lý Men Stuffs — hỏi sản phẩm hoặc nhờ mình mở đúng trang (đơn hàng, giỏ, New In…)'
+        }
         className="fixed right-6 bottom-6 z-50 h-14 w-14 rounded-full border border-white/15 bg-linear-to-br from-[#0F1115] to-[#1a1d24] text-white shadow-glow-orange focus-visible:ring-2 focus-visible:ring-[#F7931A]"
         aria-label={isOpen ? 'Đóng trợ lý Men Stuffs' : 'Mở trợ lý Men Stuffs'}
       >
-        {orderAlertCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
-            {orderAlertCount > 99 ? '99+' : orderAlertCount}
+        {(orderBadge?.count ?? 0) > 0 && (
+          <span
+            title={orderBadge?.title || undefined}
+            className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white"
+          >
+            {(orderBadge?.count ?? 0) > 99 ? '99+' : orderBadge?.count}
           </span>
         )}
         {isOpen ? <X className="h-6 w-6" /> : <Sparkles className="h-6 w-6 text-[#F7931A]" />}
@@ -488,6 +481,11 @@ export default function ChatbotWidget() {
               <p className="text-sm font-semibold">
                 <span className="text-gradient-gold">Trợ lý</span> mua sắm
               </p>
+              {(orderBadge?.count ?? 0) > 0 && (
+                <p className="text-muted-foreground mt-0.5 max-w-[220px] text-[11px] leading-snug">
+                  {orderBadge?.count} đơn đang theo dõi — rê chuột vào nút chat để xem bước từng đơn.
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="font-mono text-[10px]">
@@ -531,10 +529,17 @@ export default function ChatbotWidget() {
                 </div>
               )}
               {messages.length === 0 && (
-                <p className="py-6 text-center text-sm text-muted-foreground">
-                  Chọn gợi ý nhanh hoặc hỏi về <strong className="text-foreground">New In</strong>, sản phẩm hot, giỏ hàng.
-                  Bạn cũng có thể kéo card sản phẩm từ trang vào khung chat để nhận tư vấn phối đồ.
-                </p>
+                <div className="text-muted-foreground space-y-3 py-6 text-center text-sm">
+                  <p>
+                    Chọn gợi ý hoặc nhắn kiểu:{' '}
+                    <strong className="text-foreground">«tôi muốn xem đơn hàng»</strong>,{' '}
+                    <strong className="text-foreground">«mở New In»</strong>, <strong className="text-foreground">«/products»</strong>{' '}
+                    — mình sẽ chuyển đúng trang.
+                  </p>
+                  <p>
+                    Hỏi giá, gợi ý phối đồ, hoặc kéo card sản phẩm vào đây để tư vấn chi tiết.
+                  </p>
+                </div>
               )}
               {messages.map((m) => (
                 <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -574,28 +579,13 @@ export default function ChatbotWidget() {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-2 border-t border-white/10 px-4 py-2">
-              {QUICK_LINKS.map((s) => (
-                <Button
-                  key={s.topic}
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs text-muted-foreground hover:text-foreground"
-                  onClick={() => onChip(s.topic, `${typeof window !== 'undefined' ? window.location.origin : ''}${s.href}`)}
-                >
-                  + {s.label}
-                </Button>
-              ))}
-            </div>
-
             <div className="mt-auto flex shrink-0 gap-2 border-t border-white/10 bg-background/95 p-3">
               <Input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Hỏi về New In, giá, giỏ hàng…"
+                placeholder="VD: mở đơn hàng, /cart, tư vấn áo…"
                 className="border-white/10 bg-background/80"
               />
               <Button

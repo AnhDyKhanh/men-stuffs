@@ -9,6 +9,9 @@ export const API_ROUTES = {
     ADD_TO_CART: '/api/guest/add-to-cart',
     PAYMENT: '/api/guest/payment',
     ORDERS: '/api/guest/orders',
+    ORDERS_HISTORY: '/api/guest/orders/history',
+    REVIEWS: '/api/guest/reviews',
+    REVIEW_UPLOAD: '/api/guest/reviews/upload',
   },
   PRODUCTS: {
     GET_ALL: '/api/admin/products',

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { User } from 'lucide-react'
 import type { NavLink } from '@/constants/placeholderData'
 import ProcessingOrdersBadge from './ProcessingOrdersBadge'
 
@@ -67,9 +68,18 @@ export default function Header({
             )}
             <Link
               href={accountHref}
-              className="hidden text-sm font-medium text-white/75 transition hover:text-white sm:inline"
+              className="relative hidden items-center gap-2 text-sm font-medium text-white/75 transition hover:text-white sm:inline-flex"
             >
               {accountLabel}
+              <ProcessingOrdersBadge />
+            </Link>
+            <Link
+              href={accountHref}
+              className="relative flex rounded-lg p-2 text-white/70 transition hover:bg-white/5 hover:text-white sm:hidden"
+              aria-label={accountLabel}
+            >
+              <User className="h-5 w-5" />
+              <ProcessingOrdersBadge />
             </Link>
             <button
               type="button"
@@ -80,9 +90,8 @@ export default function Header({
             </button>
             <Link
               href={cartHref}
-              className="relative flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-white/80 shadow-[0_0_20px_-14px_rgba(247,147,26,0.35)] transition hover:border-[#F7931A]/50 hover:bg-white/8 hover:text-white hover:shadow-[0_0_30px_-12px_rgba(247,147,26,0.55)]"
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-white/80 shadow-[0_0_20px_-14px_rgba(247,147,26,0.35)] transition hover:border-[#F7931A]/50 hover:bg-white/8 hover:text-white hover:shadow-[0_0_30px_-12px_rgba(247,147,26,0.55)]"
             >
-              <ProcessingOrdersBadge />
               <CartIcon />
               <span className="hidden text-sm sm:inline">{cartLabel}</span>
             </Link>
