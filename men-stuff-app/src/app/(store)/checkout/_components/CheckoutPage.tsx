@@ -1,21 +1,6 @@
 'use client'
 
-import { useCreatePayment } from '@/hooks/createPayment'
-import { useGetCustomerCurrentCart } from '@/hooks/getCustomerCurrentCart'
-import { useGetCustomerAccountInfor } from '@/hooks/getCustomerAccountInfor'
-import { CartItem } from '@/types/cart'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ChevronLeft, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-import AddressSelector from './AddressSelector'
-import { OrderSummary } from './OrderSummary'
-import { PAYMENT_METHOD_LABELS } from '../_constants/payment'
-import { PaymentMethod } from '@/enum/payment.enum'
-import { useRouter } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -24,7 +9,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { PaymentMethod } from '@/enum/payment.enum'
+import { useCreatePayment } from '@/hooks/createPayment'
+import { useGetCustomerAccountInfor } from '@/hooks/getCustomerAccountInfor'
+import { useGetCustomerCurrentCart } from '@/hooks/getCustomerCurrentCart'
+import { CartItem } from '@/types/cart'
+import { ChevronLeft, Loader2 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useCallback, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import AddressSelector from './AddressSelector'
+import { OrderSummary } from './OrderSummary'
 
 type Customer = {
   id?: string
