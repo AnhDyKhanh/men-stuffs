@@ -7,7 +7,7 @@ import type { OrderStatus } from '@/models/order'
 import type { Staff } from '@/models/staff'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { OrdersTable } from './OrdersTable'
 import { OrdersToolbar } from './OrdersToolbar'
 import { useUpdateOrderStatus } from '@/hooks/useUpdateAminOrder'
@@ -22,44 +22,23 @@ export default function OrdersPageClient() {
   const [staffOptions, setStaffOptions] = useState<Staff[] | null>(null)
   const [isStaffLoading, setIsStaffLoading] = useState(false)
 
-  // const query = useMemo(
-  //   () => ({
-  //     page,
-  //     size: PAGE_SIZE,
-  //     status: statusFilter === 'all' ? null : statusFilter,
-  //     search: searchApplied.trim() || null,
-  //   }),
-  //   [page, statusFilter, searchApplied],
-  // )
+  const query = useMemo(
+    () => ({
+      page,
+      size: PAGE_SIZE,
+      status: statusFilter === 'all' ? null : statusFilter,
+      search: searchApplied.trim() || null,
+    }),
+    [page, statusFilter, searchApplied],
+  )
 
-  // const { data, isLoading, isFetching, refetch } = useAdminOrders(query)
-  // const updateStatus = useUpdateOrderStatus()
+  const { data, isLoading, isFetching, refetch } = useAdminOrders(query)
+  const updateStatus = useUpdateOrderStatus()
   const [updatingId, setUpdatingId] = useState<string | null>(null)
 
-  // const orders = data?.data ?? []
-  // const total = data?.total ?? 0
-  // const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
-
-  // useEffect(() => {
-  //   let cancelled = false
-  //   async function loadStaff() {
-  //     setIsStaffLoading(true)
-  //     try {
-  //       const res = await fetch(API_ROUTES.STAFF.GET_ALL, { cache: 'no-store' })
-  //       const payload = (await res.json().catch(() => null)) as { data?: Staff[]; error?: string } | null
-  //       if (!res.ok) throw new Error(payload?.error || 'Không tải được nhân viên')
-  //       if (!cancelled) setStaffOptions(payload?.data ?? [])
-  //     } catch {
-  //       if (!cancelled) setStaffOptions([])
-  //     } finally {
-  //       if (!cancelled) setIsStaffLoading(false)
-  //     }
-  //   }
-  //   void loadStaff()
-  //   return () => {
-  //     cancelled = true
-  //   }
-  // }, [])
+  const orders = data?.data ?? []
+  const total = data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   const handleSearch = useCallback(() => {
     setSearchApplied(searchInput)
@@ -71,34 +50,55 @@ export default function OrdersPageClient() {
     setPage(1)
   }, [])
 
-  // const onOrderStatusChange = useCallback(
-  //   (orderId: string, status: OrderStatus) => {
-  //     setUpdatingId(orderId)
-  //     updateStatus.mutate(
-  //       { id: orderId, status },
-  //       {
-  //         onSettled: () => setUpdatingId(null),
-  //       },
-  //     )
-  //   },
-  //   [updateStatus],
-  // )
+  const onOrderStatusChange = useCallback(
+    (orderId: string, status: OrderStatus) => {
+      setUpdatingId(orderId)
+      updateStatus.mutate(
+        { id: orderId, status },
+        {
+          onSettled: () => setUpdatingId(null),
+        },
+      )
+    },
+    [updateStatus],
+  )
 
-  // const handleAssignStaff = useCallback(
-  //   async (orderId: string, staffId: string) => {
-  //     const res = await fetch(API_ROUTES.STAFF_WORK.ASSIGN, {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ orderId, staffId }),
-  //     })
-  //     const payload = (await res.json().catch(() => null)) as { error?: string; ok?: boolean } | null
-  //     if (!res.ok || payload?.ok !== true) {
-  //       throw new Error(payload?.error || 'Gán nhân viên thất bại')
-  //     }
-  //     await refetch()
-  //   },
-  //   [refetch],
-  // )
+  const handleAssignStaff = useCallback(
+    async (orderId: string, staffId: string) => {
+      const res = await fetch(API_ROUTES.STAFF_WORK.ASSIGN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, staffId }),
+      })
+      const payload = (await res.json().catch(() => null)) as { error?: string; ok?: boolean } | null
+      if (!res.ok || payload?.ok !== true) {
+        throw new Error(payload?.error || 'Gán nhân viên thất bại')
+      }
+      await refetch()
+    },
+    [refetch],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    async function loadStaff() {
+      setIsStaffLoading(true)
+      try {
+        const res = await fetch(API_ROUTES.STAFF.GET_ALL, { cache: 'no-store' })
+        const payload = (await res.json().catch(() => null)) as { data?: Staff[]; error?: string } | null
+        if (!res.ok) throw new Error(payload?.error || 'Không tải được nhân viên')
+        if (!cancelled) setStaffOptions(payload?.data ?? [])
+      } catch {
+        if (!cancelled) setStaffOptions([])
+      } finally {
+        if (!cancelled) setIsStaffLoading(false)
+      }
+    }
+    void loadStaff()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -118,7 +118,7 @@ export default function OrdersPageClient() {
         </div>
       </div>
 
-      {/* <OrdersToolbar
+      <OrdersToolbar
         statusFilter={statusFilter}
         onStatusChange={handleStatusFilter}
         search={searchInput}
@@ -135,9 +135,9 @@ export default function OrdersPageClient() {
         onStatusChange={onOrderStatusChange}
         onAssignStaff={handleAssignStaff}
         updatingId={updatingId}
-      /> */}
+      />
 
-      {/* {totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
           <p className="font-mono text-xs text-slate-600">
             Hiển thị {total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} / {total} đơn
@@ -167,8 +167,8 @@ export default function OrdersPageClient() {
               <ChevronRight className="size-4" />
             </Button>
           </div>
-        </div> */}
-      {/* )} */}
+        </div>
+      )}
     </div>
   )
 }
