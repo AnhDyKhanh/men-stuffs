@@ -8,10 +8,16 @@ export const API_ROUTES = {
     },
     ADD_TO_CART: '/api/guest/add-to-cart',
     PAYMENT: '/api/guest/payment',
+    ORDERS: '/api/guest/orders',
+    ORDERS_HISTORY: '/api/guest/orders/history',
+    REVIEWS: '/api/guest/reviews',
+    REVIEW_UPLOAD: '/api/guest/reviews/upload',
   },
   PRODUCTS: {
     GET_ALL: '/api/admin/products',
     GET_BY_ID: '/api/admin/products/:id',
+    /** id + name + imageUrl — cho select khi gán sản phẩm vào collection */
+    OPTIONS_FOR_SELECT: '/api/admin/products/options',
     POST: '/api/admin/products',
     PUT: '/api/admin/products/:id',
     DELETE: '/api/admin/products/:id',

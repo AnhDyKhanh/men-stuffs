@@ -1,0 +1,218 @@
+# Project Architecture Rules
+
+## Tech Stack
+- Next.js 15 App Router
+- Supabase (no Prisma — raw SQL or Supabase JS client)
+- TanStack Query (React Query v5) for data fetching/mutations
+- TypeScript strict
+
+---
+
+## Folder Structure
+
+src/
+├── app/api/          # Next.js Route Handlers
+│   └── [domain]/
+│       ├── route.ts              # Entry point (GET, POST, PATCH, DELETE)
+│       └── services/
+│           └── actionName.ts     # One file per action, pure async logic
+├── hooks/            # TanStack Query hooks (useQuery / useMutation)
+├── models/           # TypeScript entity types (mirrors Supabase tables)
+├── constants/
+│   └── apiRouter.ts  # All API route strings centralized here
+└── types/
+    └── response.type.ts
+
+---
+
+## Rule 1 — API Route Handler (route.ts)
+
+- Location: `src/app/api/[domain]/[resource]/route.ts`
+- Only handles HTTP plumbing: parse params/body, call service, return NextResponse
+- No business logic inside route.ts
+- Always await `context.params` (Next.js 15 dynamic params are Promises)
+- Return `NextResponse.json(result, { status: result.status ?? 500 })`
+
+### Template:
+\`\`\`typescript
+import { NextResponse } from 'next/server'
+import { someService } from './services/someService'
+
+type RouteContext = { params: Promise<{ id: string }> }
+
+export async function GET(_request: Request, context: RouteContext) {
+  const { id } = await context.params
+  const result = await someService(id)
+  return NextResponse.json(result, { status: result.status ?? 500 })
+}
+
+export async function PATCH(request: Request, context: RouteContext) {
+  const { id } = await context.params
+  try {
+    const body = await request.json()
+    const result = await someService(id, body)
+    if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 })
+    return NextResponse.json({ ok: true })
+  } catch {
+    return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
+  }
+}
+\`\`\`
+
+---
+
+## Rule 2 — Service Files
+
+- Location: `src/app/api/[domain]/[resource]/services/actionName.ts`
+- One file = one action (e.g. `getOrderDetail.ts`, `updateOrderStatus.ts`)
+- Returns a typed result object, never throws to route
+- Use Supabase JS client directly here
+- Export the DTO type if needed (used by hooks)
+
+### Return convention:
+\`\`\`typescript
+// Success
+return { ok: true, data: ..., status: 200 }
+
+// Error
+return { ok: false, error: 'message', status: 400 }
+\`\`\`
+
+### Template:
+\`\`\`typescript
+import { createClient } from '@/lib/supabase/server'
+
+export type CreateXxxDTO = {
+  field: string
+}
+
+export async function createXxx(dto: CreateXxxDTO) {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('table').insert(dto).select().single()
+  if (error) return { ok: false, error: error.message, status: 500 }
+  return { ok: true, data, status: 201 }
+}
+\`\`\`
+
+---
+
+## Rule 3 — Models (Entity Types)
+
+- Location: `src/models/entityName.ts`
+- Mirrors Supabase table columns exactly (snake_case)
+- No class, only `type`
+- Nullable columns → `field: Type | null`
+- Define status union types in same file
+- Extended/joined types use `& {}` pattern
+
+### Template:
+\`\`\`typescript
+/**
+ * Xxx entity (table: xxx)
+ */
+export type XxxStatus = 'active' | 'inactive'
+
+export type Xxx = {
+  id: string
+  name: string | null
+  status: XxxStatus | null
+  created_at: Date | null
+  updated_at: Date | null
+}
+
+export type XxxWithRelation = Xxx & {
+  relation?: RelationType | null
+}
+\`\`\`
+
+---
+
+## Rule 4 — TanStack Query Hooks
+
+- Location: `src/hooks/useXxx.ts`
+- Must have `'use client'` at top
+- Fetch function defined above the hook (not inside)
+- Query key convention: `['@scope-resource', ...params]`
+- Use `placeholderData: (prev) => prev` for paginated queries
+- Toast on mutation success/error via `sonner`
+- Invalidate related queries on mutation success
+
+### useQuery template:
+\`\`\`typescript
+'use client'
+import { useQuery } from '@tanstack/react-query'
+import { API_ROUTES } from '@/constants/apiRouter'
+
+async function fetchXxx(id: string) {
+  const res = await fetch(API_ROUTES.XXX.GET(id), { cache: 'no-store' })
+  if (!res.ok) throw new Error('Fetch failed')
+  return res.json()
+}
+
+export function useXxx(id: string) {
+  return useQuery({
+    queryKey: ['@xxx', id],
+    queryFn: () => fetchXxx(id),
+  })
+}
+\`\`\`
+
+### useMutation template:
+\`\`\`typescript
+'use client'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { API_ROUTES } from '@/constants/apiRouter'
+import { toast } from 'sonner'
+
+export function useUpdateXxx() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: { id: string; field: string }) => {
+      const res = await fetch(API_ROUTES.XXX.PATCH(payload.id), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.error || 'Thất bại')
+      return data
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['@xxx'] })
+      toast.success('Cập nhật thành công')
+    },
+    onError: (e: Error) => {
+      toast.error(e.message || 'Có lỗi xảy ra')
+    },
+  })
+}
+\`\`\`
+
+---
+
+## Rule 5 — API Routes Constants
+
+- All API URLs must be defined in `src/constants/apiRouter.ts`
+- Never hardcode URL strings in hooks or components
+
+\`\`\`typescript
+export const API_ROUTES = {
+  XXX: {
+    GET_ALL: '/api/admin/xxx',
+    GET: (id: string) => `/api/admin/xxx/${id}`,
+    PATCH: (id: string) => `/api/admin/xxx/${id}`,
+    DELETE: (id: string) => `/api/admin/xxx/${id}`,
+  },
+}
+\`\`\`
+
+---
+
+## General Rules
+
+- No `any` type — always type properly or use `unknown`
+- Prefer `type` over `interface`
+- snake_case for DB columns, camelCase for JS variables
+- Always handle Supabase error object: `if (error) return { ok: false, error: error.message }`
+- No business logic in route.ts or hooks — logic belongs in services
+- Keep each file focused: one responsibility per file

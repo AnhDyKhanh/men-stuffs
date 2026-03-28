@@ -35,7 +35,7 @@ export default function ProductForm({ product }: ProductFormProps) {
       }, {
         onSuccess: () => {
           toast.success('Sản phẩm đã được thêm vào giỏ hàng')
-          router.push('/')
+          router.push('/cart')
         },
         onError: () => {
           toast.error('Thêm sản phẩm vào giỏ hàng thất bại')

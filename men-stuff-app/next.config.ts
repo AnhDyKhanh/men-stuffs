@@ -1,5 +1,9 @@
 import type { NextConfig } from 'next'
 
+const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : ''
+
 const nextConfig: NextConfig = {
   /* config options here */
   // xử lý khỏi bị lỗi mock, có thể review xoas sau
@@ -7,7 +11,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+        hostname: supabaseHostname,
         port: '',
         pathname: '/storage/v1/object/public/**',
       },

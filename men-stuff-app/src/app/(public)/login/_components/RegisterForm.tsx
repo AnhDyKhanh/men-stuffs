@@ -76,7 +76,7 @@ export function RegisterForm() {
             </div>
             <div className="space-y-1">
               <CardTitle className="text-foreground text-2xl font-bold tracking-tight uppercase">Đăng ký</CardTitle>
-              <CardDescription className="text-muted-foreground text-sm">Tham gia cùng Helios Global</CardDescription>
+              <CardDescription className="text-muted-foreground text-sm">Tham gia cùng Men Stuff</CardDescription>
             </div>
           </CardHeader>
 
@@ -119,7 +119,7 @@ export function RegisterForm() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">Xác nhận</Label>
+                  <Label htmlFor="confirmPassword" className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">Xác nhận lại mật khẩu</Label>
                   <div className="group relative">
                     <Lock className="text-muted-foreground group-focus-within:text-primary absolute top-3 left-3 h-4 w-4 transition-colors" />
                     <Input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" required className="bg-background h-11 pl-10" />

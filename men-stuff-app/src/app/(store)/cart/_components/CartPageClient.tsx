@@ -12,7 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Minus, Plus, Trash2, ArrowLeft, TicketPercent } from 'lucide-react'
 import { toast } from 'sonner'
-
 interface CartPageClientProps {
   cartItems: CartItem[]
   basePath: string
@@ -26,13 +25,14 @@ export default function CartPageClient({ cartItems, basePath }: CartPageClientPr
   const formatVnd = (amount: number) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
 
+  //bỏ shipping
   const stats = useMemo(() => {
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     const discount = (subtotal * discountPercent) / 100
-    const shipping = subtotal > 1_000_000 ? 0 : 30_000
-    const tax = (subtotal - discount) * 0.08
-    const total = subtotal - discount + shipping + tax
-    return { subtotal, discount, shipping, tax, total }
+    // const shipping = subtotal > 1_000_000 ? 0 : 30_000
+
+    const total = subtotal - discount
+    return { subtotal, discount, total }
   }, [cartItems, discountPercent])
 
   const handleApplyDiscount = () => {
@@ -199,10 +199,6 @@ export default function CartPageClient({ cartItems, basePath }: CartPageClientPr
                     <span>-{formatVnd(stats.discount)}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-mono text-[11px] tracking-widest text-white/55 uppercase">
-                  <span>Vận chuyển</span>
-                  <span className="text-white/80">{stats.shipping === 0 ? 'Miễn phí' : formatVnd(stats.shipping)}</span>
-                </div>
               </div>
 
               <div className="flex items-end justify-between border-t border-white/10 pt-4">
@@ -211,10 +207,16 @@ export default function CartPageClient({ cartItems, basePath }: CartPageClientPr
               </div>
 
               <Button
-                onClick={() => router.push(`${basePath}/checkout`)}
+                onClick={() => router.push(`/checkout`)}
                 className="h-12 w-full rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] text-sm font-semibold tracking-wider text-white shadow-[0_0_20px_-5px_rgba(234,88,12,0.5)] transition hover:shadow-[0_0_30px_-5px_rgba(247,147,26,0.6)]"
               >
-                Thanh toán ngay
+                Tạo đơn hàng
+              </Button>
+              <Button
+                onClick={() => router.push(`/products`)}
+                className="h-12 w-full rounded-full bg-linear-to-r from-[#EA580C] to-[#F7931A] text-sm font-semibold tracking-wider text-white shadow-[0_0_20px_-5px_rgba(234,88,12,0.5)] transition hover:shadow-[0_0_30px_-5px_rgba(247,147,26,0.6)]"
+              >
+                Tiếp tục mua sắm
               </Button>
             </CardContent>
           </Card>

@@ -1,10 +1,9 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { API_ROUTES } from '@/constants/apiRouter'
-import type { Order, OrderStatus } from '@/models/order'
+import type { Order } from '@/models/order'
 import type { PaginatedData } from '@/types/response.type'
-import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
 
 export type AdminOrdersQuery = {
   page?: number
@@ -35,28 +34,5 @@ export function useAdminOrders(q: AdminOrdersQuery) {
     queryKey: ['@admin-orders', q.page, q.size, q.status, q.search],
     queryFn: () => fetchOrders(q),
     placeholderData: (prev) => prev,
-  })
-}
-
-export function useUpdateOrderStatus() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: OrderStatus }) => {
-      const res = await fetch(API_ROUTES.ORDERS.PATCH_STATUS(id), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data?.error || 'Cập nhật thất bại')
-      return data
-    },
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['@admin-orders'] })
-      toast.success('Đã cập nhật trạng thái đơn hàng')
-    },
-    onError: (e: Error) => {
-      toast.error(e.message || 'Có lỗi xảy ra')
-    },
   })
 }

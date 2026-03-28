@@ -1,7 +1,15 @@
 import { getSupabaseAdmin } from '@/lib/supabase'
 import type { OrderStatus } from '@/models/order'
 
-const ALLOWED: OrderStatus[] = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled']
+const ALLOWED: OrderStatus[] = [
+  'pending',
+  'confirmed',
+  'ready_for_pickup',
+  'picked_up',
+  'shipping',
+  'delivered',
+  'cancelled',
+]
 
 export async function updateOrderStatus(
   orderId: string,

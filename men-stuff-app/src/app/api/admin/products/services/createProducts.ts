@@ -1,6 +1,7 @@
 import { Product } from '@/models/product'
 import { Data } from '@/types/response.type'
 import { getSupabase } from '@/lib/supabase'
+import { uploadImage } from '@/app/api/services/uploadImage'
 
 export type CreateProductDTO = {
   category_id: string
@@ -11,37 +12,19 @@ export type CreateProductDTO = {
   discount_price: number
   material: string
   is_active: 'active' | 'inactive'
+  origin_image: File
 }
 
 export async function createProduct(body: CreateProductDTO): Promise<Data<Product>> {
   try {
-    const { category_id, name, slug, description, price, discount_price, material, is_active } = body
+    const { category_id, name, slug, description, price, discount_price, material, is_active, origin_image } = body
 
-    if (
-      !category_id ||
-      !name ||
-      !slug ||
-      !description ||
-      price == null ||
-      discount_price == null ||
-      !material ||
-      !is_active
-    ) {
-      return {
-        data: null,
-        error: 'Missing required fields',
-        message: null,
-        status: 400,
-      }
-    }
-
-    if (price < 0 || discount_price < 0) {
-      return {
-        data: null,
-        error: 'Invalid price',
-        message: null,
-        status: 400,
-      }
+    const imageResult = await uploadImage(origin_image)
+    if ('error' in imageResult) return {
+      data: null,
+      error: imageResult.error,
+      message: 'Failed to upload image',
+      status: 500,
     }
 
     const { data, error } = await getSupabase()
@@ -56,7 +39,7 @@ export async function createProduct(body: CreateProductDTO): Promise<Data<Produc
           discount_price,
           material,
           is_active,
-          origin_image: null,
+          origin_image: imageResult.url,
         },
       ])
       .select()

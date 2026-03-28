@@ -29,7 +29,12 @@ function mapProduct(raw: Record<string, unknown>): Product {
   }
 }
 
-export async function listCollectionsWithProducts(): Promise<CollectionWithProducts[]> {
+/**
+ * Danh sách tất cả collection, mỗi phần tử kèm `products`.
+ * `collection_item` chỉ có id + collection_id + product_id — thứ tự hiển thị ổn định theo `id` dòng item.
+ * (Nếu cần đúng thứ tự user chọn, thêm cột `sort_order` trong DB và map lại.)
+ */
+export async function getCollectionsList(): Promise<CollectionWithProducts[]> {
   const admin = getSupabaseAdmin()
   const { data: collections, error: e1 } = await admin
     .from('collection')
@@ -42,14 +47,14 @@ export async function listCollectionsWithProducts(): Promise<CollectionWithProdu
   const ids = collections.map((c: { id: string }) => c.id)
   const { data: items, error: e2 } = await admin
     .from('collection_item')
-    .select('collection_id, sort_order, product_id')
+    .select('id, collection_id, product_id')
     .in('collection_id', ids)
-    .order('sort_order', { ascending: true })
+    .order('id', { ascending: true })
 
   if (e2) throw e2
 
   const productIds = [...new Set((items ?? []).map((r: { product_id: string }) => r.product_id))]
-  let productById = new Map<string, Product>()
+  const productById = new Map<string, Product>()
   if (productIds.length > 0) {
     const { data: prods, error: e3 } = await admin.from('product').select('*').in('id', productIds)
     if (e3) throw e3
@@ -73,54 +78,4 @@ export async function listCollectionsWithProducts(): Promise<CollectionWithProdu
     ...c,
     products: byColl.get(c.id) ?? [],
   }))
-}
-
-export async function insertCollection(body: { name: string; description?: string | null }): Promise<CollectionRow> {
-  const admin = getSupabaseAdmin()
-  const { data, error } = await admin
-    .from('collection')
-    .insert({ name: body.name.trim(), description: body.description?.trim() || null })
-    .select('id, name, description, created_at')
-    .single()
-  if (error) throw error
-  return data as CollectionRow
-}
-
-export async function updateCollection(
-  id: string,
-  body: { name?: string; description?: string | null },
-): Promise<void> {
-  const admin = getSupabaseAdmin()
-  const patch: Record<string, string | null> = {}
-  if (body.name !== undefined) patch.name = body.name.trim()
-  if (body.description !== undefined) patch.description = body.description?.trim() || null
-  const { error } = await admin.from('collection').update(patch).eq('id', id)
-  if (error) throw error
-}
-
-export async function deleteCollection(id: string): Promise<void> {
-  const admin = getSupabaseAdmin()
-  const { error } = await admin.from('collection').delete().eq('id', id)
-  if (error) throw error
-}
-
-export async function replaceCollectionItems(collectionId: string, productIds: string[]): Promise<void> {
-  const admin = getSupabaseAdmin()
-  const { error: dErr } = await admin.from('collection_item').delete().eq('collection_id', collectionId)
-  if (dErr) throw dErr
-  if (productIds.length === 0) return
-  const rows = productIds.map((product_id, sort_order) => ({
-    collection_id: collectionId,
-    product_id,
-    sort_order,
-  }))
-  const { error: iErr } = await admin.from('collection_item').insert(rows)
-  if (iErr) throw iErr
-}
-
-export function isMissingTableError(err: unknown): boolean {
-  const code = (err as { code?: string })?.code
-  if (code === '42P01' || code === 'PGRST205') return true
-  const msg = err instanceof Error ? err.message : String(err)
-  return /does not exist|Could not find the table|relation/i.test(msg)
 }

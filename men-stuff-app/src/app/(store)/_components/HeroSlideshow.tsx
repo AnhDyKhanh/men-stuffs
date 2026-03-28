@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import type { HeroSlide } from '@/constants/placeholderData'
+import Image from 'next/image'
 
 const AUTOPLAY_INTERVAL_MS = 7000
 
@@ -25,7 +26,7 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
 
   return (
     <section className="relative w-full overflow-hidden bg-neutral-200" aria-label="Hero slideshow">
-      <div className="relative aspect-[19/9] max-h-[90vh] w-full md:aspect-[19/9]">
+      <div className="relative aspect-19/9 max-h-[90vh] w-full md:aspect-19/9">
         {slides.map((slide, index) => (
           <Link
             key={slide.id}
@@ -34,7 +35,7 @@ export default function HeroSlideshow({ slides }: HeroSlideshowProps) {
               }`}
             aria-hidden={index !== current}
           >
-            <img src={slide.imageUrl} alt="" className="h-full w-full object-cover" width={1920} height={900} />
+            <Image src={slide.imageUrl} alt="" className="h-full w-full object-cover" width={1920} height={900} />
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-4 text-center text-white">
               <h2 className="max-w-[12em] text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl">{slide.title}</h2>
               {slide.subtitle && <p className="mt-2 text-lg opacity-90 md:text-xl">{slide.subtitle}</p>}

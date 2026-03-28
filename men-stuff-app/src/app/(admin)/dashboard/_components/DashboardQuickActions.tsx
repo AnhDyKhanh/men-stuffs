@@ -1,18 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
+import { useState } from 'react'
 import UploadButton from './UploadButton'
 
 type DashboardQuickActionsProps = {
-  locale: string
   createProductLabel: string
   productsLabel: string
   quickActionsLabel: string
 }
 
 export default function DashboardQuickActions({
-  locale,
   createProductLabel,
   productsLabel,
   quickActionsLabel,

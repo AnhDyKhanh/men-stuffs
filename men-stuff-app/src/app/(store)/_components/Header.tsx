@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import { User } from 'lucide-react'
 import type { NavLink } from '@/constants/placeholderData'
+import ProcessingOrdersBadge from './ProcessingOrdersBadge'
 
 interface HeaderProps {
   logoLabel: string
@@ -66,9 +68,18 @@ export default function Header({
             )}
             <Link
               href={accountHref}
-              className="hidden text-sm font-medium text-white/75 transition hover:text-white sm:inline"
+              className="relative hidden items-center gap-2 text-sm font-medium text-white/75 transition hover:text-white sm:inline-flex"
             >
               {accountLabel}
+              <ProcessingOrdersBadge />
+            </Link>
+            <Link
+              href={accountHref}
+              className="relative flex rounded-lg p-2 text-white/70 transition hover:bg-white/5 hover:text-white sm:hidden"
+              aria-label={accountLabel}
+            >
+              <User className="h-5 w-5" />
+              <ProcessingOrdersBadge />
             </Link>
             <button
               type="button"

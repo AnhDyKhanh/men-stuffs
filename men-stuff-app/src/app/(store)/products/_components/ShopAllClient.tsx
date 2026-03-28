@@ -66,6 +66,7 @@ export default function ShopAllClient() {
     categoryId: categoryId ? [categoryId] : [],
     dateFrom: dateFrom || undefined,
     dateTo: dateTo || undefined,
+    status: 'active'
   })
 
   const products = mapProductsToPlaceholder((response as { data?: Product[] })?.data ?? null, BASE_PATH)
