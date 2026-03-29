@@ -303,7 +303,7 @@ export function OrdersTable({
               onClick={() => void handleAssignStaff()}
               disabled={isAssigningStaff}
             >
-              Thêm người giao hàng
+              Đổi nhân viên phụ trách
             </Button>
           </DialogFooter>
         </DialogContent>
