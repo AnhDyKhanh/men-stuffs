@@ -1,8 +1,7 @@
-import { getSupabase } from '@/lib/supabase'
-import { getCurrentCustomerId } from '../../services/getCustomerAccount'
-import type { PaymentMethod, PaymentStatus } from '@/models/order'
 import { CartStatus } from '@/enum/cart.enum'
-import { randomUUID } from 'crypto'
+import { getSupabase } from '@/lib/supabase'
+import type { PaymentMethod, PaymentStatus } from '@/models/order'
+import { getCurrentCustomerId } from '../../services/getCustomerAccount'
 
 export type CreateOrderItemDTO = {
   product_id: string
@@ -89,7 +88,7 @@ export async function createOrder(body: CreateOrderDTO) {
     }
 
     const { data: staffList, error: staffFetchError } = await supabase
-      .from('staffs')
+      .from('staff')
       .select('id')
       .eq('role', 'staff')
 
