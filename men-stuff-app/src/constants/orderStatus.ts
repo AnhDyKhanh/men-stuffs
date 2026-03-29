@@ -1,4 +1,4 @@
-export const STORE_ORDER_FLOW = ['pending', 'confirmed', 'ready_for_pickup', 'picked_up'] as const
+export const STORE_ORDER_FLOW = ['pending', 'confirmed', 'shipping', 'picked_up'] as const
 
 export const ORDER_STATUS_LABELS: Record<string, string> = {
   pending: 'Đã nhận đơn',

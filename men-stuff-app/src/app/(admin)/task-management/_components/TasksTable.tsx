@@ -29,33 +29,20 @@ function shortId(id: string | null | undefined) {
   return id.length > 8 ? `${id.slice(0, 8)}…` : id
 }
 
-type Dict = {
-  tableTitle: string
-  colTitle: string
-  colType: string
-  colStatus: string
-  colOrder: string
-  colAssignee: string
-  colDescription: string
-  colCreated: string
-  empty: string
-}
-
 type Props = {
   tasks: StaffWorkAdminRow[] | null | undefined
   isLoading: boolean
-  dict: Dict
   onStatusChange: (taskId: string, status: StaffWorkStatus) => void
   updatingId?: string | null
 }
 
-export function TasksTable({ tasks, isLoading, dict, onStatusChange, updatingId }: Props) {
+export function TasksTable({ tasks, isLoading, onStatusChange, updatingId }: Props) {
   const rows = tasks ?? []
 
   return (
     <Card className="border-slate-200 bg-white text-slate-900 shadow-sm">
       <CardHeader className="border-b border-slate-200 pb-4">
-        <CardTitle className="text-lg font-semibold tracking-tight text-slate-900">{dict.tableTitle}</CardTitle>
+        <CardTitle className="text-lg font-semibold tracking-tight text-slate-900">Danh sách công việc</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="relative">
@@ -67,20 +54,20 @@ export function TasksTable({ tasks, isLoading, dict, onStatusChange, updatingId 
             </div>
           )}
           {!isLoading && rows.length === 0 && (
-            <p className="p-8 text-center text-sm text-slate-500">{dict.empty}</p>
+            <p className="p-8 text-center text-sm text-slate-500">Không có việc nào</p>
           )}
           {!isLoading && rows.length > 0 && (
             <div className="w-full overflow-x-auto">
               <Table className="min-w-[1024px]">
                 <TableHeader>
                   <TableRow className="border-slate-200 hover:bg-slate-50">
-                    <TableHead className="text-slate-600">{dict.colTitle}</TableHead>
-                    <TableHead className="text-slate-600">{dict.colType}</TableHead>
-                    <TableHead className="text-slate-600">{dict.colAssignee}</TableHead>
-                    <TableHead className="text-slate-600">{dict.colOrder}</TableHead>
-                    <TableHead className="text-slate-600">{dict.colDescription}</TableHead>
-                    <TableHead className="text-slate-600">{dict.colCreated}</TableHead>
-                    <TableHead className="text-slate-600">{dict.colStatus}</TableHead>
+                    <TableHead className="text-slate-600">Tiêu đề</TableHead>
+                    <TableHead className="text-slate-600">Loại</TableHead>
+                    <TableHead className="text-slate-600">Người giao</TableHead>
+                    <TableHead className="text-slate-600">Mã đơn</TableHead>
+                    <TableHead className="text-slate-600">Mô tả</TableHead>
+                    <TableHead className="text-slate-600">Ngày tạo</TableHead>
+                    <TableHead className="text-slate-600">Trạng thái</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
