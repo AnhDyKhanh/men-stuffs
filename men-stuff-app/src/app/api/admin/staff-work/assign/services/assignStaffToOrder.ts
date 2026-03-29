@@ -1,7 +1,5 @@
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getStaffIdByAccountId } from '@/lib/auth-server'
-import type { StaffWorkStatus } from '@/models/staff-work'
-import { randomUUID } from 'crypto'
 
 const NEXT_ORDER_STATUS = 'shipping'
 
@@ -24,10 +22,10 @@ export async function assignStaffToOrder(
 
   const supabase = getSupabaseAdmin()
 
-  // Lấy thông tin đơn để tạo title/description cho staff_work.
+  // Kiểm tra đơn tồn tại và còn gán được.
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .select('id, order_code, receiver_name, receiver_phone, shipping_address, status')
+    .select('id, status')
     .eq('id', orderId)
     .single()
 
@@ -37,38 +35,28 @@ export async function assignStaffToOrder(
   if (order.status === 'cancelled') return { ok: false, error: 'Đơn đã hủy' }
   if (order.status === 'delivered') return { ok: false, error: 'Đơn đã giao xong' }
 
-  // 1) Cập nhật order status sang shipping.
+  // 1) Cập nhật nhân viên được giao trên bản ghi staff_work đã gắn với đơn (không tạo mới).
+  const { data: updatedRows, error: updateWorkError } = await supabase
+    .from('staff_work')
+    .update({ assigned_to: assignedToStaffId })
+    .eq('related_order_id', orderId)
+    .select('id')
+
+  if (updateWorkError) return { ok: false, error: updateWorkError.message }
+  if (!updatedRows?.length) {
+    return {
+      ok: false,
+      error: 'Chưa có công việc gắn với đơn hàng này. Hãy tạo staff_work trước khi gán nhân viên.',
+    }
+  }
+
+  // 2) Cập nhật order status sang shipping.
   const { error: updateOrderError } = await supabase
     .from('orders')
     .update({ status: NEXT_ORDER_STATUS })
     .eq('id', orderId)
 
   if (updateOrderError) return { ok: false, error: updateOrderError.message }
-
-  // 2) Tạo staff_work.
-  const title = `Giao đơn ${order.order_code ?? String(order.id).slice(0, 8)}`
-  const descriptionParts = [
-    order.receiver_name ?? null,
-    order.receiver_phone ?? null,
-    order.shipping_address ?? null,
-  ].filter(Boolean)
-  const description = descriptionParts.join(' - ') || null
-
-  const defaultTaskStatus: StaffWorkStatus = 'pending'
-
-  const { error: insertError } = await supabase.from('staff_work').insert({
-    // Tránh trường hợp staff_work.id không có default gen_random_uuid trong DB.
-    id: randomUUID(),
-    assigned_to: assignedToStaffId,
-    created_by: createdByStaffId,
-    related_order_id: orderId,
-    title,
-    description,
-    status: defaultTaskStatus,
-    task_type: 'fulfillment',
-  })
-
-  if (insertError) return { ok: false, error: insertError.message }
 
   return { ok: true }
 }

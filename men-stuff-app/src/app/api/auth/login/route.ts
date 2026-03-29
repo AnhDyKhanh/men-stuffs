@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
-import { isStaffByAccountId } from '@/lib/auth-server'
 import bcrypt from 'bcryptjs'
 
 const ACCOUNT_TABLE = 'account'
+const STAFF_TABLE = 'staff'
 const COOKIE_ACCOUNT_ID = 'account_id'
+const COOKIE_STAFF_ID = 'staff_id'
 const COOKIE_ROLE = 'role'
-const COOKIE_MAX_AGE = 86400 // 24h
+const COOKIE_STAFF_ROLE = 'staff_role'
+const COOKIE_MAX_AGE = 86400
 
 export async function POST(request: Request) {
   try {
@@ -34,22 +36,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
-    const isStaff = await isStaffByAccountId(account.id)
-    const role = isStaff ? 'admin' : 'user'
+    const { data: staffData } = await supabase
+      .from(STAFF_TABLE)
+      .select('id, role')
+      .eq('account_id', account.id)
+      .maybeSingle()
 
-    const response = NextResponse.json({ success: true, role }, { status: 200 })
-    response.cookies.set(COOKIE_ACCOUNT_ID, account.id, {
+    const finalRole = staffData ? 'admin' : 'user'
+    const response = NextResponse.json({ success: true, role: finalRole }, { status: 200 })
+
+    const cookieOptions = {
       httpOnly: true,
       path: '/',
       maxAge: COOKIE_MAX_AGE,
-      sameSite: 'lax',
-    })
-    response.cookies.set(COOKIE_ROLE, role, {
-      httpOnly: true,
-      path: '/',
-      maxAge: COOKIE_MAX_AGE,
-      sameSite: 'lax',
-    })
+      sameSite: 'lax' as const,
+    }
+
+    response.cookies.set(COOKIE_ACCOUNT_ID, account.id, cookieOptions)
+    response.cookies.set(COOKIE_ROLE, finalRole, cookieOptions)
+
+    if (staffData) {
+      response.cookies.set(COOKIE_STAFF_ID, staffData.id, cookieOptions)
+      response.cookies.set(COOKIE_STAFF_ROLE, staffData.role, cookieOptions)
+    }
+
+    console.log('response.cookies', response.cookies)
 
     return response
   } catch {

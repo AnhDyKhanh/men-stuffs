@@ -280,7 +280,7 @@ export function OrdersTable({
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-slate-800">Chọn nhân viên</p>
+                <p className="text-sm font-semibold text-slate-800">Đổi nhân viên phụ trách</p>
                 <Select value={selectedStaffId} onValueChange={setSelectedStaffId} disabled={isAssigningStaff}>
                   <SelectTrigger className="border-slate-300 bg-white text-slate-900">
                     <SelectValue placeholder="Chọn staff..." />
@@ -303,7 +303,7 @@ export function OrdersTable({
               onClick={() => void handleAssignStaff()}
               disabled={isAssigningStaff}
             >
-              Thêm người giao hàng
+              Đổi nhân viên phụ trách
             </Button>
           </DialogFooter>
         </DialogContent>
