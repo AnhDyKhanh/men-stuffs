@@ -110,17 +110,6 @@ export function TasksPageClient() {
       <TasksTable
         tasks={tasks}
         isLoading={isLoading}
-        dict={{
-          tableTitle: dict.tableTitle,
-          colTitle: dict.colTitle,
-          colType: dict.colType,
-          colStatus: dict.colStatus,
-          colOrder: dict.colOrder,
-          colAssignee: dict.colAssignee,
-          colDescription: dict.colDescription,
-          colCreated: dict.colCreated,
-          empty: dict.empty,
-        }}
         onStatusChange={onTaskStatusChange}
         updatingId={updatingId}
       />

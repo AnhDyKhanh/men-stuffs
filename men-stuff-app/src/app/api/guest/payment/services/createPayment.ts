@@ -1,7 +1,7 @@
-import { getSupabase } from '@/lib/supabase'
-import { getCurrentCustomerId } from '../../services/getCustomerAccount'
-import type { PaymentMethod, PaymentStatus } from '@/models/order'
 import { CartStatus } from '@/enum/cart.enum'
+import { getSupabase } from '@/lib/supabase'
+import type { PaymentMethod, PaymentStatus } from '@/models/order'
+import { getCurrentCustomerId } from '../../services/getCustomerAccount'
 
 export type CreateOrderItemDTO = {
   product_id: string
@@ -51,7 +51,6 @@ export async function createOrder(body: CreateOrderDTO) {
       return { data: null, error: 'Unauthorized', status: 401 }
     }
 
-    // Bước 1: Tạo Order trước
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -74,7 +73,6 @@ export async function createOrder(body: CreateOrderDTO) {
     if (orderError) throw orderError
     const orderId = orderData?.id
 
-    // Bước 2: Chuẩn bị dữ liệu items
     const orderItems = items.map((item) => ({
       order_id: orderId,
       product_id: item.product_id,
@@ -82,24 +80,63 @@ export async function createOrder(body: CreateOrderDTO) {
       price: item.price,
     }))
 
-    // Bước 3: Chèn items vào bảng order_item
     const { error: itemsError } = await supabase.from('order_item').insert(orderItems)
 
-    // Bước 4: Xử lý "Bẫy lỗi" (Manual Rollback)
-    // Nếu chèn items lỗi, phải xóa cái Order vừa tạo để tránh đơn hàng rác
     if (itemsError) {
       await supabase.from('orders').delete().eq('id', orderId)
       throw itemsError
     }
 
-    // Bước 5: Set status của cart tương ứng là inactive
+    const { data: staffList, error: staffFetchError } = await supabase
+      .from('staff')
+      .select('id')
+      .eq('role', 'staff')
+
+    if (staffFetchError) {
+      await supabase.from('order_item').delete().eq('order_id', orderId)
+      await supabase.from('orders').delete().eq('id', orderId)
+      throw staffFetchError
+    }
+
+    if (!staffList || staffList.length === 0) {
+      return {
+        data: { id: orderId, order_code: orderData?.order_code ?? null },
+        error: 'Không có staff để giao đơn',
+        status: 200,
+      }
+    }
+
+    // if (staffList && staffList.length > 0) {
+    const randomIndex = Math.floor(Math.random() * staffList.length)
+    const assignedStaffId = staffList[randomIndex].id
+
+    const taskTitle = `Giao đơn ${orderData.order_code ?? String(orderId).slice(0, 8)}`
+    const descriptionParts = [receiver_name, receiver_phone, shipping_address].filter(Boolean)
+    const taskDescription = descriptionParts.join(' - ')
+
+    const { error: staffWorkError } = await supabase.from('staff_work').insert({
+      assigned_to: assignedStaffId,
+      related_order_id: orderId,
+      title: taskTitle,
+      description: taskDescription,
+      status: 'pending',
+      task_type: 'fulfillment',
+    })
+
+    if (staffWorkError) {
+      await supabase.from('order_item').delete().eq('order_id', orderId)
+      await supabase.from('orders').delete().eq('id', orderId)
+      throw staffWorkError
+    }
+    // }
+
     const { error: cartError } = await supabase
       .from('cart')
       .update({ status: CartStatus.INACTIVE })
       .eq('id', cart_id)
 
     if (cartError) {
-      // Rollback order và order_items
+      await supabase.from('staff_work').delete().eq('related_order_id', orderId)
       await supabase.from('order_item').delete().eq('order_id', orderId)
       await supabase.from('orders').delete().eq('id', orderId)
       throw cartError

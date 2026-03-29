@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getStaffIdByAccountId } from '@/lib/auth-server'
+import { STAFF_ROLE } from '@/constants/staffRole'
 
 /**
  * GET /api/admin/staff
@@ -16,10 +17,12 @@ export async function GET(_request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // thêm điều kiện role là staff
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('staff')
     .select('id, full_name, phone, role')
+    .eq('role', STAFF_ROLE.STAFF)
     .order('full_name', { ascending: true })
 
   if (error) {

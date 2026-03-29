@@ -1,16 +1,22 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useLogout } from '@/hooks/useLogout'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 
 export default function LogoutButton() {
   const router = useRouter()
   const { mutate: logout } = useLogout()
+  const queryClient = useQueryClient()
 
-  const handleLogout = async () => {
-    logout()
-    router.push('/login')
-    router.refresh()
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        queryClient.clear()
+        router.push('/login')
+        router.refresh()
+      },
+    })
   }
 
   return (

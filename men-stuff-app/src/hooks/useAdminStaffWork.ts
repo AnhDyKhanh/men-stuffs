@@ -56,7 +56,7 @@ export function useUpdateStaffWorkStatus() {
       return data
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['@admin-staff-work'] })
+      qc.invalidateQueries({ queryKey: ['@admin-staff-work'] })
       toast.success('Đã cập nhật trạng thái công việc')
     },
     onError: (e: Error) => {
